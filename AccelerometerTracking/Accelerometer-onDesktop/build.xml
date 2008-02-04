@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project default="host-run" basedir="." name="Telemetry-onDesktop">
+
+    <property name="user.properties.file" value="build.properties"/>
+    <property file="${user.home}/.sunspot.properties"/>
+    <import file="${sunspot.home}/build.xml"/>
+
+    <property name="doc.dir" value="doc"/>
+
+    <target name="-post-host-compile">
+        <copy todir="${build.dir}">
+            <fileset dir="${src.dir}">
+                <include name="**/*.gif"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="base" depends="selectbasestation,run" />
+
+    <target name="jar" depends="init">
+        <jar destfile="${build.dir}/telemetry.jar"> 
+            <fileset dir="${build.dir}" excludes="**.jar"/>            
+                <manifest>
+                    <attribute name="Main-Class" value="org.sunspotworld.demo.TelemetryFrame" /> 
+                </manifest>
+        </jar>
+    </target>
+    
+    <target name="javadoc">
+        <delete dir="${doc.dir}"/>
+        <mkdir dir="${doc.dir}"/>
+        <javadoc destdir="${doc.dir}"
+	         author="true"
+		 sourcepath="src" 
+		 overview="overview.html"
+		 packagenames="org.sunspotworld.demo"
+		 windowtitle="Sun SPOT Telemetry Demo -- Host side v1.0"
+		 doctitle="Sun SPOT Telemetry Demo -- Host side (Version 1.0)" >
+	    <classpath path="${sunspot.lib}/spotlib_host.jar:${sunspot.lib}/spotlib_common.jar:${sunspot.lib}/squawk_rt.jar:${sunspot.lib}/RXTXcomm.jar" />
+            <header><![CDATA[<b>Sun SPOT Telemetry Demo -- Host side<br>v1.0</b>]]></header>
+            <bottom><![CDATA[<center><font size="-1"><i>Copyright &#169; 2006 Sun Microsystems, Inc. All Rights Reserved.</i></font></center>]]></bottom>
+        </javadoc>
+    </target>
+
+</project>
