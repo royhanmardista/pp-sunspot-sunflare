@@ -317,6 +317,7 @@ public class AccelerometerListener extends Thread {
      */
     private void receive (Datagram dg, boolean twoG) {
         boolean skipZeros = (index == 0);
+        skipZeros = false;
         int scale = twoG ? 0 : 1;
         double gValue = twoG ? SENSITIVITY_2G : SENSITIVITY_6G;
         try {
@@ -333,7 +334,7 @@ public class AccelerometerListener extends Thread {
                 int yValue = dg.readShort() - zeroGoffset[scale][1];
                 int zValue = dg.readShort() - zeroGoffset[scale][2];
 
-                if (skipZeros &&                    // Ignore leading values until they become non-zero
+/*                if (skipZeros &&                    // Ignore leading values until they become non-zero
                     ((Math.abs(xValue) > 20) || 
                      (Math.abs(yValue) > 20) || 
                      (Math.abs(zValue) > 20))) {
@@ -342,7 +343,7 @@ public class AccelerometerListener extends Thread {
                     timeStamp -= sampleTime;
                     sampleTime = 0;
                 }
-
+*/
 		double x  = xValue / gValue;        // Convert to G's
 		double y  = yValue / gValue;
 		double z  = zValue / gValue;

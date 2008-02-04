@@ -34,9 +34,11 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
-import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
+import javax.media.j3d.Transform3D;
+import javax.media.j3d.TransformGroup;
+import javax.vecmath.Vector3d;
 
 /**
  * A simple class to store 1 minute of telemetry data, display it on the screen, 
@@ -111,14 +113,31 @@ public class GraphView extends JPanel {
     private int smoothIndex = -1;
     private boolean fileData = false;
     
-    private double[] vel;
-    private double[] dist;
+    private double[] velx;
+    private double[] vely;
+    private double[] velz;
 
+    private double[] distx;
+    private double[] disty;
+    private double[] distz;
+
+    /** For 3d visualization */
+    private TransformGroup transformGroup = null;
+    
     /** Creates a new instance of GraphPanel */
     public GraphView() {
         init();
     }
 
+    /**
+     * Specify the transform group for a 3d visualization
+     *
+     * @param tg the transformgroup parenting the 3d object
+     */
+    public void setTransformGroup (TransformGroup tg) {
+        transformGroup = tg;
+    }
+    
     /**
      * Specify the panel displaying the Y-axis.
      *
@@ -206,8 +225,15 @@ public class GraphView extends JPanel {
         yDataZ = new double[xMax - xMin];
         yGraphValsZ = new int[xMax - xMin];
 
-        vel = new double[xMax - xMin];
-        dist = new double[xMax - xMin];
+        velx = new double[xMax - xMin];
+        vely = new double[xMax - xMin];
+        velz = new double[xMax - xMin];
+        distx = new double[xMax - xMin];
+        disty = new double[xMax - xMin];
+        distz = new double[xMax - xMin];
+        
+        velx[0] = vely[0] = velz[0] = 0;
+        distx[0] = disty[0] = distz[0] = 0;
 
         // Fill in initial values
         for (int i = 0; i < xVals.length; i++) {
@@ -380,6 +406,29 @@ public class GraphView extends JPanel {
             port.setViewPosition(new Point(viewRect.x + viewRect.width / 2, 0));
             viewRect = port.getViewRect();
         }
+        
+        if(index!=0) {
+            double t = (timeMS[index] - timeMS[index-1]) / 1000.0;
+            velx[index] = velx[index-1] + 32 * t * x; //(orgY - yGraphValsX[index]) / scaleY;
+            vely[index] = vely[index-1] + 32 * t * y; //(orgY - yGraphValsY[index]) / scaleY;
+            velz[index] = velz[index-1] + 32 * t * z; //(orgY - yGraphValsZ[index]) / scaleY;
+            
+            distx[index] = distx[index-1] + t * (velx[index-1] + velx[index]) / 2;
+            disty[index] = disty[index-1] + t * (vely[index-1] + vely[index]) / 2;
+            distz[index] = distz[index-1] + t * (velz[index-1] + velz[index]) / 2;
+
+            if ((index % 100 == 0) || (index == (indexMax - 1))) {
+                System.out.print(timeMS[index] + " vx = " + velx[index] + " dx = " + distx[index]);
+                System.out.print(timeMS[index] + " vy = " + vely[index] + " dy = " + disty[index]);
+                System.out.print(timeMS[index] + " vz = " + velz[index] + " dz = " + distz[index] + "\n");
+            }
+            if(transformGroup != null) {
+                Transform3D newTransform = new Transform3D();
+                newTransform.setTranslation(new Vector3d(x,y,z));
+                transformGroup.setTransform(newTransform);
+            }
+
+        }
     }
     
     /**
@@ -470,7 +519,7 @@ public class GraphView extends JPanel {
      * Code below assumes distance travelled is along the Y-axis.
      *
      * Note: this code is not currently called. It is just provided as an example.
-     */
+     
     private void calculatePositionsViaIntegration() {
         System.out.println("\n\nPosition -- filter window = " + (filterWidth+1));
         dist[0] = 0;
@@ -486,7 +535,7 @@ public class GraphView extends JPanel {
             }
         }
     }
-    
+    */
 
     /* Routines to connect with GUI components */
     

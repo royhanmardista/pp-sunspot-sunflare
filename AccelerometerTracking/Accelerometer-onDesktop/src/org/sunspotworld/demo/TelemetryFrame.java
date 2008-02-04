@@ -1,24 +1,24 @@
 /*
-* Copyright (c) 2006 Sun Microsystems, Inc.
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to 
-* deal in the Software without restriction, including without limitation the 
-* rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-* sell copies of the Software, and to permit persons to whom the Software is 
-* furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in 
-* all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
- **/       
+ * Copyright (c) 2006 Sun Microsystems, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ **/
 package org.sunspotworld.demo;
 
 /*
@@ -28,18 +28,31 @@ package org.sunspotworld.demo;
  * from a remote SPOT. Provides the user interface to interact with the SPOT
  * and to control the telemetry data collected.
  *
- * author: Ron Goldman  
- * date: May 2, 2006 
+ * author: Ron Goldman
+ * date: May 2, 2006
  */
 
+import com.sun.j3d.utils.behaviors.mouse.MouseRotate;
+import com.sun.j3d.utils.geometry.ColorCube;
+import com.sun.j3d.utils.geometry.Sphere;
+import com.sun.j3d.utils.geometry.Text2D;
+import com.sun.j3d.utils.universe.SimpleUniverse;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import java.util.*;
 import java.text.*;
+import javax.media.j3d.BoundingSphere;
+import javax.media.j3d.BranchGroup;
+import javax.media.j3d.Canvas3D;
+import javax.media.j3d.DirectionalLight;
+import javax.media.j3d.PolygonAttributes;
+import javax.media.j3d.Transform3D;
+import javax.media.j3d.TransformGroup;
+import javax.vecmath.Color3f;
+import javax.vecmath.Vector3f;
 
 /**
  * GUI creating code to make a window to display accelerometer data gathered
@@ -49,14 +62,14 @@ import java.text.*;
  * @author Ron Goldman
  */
 public class TelemetryFrame extends JFrame implements Printable {
-
+    
     private static String version = "1.0";
     private static String versionDate = "June 8, 2006";
     private static int numWindows = 0;
     private static AccelerometerListener listener = null;
     private static final Font footerFont = new Font("Serif", Font.PLAIN, 9);
     private static final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy  HH:mm z");
-
+    
     private static Vector windows = new Vector();
     private static ImageIcon aboutIcon = null;
     
@@ -66,14 +79,16 @@ public class TelemetryFrame extends JFrame implements Printable {
     private File file = null;
     private boolean fixedData = false;
     private boolean clearedData = true;
-
+    
     private PrinterJob printJob = PrinterJob.getPrinterJob();
     private PageFormat pageFormat = printJob.defaultPage();
-
+    
+    private TransformGroup transformGroup = null;
+    
     /**
      * Creates a new TelemetryFrame window.
      */
-    public TelemetryFrame () {
+    public TelemetryFrame() {
         init(null);
     }
     
@@ -82,20 +97,24 @@ public class TelemetryFrame extends JFrame implements Printable {
      *
      * @param file the file to read/write accelerometer data from/to
      */
-    public TelemetryFrame (File file) {
+    public TelemetryFrame(File file) {
         init(file);
     }
-
+    
     /**
      * Initialize the new TelemetryFrame
      */
-    private void init (File file) {
+    private void init(File file) {
         if (listener == null) {
             listener = new AccelerometerListener();         // only need one
             listener.start();
             aboutIcon = new ImageIcon(getClass().getResource("/org/sunspotworld/demo/racecar.gif"));
         }
         initComponents();
+        
+        // Now set up 3d canvas
+        create3dCanvas();
+        
         this.file = file;
         if (file != null) {
             this.setTitle(file.getName());
@@ -110,12 +129,96 @@ public class TelemetryFrame extends JFrame implements Printable {
         pageFormat.setOrientation(PageFormat.LANDSCAPE);
     }
     
+    private void create3dCanvas() {
+        GraphicsConfiguration config = SimpleUniverse.getPreferredConfiguration();
+        Canvas3D canvas3D = new Canvas3D( config );
+        SimpleUniverse simpleU = new SimpleUniverse(canvas3D);
+        BranchGroup scene = createSceneGraph();
+        simpleU.getViewingPlatform().setNominalViewingTransform();       // This will move the ViewPlatform back a bit so the
+        simpleU.addBranchGraph(scene);
+        
+        simulator.setLayout( new BorderLayout() );
+        simulator.setOpaque( false );
+        simulator.add("Center", canvas3D);   // <-- HERE IT IS - tada! j3d in swing
+        
+    }
+    
+    // make a scene with a cube and a label
+    private BranchGroup createSceneGraph() {
+        
+        BranchGroup objRoot = new BranchGroup();
+        TransformGroup root_group = new TransformGroup(  );
+        transformGroup = new TransformGroup();
+
+        root_group.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE); // allow the mouse behavior to rotate the scene
+        root_group.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+
+        transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE); // all object to move
+        transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+
+        objRoot.addChild( root_group );  // this is the local origin  - everyone hangs off this - moving this move every one
+        
+        root_group.addChild(transformGroup);
+        
+        transformGroup.addChild( new ColorCube(0.2) );  // add a color cube
+        transformGroup.addChild( new Label3D( 0.2f, 0.2f, 0.0f, "SunSPOT") ); // add a label to the scene
+                
+        MouseRotate mouseRotate = new MouseRotate( root_group );  // add the mouse behavior
+        mouseRotate.setSchedulingBounds( new BoundingSphere() );
+        objRoot.addChild( mouseRotate);
+        return objRoot;
+    }
+    
+    /**
+     * Title: Label3D
+     * Description: Places a Text2D in a scene, allows the text to be seen from the back
+     * Copyright:    Copyright (c) 2001
+     * Company:      Meissner Software Development, LLC
+     * @author Karl Meissner
+     * @version 1.0
+     */
+    
+    class Label3D
+            extends TransformGroup {
+        
+        public Label3D( float x, float y, float z, String msg ) {
+            super();
+            
+            // place it in the scene graph
+            Transform3D offset = new Transform3D();
+            offset.setTranslation( new Vector3f( x, y, z ));
+            this.setTransform( offset );
+            
+            // face it in the scene graph
+            Transform3D rotation = new Transform3D();
+            TransformGroup rotation_group = new TransformGroup( rotation );
+            this.addChild( rotation_group );
+            
+            // make a texture mapped polygon
+            Text2D msg_poly = new Text2D( msg, new
+                    Color3f( 1.0f, 1.0f, 1.0f),
+                    "Helvetica", 18, Font.PLAIN );
+            
+            
+            // set it to draw both the front and back of the poly
+            PolygonAttributes msg_attributes = new PolygonAttributes();
+            msg_attributes.setCullFace( PolygonAttributes.CULL_NONE );
+            msg_attributes.setBackFaceNormalFlip( true );
+            msg_poly.getAppearance().setPolygonAttributes( msg_attributes );
+            
+            // attach it
+            rotation_group.addChild( msg_poly );
+        }
+        
+    }
+    
     /**
      * Set the GraphView to display accelerometer values for this window.
      */
-    private void setGraphView (GraphView gv) {
+    private void setGraphView(GraphView gv) {
         graphView = gv;
         graphViewScrollPane.setViewportView(gv);
+        gv.setTransformGroup(transformGroup);
         gv.setViewport(graphViewScrollPane.getViewport());
         gv.setMaxGLabel(maxGLabel);
         Integer fieldWidth = (Integer)filterWidthField.getValue();
@@ -144,14 +247,14 @@ public class TelemetryFrame extends JFrame implements Printable {
             sixGRadioButton.setEnabled(false);
         }
     }
-
+    
     /**
      * Check that new window has a unique name.
      *
      * @param str proposed new window name
      * @return true if current name is unique, false if it is the same as another window
      */
-    private static boolean checkTitle (String str) {
+    private static boolean checkTitle(String str) {
         boolean results = true;
         for (Enumeration e = windows.elements() ; e.hasMoreElements() ;) {
             TelemetryFrame fr = (TelemetryFrame)e.nextElement();
@@ -162,11 +265,11 @@ public class TelemetryFrame extends JFrame implements Printable {
         }
         return results;
     }
-
+    
     /**
      * Connect this window with a graph display and a file.
      */
-    private static TelemetryFrame frameGraph (File file, GraphView graphView) {
+    private static TelemetryFrame frameGraph(File file, GraphView graphView) {
         TelemetryFrame telemetryFrame = new TelemetryFrame(file);
         telemetryFrame.setGraphView(graphView);
         telemetryFrame.setVisible(true);
@@ -186,15 +289,15 @@ public class TelemetryFrame extends JFrame implements Printable {
         numWindows++;
         return telemetryFrame;
     }
-
+    
     /**
-     * Display the current connection status to a remote SPOT. 
+     * Display the current connection status to a remote SPOT.
      * Called by the AccelerometerListener whenever the radio connection status changes.
      *
      * @param conn true if now connected to a remote SPOT
-     * @param msg the String message to display, includes the 
+     * @param msg the String message to display, includes the
      */
-    public void setConnectionStatus (boolean conn, String msg) {
+    public void setConnectionStatus(boolean conn, String msg) {
         connStatusLabel.setText(msg);
         pingButton.setEnabled(conn);
         reconnButton.setEnabled(conn);
@@ -215,7 +318,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     /**
      * Select a (new) file to save the accelerometer data in.
      */
-    private void doSaveAs () {
+    private void doSaveAs() {
         JFileChooser chooser;
         if (file != null) {
             chooser = new JFileChooser(file.getParent());
@@ -226,10 +329,10 @@ public class TelemetryFrame extends JFrame implements Printable {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = chooser.getSelectedFile();
             if (file.exists()) {
-                int n = JOptionPane.showConfirmDialog(this, "The file: " + file.getName() + 
-                                                      " already exists. Do you wish to replace it?",
-                                                      "File Already Exists",
-                                                      JOptionPane.YES_NO_OPTION);
+                int n = JOptionPane.showConfirmDialog(this, "The file: " + file.getName() +
+                        " already exists. Do you wish to replace it?",
+                        "File Already Exists",
+                        JOptionPane.YES_NO_OPTION);
                 if (n != JOptionPane.YES_OPTION) {
                     return;                             // cancel the Save As command
                 }
@@ -242,7 +345,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     /**
      * Save the current accelerometer data to the file associated with this window.
      */
-    private void doSave () {
+    private void doSave() {
         if (graphView.writeData(file)) {
             saveMenuItem.setEnabled(false);
         }
@@ -287,7 +390,7 @@ public class TelemetryFrame extends JFrame implements Printable {
             g2d.scale(xscale, yscale);
             axisView.paint(g2d);
             axisView.setDoubleBuffered(true);
-
+            
             // now have graph view print the next page
             // note: while the values to translate & setClip work they seem wrong. Why 2 * axisW ???
             graphView.setDoubleBuffered(false);
@@ -295,11 +398,11 @@ public class TelemetryFrame extends JFrame implements Printable {
             g2d.setClip((int)((w * pageIndex) / xscale + 2), 0, (int)(w / xscale), (int)(h / yscale));
             graphView.paint(g2d);
             graphView.setDoubleBuffered(true);
-                    
+            
             return(PAGE_EXISTS);
         }
     }
-
+    
     /**
      * Routine to bring the user selected window to the front.
      *
@@ -317,8 +420,8 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         }
     }
-
-
+    
+    
     /**
      * Cleanly exit.
      */
@@ -328,7 +431,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     }
     
     // GUI code generated using NetBeans GUI editor:
-
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -389,6 +492,7 @@ public class TelemetryFrame extends JFrame implements Printable {
         pingButton = new javax.swing.JButton();
         reconnButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        simulator = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
@@ -413,11 +517,11 @@ public class TelemetryFrame extends JFrame implements Printable {
         setTitle("Sun SPOTs Telemetry Demo");
         setName("spotTelemetry");
         addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosed(java.awt.event.WindowEvent evt) {
-                formWindowClosed(evt);
-            }
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
+            }
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
             }
             public void windowDeactivated(java.awt.event.WindowEvent evt) {
                 formWindowDeactivated(evt);
@@ -931,6 +1035,10 @@ public class TelemetryFrame extends JFrame implements Printable {
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
+        simulator.setMinimumSize(new java.awt.Dimension(10, 200));
+        simulator.setPreferredSize(new java.awt.Dimension(600, 400));
+        getContentPane().add(simulator, java.awt.BorderLayout.EAST);
+
         fileMenu.setText("File");
         aboutMenuItem.setText("About...");
         aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1034,12 +1142,12 @@ public class TelemetryFrame extends JFrame implements Printable {
 
         windowMenu.setText("Windows");
         windowMenu.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                windowMenuMenuSelected(evt);
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                windowMenuMenuSelected(evt);
             }
         });
 
@@ -1049,7 +1157,7 @@ public class TelemetryFrame extends JFrame implements Printable {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
         JOptionPane.showMessageDialog(this,
                 "Sun SPOTs Telemetry Demo (Version " + version + ")\n\nA demo showing how to collect data from a SPOT and \nsend it to a desktop application to be displayed.\n\nAuthor: Ron Goldman, Sun Labs\nDate: " + versionDate,
@@ -1057,16 +1165,16 @@ public class TelemetryFrame extends JFrame implements Printable {
                 JOptionPane.INFORMATION_MESSAGE,
                 aboutIcon);
     }//GEN-LAST:event_aboutMenuItemActionPerformed
-
+    
     private void pagesetupMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pagesetupMenuItemActionPerformed
         // Ask user for page format (e.g., portrait/landscape)
         pageFormat = printJob.pageDialog(pageFormat);
     }//GEN-LAST:event_pagesetupMenuItemActionPerformed
-
+    
     private void reconnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reconnButtonActionPerformed
         listener.reconnect();
     }//GEN-LAST:event_reconnButtonActionPerformed
-
+    
     private void windowMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_windowMenuMenuSelected
         windowMenu.removeAll();
         for (Enumeration e = windows.elements() ; e.hasMoreElements() ;) {
@@ -1078,23 +1186,23 @@ public class TelemetryFrame extends JFrame implements Printable {
             });
         }
     }//GEN-LAST:event_windowMenuMenuSelected
-
+    
     private void xZoomButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xZoomButton4ActionPerformed
         graphView.setZoomX(8);
     }//GEN-LAST:event_xZoomButton4ActionPerformed
-
+    
     private void xZoomButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xZoomButton3ActionPerformed
         graphView.setZoomX(4);
     }//GEN-LAST:event_xZoomButton3ActionPerformed
-
+    
     private void xZoomButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xZoomButton2ActionPerformed
         graphView.setZoomX(2);
     }//GEN-LAST:event_xZoomButton2ActionPerformed
-
+    
     private void xZoomButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xZoomButton1ActionPerformed
         graphView.setZoomX(1);
     }//GEN-LAST:event_xZoomButton1ActionPerformed
-
+    
     private void filterWidthFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_filterWidthFieldPropertyChange
         Integer fieldWidth = (Integer)filterWidthField.getValue();
         int w = fieldWidth.intValue();
@@ -1109,7 +1217,7 @@ public class TelemetryFrame extends JFrame implements Printable {
             graphView.setFilterWidth(w - 1);
         }
     }//GEN-LAST:event_filterWidthFieldPropertyChange
-
+    
     private void connStatusLabelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_connStatusLabelPropertyChange
         if (connStatusLabel.getText().startsWith("Connected")) {
             if (listener.is2GScale()) {
@@ -1119,7 +1227,7 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         }
     }//GEN-LAST:event_connStatusLabelPropertyChange
-
+    
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         listener.setGUI(this);
         if (clearedData) {
@@ -1131,52 +1239,52 @@ public class TelemetryFrame extends JFrame implements Printable {
             sixGRadioButton.setSelected(true);
         }
     }//GEN-LAST:event_formWindowActivated
-
+    
     private void formWindowDeactivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeactivated
         listener.setGUI(null);
     }//GEN-LAST:event_formWindowDeactivated
-
+    
     private void triangleSmoothingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_triangleSmoothingButtonActionPerformed
         graphView.setSmooth(true);
         graphView.setFiltertype(false);
     }//GEN-LAST:event_triangleSmoothingButtonActionPerformed
-
+    
     private void boxcarSmoothingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boxcarSmoothingButtonActionPerformed
         graphView.setSmooth(true);
         graphView.setFiltertype(true);
     }//GEN-LAST:event_boxcarSmoothingButtonActionPerformed
-
+    
     private void noSmoothingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noSmoothingButtonActionPerformed
         graphView.setSmooth(false);
     }//GEN-LAST:event_noSmoothingButtonActionPerformed
-
+    
     private void yZoomButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yZoomButton4ActionPerformed
         graphView.setZoomY(8);
     }//GEN-LAST:event_yZoomButton4ActionPerformed
-
+    
     private void yZoomButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yZoomButton3ActionPerformed
         graphView.setZoomY(4);
     }//GEN-LAST:event_yZoomButton3ActionPerformed
-
+    
     private void yZoomButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yZoomButton2ActionPerformed
         graphView.setZoomY(2);
     }//GEN-LAST:event_yZoomButton2ActionPerformed
-
+    
     private void yZoomButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yZoomButton1ActionPerformed
         graphView.setZoomY(1);
     }//GEN-LAST:event_yZoomButton1ActionPerformed
-
+    
     private void quitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitMenuItemActionPerformed
         doQuit();
     }//GEN-LAST:event_quitMenuItemActionPerformed
-
+    
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         windows.remove(this);
         if (--numWindows <= 0) {
             doQuit();
         }
     }//GEN-LAST:event_formWindowClosed
-
+    
     private void printMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printMenuItemActionPerformed
         printJob.setPrintable(this, pageFormat);
         if (printJob.printDialog()) {
@@ -1190,11 +1298,11 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         }
     }//GEN-LAST:event_printMenuItemActionPerformed
-
+    
     private void saveAsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsMenuItemActionPerformed
         doSaveAs();
     }//GEN-LAST:event_saveAsMenuItemActionPerformed
-
+    
     private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuItemActionPerformed
         if (file == null) {
             doSaveAs();
@@ -1202,12 +1310,12 @@ public class TelemetryFrame extends JFrame implements Printable {
             doSave();
         }
     }//GEN-LAST:event_saveMenuItemActionPerformed
-
+    
     private void closeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeMenuItemActionPerformed
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeMenuItemActionPerformed
-
+    
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
         JFileChooser chooser;
         if (file != null) {
@@ -1224,43 +1332,43 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         }
     }//GEN-LAST:event_openMenuItemActionPerformed
-
+    
     private void newMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newMenuItemActionPerformed
         frameGraph(null, new GraphView());
     }//GEN-LAST:event_newMenuItemActionPerformed
-
+    
     private void xCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xCheckBoxActionPerformed
         graphView.setShowX(xCheckBox.isSelected());
     }//GEN-LAST:event_xCheckBoxActionPerformed
-
+    
     private void yCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yCheckBoxActionPerformed
         graphView.setShowY(yCheckBox.isSelected());
     }//GEN-LAST:event_yCheckBoxActionPerformed
-
+    
     private void zCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zCheckBoxActionPerformed
         graphView.setShowZ(zCheckBox.isSelected());
     }//GEN-LAST:event_zCheckBoxActionPerformed
-
+    
     private void gCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gCheckBoxActionPerformed
         graphView.setShowG(gCheckBox.isSelected());
     }//GEN-LAST:event_gCheckBoxActionPerformed
-
+    
     private void pingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pingButtonActionPerformed
         listener.doPing();
     }//GEN-LAST:event_pingButtonActionPerformed
-
+    
     private void sixGRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sixGRadioButtonActionPerformed
         listener.doSetScale(6);
     }//GEN-LAST:event_sixGRadioButtonActionPerformed
-
+    
     private void twoGRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_twoGRadioButtonActionPerformed
         listener.doSetScale(2);
     }//GEN-LAST:event_twoGRadioButtonActionPerformed
-
+    
     private void calibrateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calibrateButtonActionPerformed
         listener.doCalibrate();
     }//GEN-LAST:event_calibrateButtonActionPerformed
-
+    
     private void sendDataButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendDataButtonActionPerformed
         sendData = !sendData;
         listener.doSendData(sendData, graphView);
@@ -1268,20 +1376,20 @@ public class TelemetryFrame extends JFrame implements Printable {
         saveMenuItem.setEnabled(true);
         clearedData = false;
     }//GEN-LAST:event_sendDataButtonActionPerformed
-
+    
     private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         if (saveMenuItem.isEnabled()) {
-            int n = JOptionPane.showConfirmDialog(this, "The current data has not been saved to a file. " + 
-                                                  "Do you wish to delete it?",
-                                                  "Data Not Saved",
-                                                  JOptionPane.YES_NO_OPTION);
+            int n = JOptionPane.showConfirmDialog(this, "The current data has not been saved to a file. " +
+                    "Do you wish to delete it?",
+                    "Data Not Saved",
+                    JOptionPane.YES_NO_OPTION);
             if (n != JOptionPane.YES_OPTION) {
                 return;                             // cancel the Clear command
             }
         }
-
+        
         if (sendData) {                             // if currently sending data, then stop
-            listener.doSendData(false, graphView);            
+            listener.doSendData(false, graphView);
         }
         graphView.clearGraph();
         listener.clear();
@@ -1350,6 +1458,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JButton sendDataButton;
+    private javax.swing.JPanel simulator;
     private javax.swing.JRadioButton sixGRadioButton;
     private javax.swing.ButtonGroup smoothGroup;
     private javax.swing.JPanel smoothPanel;
