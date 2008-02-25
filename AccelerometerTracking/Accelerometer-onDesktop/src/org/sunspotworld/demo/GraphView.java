@@ -34,6 +34,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
+import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
 import javax.media.j3d.Transform3D;
@@ -437,16 +438,16 @@ public class GraphView extends JPanel {
      * @param i the index of the data sample to compute
      */
     private void smooth (int i){
-        int i0 = (i > halfWindowSize) ? i - halfWindowSize : 0;
-        int i1 = ((i + halfWindowSize) < indexMax) ? i + halfWindowSize : indexMax;
+        int i0 = i - halfWindowSize;
+        int i1 = i + halfWindowSize;
         int wt = boxcar ? 1 : ((i > halfWindowSize) ? 1 : (2 * (halfWindowSize - i + 1) - 1));
         double xs, ys, zs, gs;
         xs = ys = zs = gs = 0.0;
         for (int j = i0; j <= i1; j++) {
-            xs += wt * yDataX[j];
-            ys += wt * yDataY[j];
-            zs += wt * yDataZ[j];
-            gs += wt * yDataG[j];
+            xs += wt * yDataX[(j < 0) ? 0 : (j >= indexMax) ? (indexMax - 1) : j];
+            ys += wt * yDataY[(j < 0) ? 0 : (j >= indexMax) ? (indexMax - 1) : j];
+            zs += wt * yDataZ[(j < 0) ? 0 : (j >= indexMax) ? (indexMax - 1) : j];
+            gs += wt * yDataG[(j < 0) ? 0 : (j >= indexMax) ? (indexMax - 1) : j];
             if (!boxcar) {
                 if (j < i) {
                     wt += 2;
@@ -455,7 +456,7 @@ public class GraphView extends JPanel {
                 }
             }
         }
-        double samples = boxcar ? filterWidth : (2 * halfWindowSize * (halfWindowSize + 2) + 1); // smooth + 1; // i1 - i0 + 1;
+        double samples = boxcar ? (filterWidth + 1) : (2 * halfWindowSize * (halfWindowSize + 1) + 1); // smooth + 1; // i1 - i0 + 1;
         yGraphValsG[i] = (int) ((double) orgY - ((gs / samples) * scaleY));
         yGraphValsX[i] = (int) ((double) orgY - ((xs / samples) * scaleY));
         yGraphValsY[i] = (int) ((double) orgY - ((ys / samples) * scaleY));
@@ -519,8 +520,8 @@ public class GraphView extends JPanel {
      * Code below assumes distance travelled is along the Y-axis.
      *
      * Note: this code is not currently called. It is just provided as an example.
-     
-    private void calculatePositionsViaIntegration() {
+     */
+/*    private void calculatePositionsViaIntegration() {
         System.out.println("\n\nPosition -- filter window = " + (filterWidth+1));
         dist[0] = 0;
         vel[0] = 0;
@@ -535,7 +536,7 @@ public class GraphView extends JPanel {
             }
         }
     }
-    */
+  */  
 
     /* Routines to connect with GUI components */
     

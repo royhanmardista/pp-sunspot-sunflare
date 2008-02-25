@@ -31,16 +31,17 @@ package org.sunspotworld.demo;
  * date: May 8, 2006 
  */
 
+import com.sun.spot.sensorboard.EDemoBoard;
+import com.sun.spot.sensorboard.peripheral.LIS3L02AQAccelerometer;
 import com.sun.spot.peripheral.ChannelBusyException;
 import com.sun.spot.peripheral.NoAckException;
+import com.sun.spot.util.Utils;
+import com.sun.spot.io.j2me.radiogram.RadiogramConnection;
+import com.sun.spot.peripheral.radio.IRadiogramProtocolManager;
+import com.sun.spot.peripheral.radio.RadioPacket;
+
 import java.io.IOException;
 import javax.microedition.io.Datagram;
-
-import com.sun.spot.io.j2me.radiogram.RadiogramConnection;
-import com.sun.spot.sensorboard.EDemoBoard;
-import com.sun.spot.sensorboard.io.IScalarInput;
-import com.sun.spot.sensorboard.peripheral.IAccelerometer3D;
-import com.sun.spot.sensorboard.peripheral.ITriColorLED;
 
 /**
  * Routines to control and read data from the SPOT's accelerometer and send them
@@ -49,14 +50,20 @@ import com.sun.spot.sensorboard.peripheral.ITriColorLED;
  * @author Ron Goldman
  */
 public class AccelOutput implements Runnable {
-    private IAccelerometer3D acc;
-    private IScalarInput x, y, z;
+    
+    private static final int PAYLOAD_SIZE = RadioPacket.MIN_PAYLOAD_LENGTH - IRadiogramProtocolManager.DATA_OFFSET;
+    private static final int HEADER_SIZE = 1 + 8 + 1;        // packet type + timestamp + #samples
+    private static final int DATA_RECORD_SIZE = PAYLOAD_SIZE - HEADER_SIZE;
+    private static final int SAMPLE_SIZE = 1 + 3 * 2;   // 1 = delta t + 3 * 2 = xyz accels
+    private static final int MAX_SAMPLES = DATA_RECORD_SIZE / SAMPLE_SIZE;
+
+    
+    private LIS3L02AQAccelerometer acc;
     private int index = 0;
-    private int[] xOffset, yOffset, zOffset;
+    private int[][] offsets = new int[2][3];
     private byte[] packetHdr = { AccelMain.ACCEL_2G_DATA_REPLY, AccelMain.ACCEL_6G_DATA_REPLY };
 
     private AccelMain main;
-    private int sampleSize = 7;
     private int sampleInterval = 5;     // in milliseconds
     private boolean running;
     
@@ -70,27 +77,18 @@ public class AccelOutput implements Runnable {
      */
     public AccelOutput(AccelMain m) {
         main = m;
-        acc = EDemoBoard.getInstance().getAccelerometer();
-        acc.setRange(0);        // start using 2G scale
+        acc = (LIS3L02AQAccelerometer)EDemoBoard.getInstance().getAccelerometer();
+        acc.setScale(LIS3L02AQAccelerometer.SCALE_2G);        // start using 2G scale
         index = 0;
-        x = acc.getXAxis();
-        y = acc.getYAxis();
-        z = acc.getZAxis();
-        xOffset = new int [2];
-        yOffset = new int [2];
-        zOffset = new int [2];
-        xOffset[0] = xOffset[1] = yOffset[0] = yOffset[1] = zOffset[0] = zOffset[1] = 455;
+        copyRestOffsets();
     }
-    
-    /**
-     * A convenience function to sleep a bit.
-     *
-     * @param time the number of milliseconds to sleep
-     */
-    private void pause(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (Exception e) {
+
+    private void copyRestOffsets() {
+        double offs[][] = acc.getRestOffsets();
+        for (int sc = 0; sc < 2; sc++) {
+            for (int i = 0; i < 3; i++) {
+                offsets[sc][i] = (int)offs[sc][i];
+            }
         }
     }
     
@@ -103,13 +101,7 @@ public class AccelOutput implements Runnable {
     public void setRadiogramConnection (RadiogramConnection conn) {
         this.conn = conn;
         try {
-            sampleSize = (conn.getMaximumLength() - 1 - 8 - 1) / 7;
-        } catch (IOException ex) { 
-            sampleSize = 5; 
-        }
-
-        try {
-            dg = conn.newDatagram(conn.getMaximumLength());
+            dg = conn.newDatagram(PAYLOAD_SIZE);
         } catch (IOException e) {
         }
     }
@@ -152,11 +144,11 @@ public class AccelOutput implements Runnable {
             dg.writeByte(AccelMain.SET_ACCEL_SCALE_REPLY);      // packet type
             if (b == 2) {
                 index = 0;
-                acc.setRange(0);
+                acc.setScale(LIS3L02AQAccelerometer.SCALE_2G);
                 dg.writeByte(2);
             } else if (b == 6) {
                 index = 1;
-                acc.setRange(1);
+                acc.setScale(LIS3L02AQAccelerometer.SCALE_6G);
                 dg.writeByte(6);
             } else {
                 dg.writeByte(0);
@@ -173,38 +165,21 @@ public class AccelOutput implements Runnable {
      * with the 6 offset values.
      */
     public void calibrate () {
-        int curScale = acc.getCurrentRange();
         try {
+            acc.setRestOffsets();
+            copyRestOffsets();
             dg.reset();
             dg.writeByte(AccelMain.CALIBRATE_ACCEL_REPLY);      // packet type
             for (int sc = 0; sc < 2; sc++) {
-                acc.setRange(sc);
-                pause(100);         // give it time to settle
-                long aveX = 0;
-                long aveY = 0;
-                long aveZ = 0;
-                for (int i = 0; i < 50; i++) {
-                    try {
-                        aveX += x.getValue();
-                        aveY += y.getValue();
-                        aveZ += z.getValue();
-                    } catch (Exception e) { }
-                    pause(20);
-                }
-                xOffset[sc] = (int) (aveX / 50);
-                yOffset[sc] = (int) (aveY / 50);
-                zOffset[sc] = (int) (aveZ / 50);
-                dg.writeShort((short)xOffset[sc]);
-                dg.writeShort((short)yOffset[sc]);
-                dg.writeShort((short)zOffset[sc]);
+                dg.writeShort((short)offsets[sc][0]);
+                dg.writeShort((short)offsets[sc][1]);
+                dg.writeShort((short)offsets[sc][2]);
                 System.out.println((sc == 0 ? "2" : "6") + "G Scale: " + 
-                                   xOffset[sc] + ", " + yOffset[sc] + ", " + zOffset[sc]);
+                                   offsets[sc][0] + ", " + offsets[sc][1] + ", " + offsets[sc][2]);
             }
             conn.send(dg);
         } catch (IOException ex) {
             // ignore errors - display server can repeat request if need be
-        } finally {
-            acc.setRange(curScale);
         }
 
     }
@@ -246,15 +221,15 @@ public class AccelOutput implements Runnable {
             dg.reset();
             dg.writeByte(packetHdr[index]);
             dg.writeLong(startTime);
-            dg.writeByte(sampleSize);
-            for (int i = 0; i < sampleSize; i++) {
+            dg.writeByte(MAX_SAMPLES);
+            for (int i = 0; i < MAX_SAMPLES; i++) {
                 dg.writeByte((int) (System.currentTimeMillis() - startTime));
-                dg.writeShort(x.getValue());
-                dg.writeShort(y.getValue());
-                dg.writeShort(z.getValue());
+                dg.writeShort(acc.getRawX());
+                dg.writeShort(acc.getRawY());
+                dg.writeShort(acc.getRawZ());
 
-                if (i < (sampleSize - 1)) {     // Don't pause after writing last set of samples.
-                    pause(sampleInterval);      // Sending the packet will take some time.
+                if (i < (MAX_SAMPLES - 1)) {        // Don't sleep after writing last set of samples.
+                    Utils.sleep(sampleInterval);    // Sending the packet will take some time.
                 }
             }
             readyToSend = true;

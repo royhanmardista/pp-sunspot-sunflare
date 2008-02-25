@@ -32,18 +32,16 @@ package org.sunspotworld.demo;
  */
 
 import com.sun.spot.io.j2me.radiogram.*;
-import com.sun.spot.peripheral.radio.LowPanPacketDispatcher;
-import com.sun.spot.peripheral.ChannelBusyException;
 import com.sun.spot.peripheral.NoAckException;
 import com.sun.spot.peripheral.TimeoutException;
-import com.sun.spot.peripheral.SpotFatalException;
+import com.sun.spot.peripheral.radio.IProprietaryRadio;
+import com.sun.spot.peripheral.radio.IRadioPolicyManager;
 import com.sun.spot.util.IEEEAddress;
 
 import java.io.*;
 import javax.microedition.io.*;
 
 import javax.swing.*;
-import java.util.Vector;
 
 /**
  * Framework class to locate a remote service (on a SPOT), to connect to it
@@ -51,8 +49,8 @@ import java.util.Vector;
  * accelerometer and to return a stream of accelerometer telemetry information. 
  */
 public class AccelerometerListener extends Thread {
-    private static final int CHANNEL_NUMBER = 11;            // currently just use default channel + pan ID
-    private static final short PAN_ID       = 29;
+    private static final int CHANNEL_NUMBER = IProprietaryRadio.DEFAULT_CHANNEL;
+    private static final short PAN_ID       = IRadioPolicyManager.DEFAULT_PAN_ID;
     private static final String BROADCAST_PORT = "42";
     private static final String CONNECTED_PORT = "43";
     private static final long SERVER_CHECK_INTERVAL = 10000;      // = 10 seconds
@@ -140,11 +138,9 @@ public class AccelerometerListener extends Thread {
      */
     private void init () {
         try {
-            // System.setProperty("SERIAL_PORT", "/dev/tty.usbmodemNNNN");  // set in main of TelemetryFrame.java
-            LowPanPacketDispatcher.getInstance().initBaseStation();
             // currently just use default channel + pan ID
-            // LowPanPacketDispatcher.getInstance().setChannelNumber(CHANNEL_NUMBER);
-            // LowPanPacketDispatcher.getInstance().setPanId(PAN_ID);
+            // Spot.getInstance().getRadioPolicyManager().setChannelNumber(CHANNEL_NUMBER);
+            // Spot.getInstance().getRadioPolicyManager().setPanId(PAN_ID);
             baseStationPresent = true;
         } catch (Exception ex) {
             baseStationPresent = false;
@@ -316,8 +312,8 @@ public class AccelerometerListener extends Thread {
      * @param twoG the scale that was used to collect the data (true = 2G, false = 6G)
      */
     private void receive (Datagram dg, boolean twoG) {
-        boolean skipZeros = (index == 0);
-        skipZeros = false;
+        //boolean skipZeros = (index == 0);
+        boolean skipZeros = false;
         int scale = twoG ? 0 : 1;
         double gValue = twoG ? SENSITIVITY_2G : SENSITIVITY_6G;
         try {

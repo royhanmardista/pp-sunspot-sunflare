@@ -32,25 +32,22 @@ package org.sunspotworld.demo;
  * date: May 8, 2006 
  */
 
+import com.sun.spot.peripheral.radio.IProprietaryRadio;
+import com.sun.spot.peripheral.radio.IRadioPolicyManager;
 import com.sun.spot.sensorboard.EDemoBoard;
-import com.sun.spot.sensorboard.io.IScalarInput;
 import com.sun.spot.sensorboard.peripheral.ITriColorLED;
-import com.sun.spot.peripheral.radio.LowPanPacketDispatcher;
 import com.sun.spot.peripheral.Spot;
-import com.sun.spot.sensorboard.peripheral.ISwitch;
 
 import com.sun.spot.io.j2me.radiogram.*;
 import com.sun.spot.peripheral.ChannelBusyException;
 import com.sun.spot.peripheral.NoAckException;
 import com.sun.spot.peripheral.TimeoutException;
 import com.sun.spot.util.IEEEAddress;
+import com.sun.spot.util.Utils;
 
 import java.io.*;
 import javax.microedition.io.*;
 import java.util.Random;
-
-import javax.microedition.midlet.MIDlet;
-import javax.microedition.midlet.MIDletStateChangeException;
 
 /**
  * Framework class to locate a remote service (on a host) and to connect to it
@@ -77,8 +74,8 @@ import javax.microedition.midlet.MIDletStateChangeException;
  */
 public class AccelMain extends Spotlet {
     private static final String VERSION = "1.0";
-    private static final int CHANNEL_NUMBER = 11;       // currently just use default channel + pan ID
-    private static final short PAN_ID       = 29;
+    private static final int CHANNEL_NUMBER = IProprietaryRadio.DEFAULT_CHANNEL;
+    private static final short PAN_ID       = IRadioPolicyManager.DEFAULT_PAN_ID;
     private static final String BROADCAST_PORT = "42";
     private static final String CONNECTED_PORT = "43";
     private static final long SERVER_CHECK_INTERVAL = 10000;    // = 10 seconds
@@ -135,12 +132,12 @@ public class AccelMain extends Spotlet {
      * Initialize any needed variables. Called by Spotlet.
      */
     public void initialize() {
-        leds = EDemoBoard.getInstance ().getLEDs ();
+        leds = EDemoBoard.getInstance().getLEDs ();
         leds[0].setRGB(50,0,0);     // Red = not active
         leds[0].setOn();
         // currently just use default channel + pan ID
-        // LowPanPacketDispatcher.getInstance().setChannelNumber(CHANNEL_NUMBER);
-        // LowPanPacketDispatcher.getInstance().setPanId(PAN_ID);
+        // Spot.getInstance().getRadioPolicyManager().setChannelNumber(CHANNEL_NUMBER);
+        // Spot.getInstance().getRadioPolicyManager().setPanId(PAN_ID);
 
         accelOutput = new AccelOutput(this);
 
@@ -207,7 +204,7 @@ public class AccelMain extends Spotlet {
                     break;
                 } catch (ChannelBusyException ex) {
                     retry++;
-                    pause(random.nextInt(10) + 2);  // wait a random amount before retrying
+                    Utils.sleep(random.nextInt(10) + 2);  // wait a random amount before retrying
                 }
             }
             try {
@@ -274,7 +271,7 @@ public class AccelMain extends Spotlet {
                     leds[1].setOn();
                     do {
                         found = locateDisplayServer(txConn, xdg, rcvConn, rdg);
-                        pause(20);  // wait 20 msecs
+                        Utils.sleep(20);         // wait 20 msecs
                         ++tries;
                     } while (!found && tries < 5);
                     leds[1].setOff();
@@ -282,7 +279,7 @@ public class AccelMain extends Spotlet {
                         connected = true;
                         break;
                     } else {
-                        pause(SERVER_CHECK_INTERVAL);  // wait a while before looking again
+                        Utils.sleep(SERVER_CHECK_INTERVAL);  // wait a while before looking again
                     }
                 }
             } catch (Exception ex) {
@@ -318,7 +315,7 @@ public class AccelMain extends Spotlet {
             rcvConn.setTimeout(-1);             // no timeout
             Radiogram rdg = (Radiogram)rcvConn.newDatagram(rcvConn.getMaximumLength());
             accelOutput.setRadiogramConnection(rcvConn);
-            pause(200);                         // give host a little time to setup radio connection
+            Utils.sleep(200);                   // give host a little time to setup radio connection
             accelOutput.getScale();             // notify host which scale is currently in use
 
             while (connected) {
@@ -338,7 +335,7 @@ public class AccelMain extends Spotlet {
                         accelOutput.setScale(rdg.readByte());
                         leds[1].setRGB(0,30, accelOutput.is2GScale() ? 0 : 30);
                         leds[1].setOn();        // green = 2G, blue-green = 6G
-                        pause(200);
+                        Utils.sleep(200);
                         leds[1].setOff();
                         break;
                     case CALIBRATE_ACCEL_REQ:
@@ -375,7 +372,7 @@ public class AccelMain extends Spotlet {
                         leds[1].setRGB(40,0, 0);         // Red = ping
                         leds[1].setOn();
                         for (int im = 0; im < stringIndex; im++) {
-                            pause(30);                      // give host time to process packet
+                            Utils.sleep(30);                      // give host time to process packet
                             rdg.reset();
                             rdg.writeByte(MESSAGE_REPLY);      // packet type
                             rdg.writeUTF(messages[im]);
@@ -383,7 +380,7 @@ public class AccelMain extends Spotlet {
                             // System.out.println("Sent message: " + messages[im]);
                         }
                         stringIndex = 0;
-                        pause(200);
+                        Utils.sleep(200);
                         leds[1].setOff();
                         break;
                 }
