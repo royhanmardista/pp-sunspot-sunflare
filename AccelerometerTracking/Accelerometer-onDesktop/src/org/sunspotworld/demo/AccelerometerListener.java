@@ -312,7 +312,7 @@ public class AccelerometerListener extends Thread {
      * @param twoG the scale that was used to collect the data (true = 2G, false = 6G)
      */
     private void receive (Datagram dg, boolean twoG) {
-        //boolean skipZeros = (index == 0);
+        boolean skipZeros = (index == 0);
         skipZeros = false;
         int scale = twoG ? 0 : 1;
         double gValue = twoG ? SENSITIVITY_2G : SENSITIVITY_6G;
