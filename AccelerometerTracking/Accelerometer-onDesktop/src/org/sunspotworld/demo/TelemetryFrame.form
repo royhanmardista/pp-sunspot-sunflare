@@ -1057,6 +1057,88 @@
             </Component>
           </SubComponents>
         </Container>
+        <Container class="javax.swing.JPanel" name="dataPanel">
+          <Properties>
+            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[100, 109]"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
+              <GridBagConstraints gridX="-1" gridY="-1" gridWidth="0" gridHeight="0" fill="1" ipadX="0" ipadY="0" insetsTop="0" insetsLeft="0" insetsBottom="0" insetsRight="0" anchor="10" weightX="0.0" weightY="0.0"/>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+            <Property name="columns" type="int" value="2"/>
+            <Property name="horizontalGap" type="int" value="5"/>
+            <Property name="rows" type="int" value="6"/>
+            <Property name="verticalGap" type="int" value="5"/>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JLabel" name="label_velx">
+              <Properties>
+                <Property name="horizontalAlignment" type="int" value="2"/>
+                <Property name="text" type="java.lang.String" value="VelX:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_velx_data">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="0"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_vely">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="VelY:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_vely_data">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="0"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_velz">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="VelZ:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_velz_data">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="0"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_distx">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="DistX:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_distx_data">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="0"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_disty">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="DistY:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_disty_data">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="0"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_distz">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="DistZ:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="label_distz_data">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="0"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="simulator">

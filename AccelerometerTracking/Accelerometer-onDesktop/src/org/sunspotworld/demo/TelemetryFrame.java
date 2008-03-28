@@ -217,6 +217,7 @@ public class TelemetryFrame extends JFrame implements Printable {
      */
     private void setGraphView(GraphView gv) {
         graphView = gv;
+        graphView.setGUI(this);
         graphViewScrollPane.setViewportView(gv);
         gv.setTransformGroup(transformGroup);
         gv.setViewport(graphViewScrollPane.getViewport());
@@ -492,6 +493,19 @@ public class TelemetryFrame extends JFrame implements Printable {
         pingButton = new javax.swing.JButton();
         reconnButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        dataPanel = new javax.swing.JPanel();
+        label_velx = new javax.swing.JLabel();
+        label_velx_data = new javax.swing.JLabel();
+        label_vely = new javax.swing.JLabel();
+        label_vely_data = new javax.swing.JLabel();
+        label_velz = new javax.swing.JLabel();
+        label_velz_data = new javax.swing.JLabel();
+        label_distx = new javax.swing.JLabel();
+        label_distx_data = new javax.swing.JLabel();
+        label_disty = new javax.swing.JLabel();
+        label_disty_data = new javax.swing.JLabel();
+        label_distz = new javax.swing.JLabel();
+        label_distz_data = new javax.swing.JLabel();
         simulator = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
@@ -1033,6 +1047,52 @@ public class TelemetryFrame extends JFrame implements Printable {
         gridBagConstraints.weightx = 1.0;
         jPanel3.add(buttonPanel, gridBagConstraints);
 
+        dataPanel.setLayout(new java.awt.GridLayout(6, 2, 5, 5));
+
+        dataPanel.setMinimumSize(new java.awt.Dimension(100, 109));
+        label_velx.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        label_velx.setText("VelX:");
+        dataPanel.add(label_velx);
+
+        label_velx_data.setText("0");
+        dataPanel.add(label_velx_data);
+
+        label_vely.setText("VelY:");
+        dataPanel.add(label_vely);
+
+        label_vely_data.setText("0");
+        dataPanel.add(label_vely_data);
+
+        label_velz.setText("VelZ:");
+        dataPanel.add(label_velz);
+
+        label_velz_data.setText("0");
+        dataPanel.add(label_velz_data);
+
+        label_distx.setText("DistX:");
+        dataPanel.add(label_distx);
+
+        label_distx_data.setText("0");
+        dataPanel.add(label_distx_data);
+
+        label_disty.setText("DistY:");
+        dataPanel.add(label_disty);
+
+        label_disty_data.setText("0");
+        dataPanel.add(label_disty_data);
+
+        label_distz.setText("DistZ:");
+        dataPanel.add(label_distz);
+
+        label_distz_data.setText("0");
+        dataPanel.add(label_distz_data);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanel3.add(dataPanel, gridBagConstraints);
+
         getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
         simulator.setMinimumSize(new java.awt.Dimension(10, 200));
@@ -1409,6 +1469,24 @@ public class TelemetryFrame extends JFrame implements Printable {
         TelemetryFrame.frameGraph(null, new GraphView());       // create an empty window to collect telemetry
     }
     
+    public void set_label_distx_data(String data) {
+        label_distx_data.setText(data);
+    }
+    public void set_label_disty_data(String data) {
+        label_disty_data.setText(data);
+    }
+    public void set_label_distz_data(String data) {
+        label_distz_data.setText(data);
+    }
+    public void set_label_velx_data(String data) {
+        label_velx_data.setText(data);
+    }
+    public void set_label_vely_data(String data) {
+        label_vely_data.setText(data);
+    }
+    public void set_label_velz_data(String data) {
+        label_velz_data.setText(data);
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JPanel axisPanel;
@@ -1418,6 +1496,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     private javax.swing.JButton clearButton;
     private javax.swing.JMenuItem closeMenuItem;
     private javax.swing.JLabel connStatusLabel;
+    private javax.swing.JPanel dataPanel;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JFormattedTextField filterWidthField;
     private javax.swing.ButtonGroup fullscaleGroup;
@@ -1446,6 +1525,18 @@ public class TelemetryFrame extends JFrame implements Printable {
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JLabel label_distx;
+    private javax.swing.JLabel label_distx_data;
+    private javax.swing.JLabel label_disty;
+    private javax.swing.JLabel label_disty_data;
+    private javax.swing.JLabel label_distz;
+    private javax.swing.JLabel label_distz_data;
+    private javax.swing.JLabel label_velx;
+    private javax.swing.JLabel label_velx_data;
+    private javax.swing.JLabel label_vely;
+    private javax.swing.JLabel label_vely_data;
+    private javax.swing.JLabel label_velz;
+    private javax.swing.JLabel label_velz_data;
     private javax.swing.JLabel maxGLabel;
     private javax.swing.JMenuItem newMenuItem;
     private javax.swing.JRadioButton noSmoothingButton;

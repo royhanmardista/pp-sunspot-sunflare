@@ -1,24 +1,24 @@
 /*
-* Copyright (c) 2006 Sun Microsystems, Inc.
-* 
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to 
-* deal in the Software without restriction, including without limitation the 
-* rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-* sell copies of the Software, and to permit persons to whom the Software is 
-* furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in 
-* all copies or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
- **/       
+ * Copyright (c) 2006 Sun Microsystems, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ **/
 package org.sunspotworld.demo;
 
 /*
@@ -26,29 +26,27 @@ package org.sunspotworld.demo;
  *
  * Store telemetry data and display it.
  *
- * author: Ron Goldman  
- * date: May 2, 2006 
+ * author: Ron Goldman
+ * date: May 2, 2006
  */
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
-import java.util.Vector;
+import java.text.DecimalFormat;
 import java.util.StringTokenizer;
 import java.util.NoSuchElementException;
-import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
-import javax.vecmath.Vector3d;
 
 /**
- * A simple class to store 1 minute of telemetry data, display it on the screen, 
- * do some simple filtering of the data and read/write it to a file. 
+ * A simple class to store 1 minute of telemetry data, display it on the screen,
+ * do some simple filtering of the data and read/write it to a file.
  *
  * @author Ron Goldman
  */
 public class GraphView extends JPanel {
-
+    
     /** Specifies the width of the y-axis display */
     public static final int AXIS_WIDTH = 60;
     private static final int MSEC_PER_PIXEL = 5;
@@ -59,22 +57,37 @@ public class GraphView extends JPanel {
     private static final String Y_GS = "Y  -  Gs";
     private static final String X_GS = "X  -  Gs";
     private static final String TOTAL_GS = "Total Gs";
-
+    
     static private final Color G_COLOR = new Color(255, 140, 0); // Dark Orange
     static private final Color X_COLOR = new Color(0, 150, 0); // Medium Green
     static private final Color Y_COLOR = Color.BLUE;
     static private final Color Z_COLOR = Color.RED;
-
+    
+    // Time to indicate we have stopped movement, in seconds
+    static private final double STOP_TIME = 1.0;
+    private boolean stoppedX = true;
+    private boolean stoppedY = true;
+    private boolean stoppedZ = true;
+    private double timeStoppedX = 0;
+    private double timeStoppedY = 0;
+    private double timeStoppedZ = 0;
+    private int timeStoppedX_count = 0;
+    private int timeStoppedY_count = 0;
+    private int timeStoppedZ_count = 0;
+    private int lastLatestStoppedIndexX = 0;
+    private int lastLatestStoppedIndexY = 0;
+    private int lastLatestStoppedIndexZ = 0;
+    
     private int orgX, orgY; // Pixel coord of the X and Y origin of the graph.
     private int yMinPixels; // Pixel coord of the minimal point on the Y axis
     private int orgG;       // as above but for the total Gs graph
-
+    
     private int borderX, borderY; // Width/height of region outside graph in pixels.
-
+    
     private double yMin, yMax; // min and max data values (not pixels, data).
-
+    
     private int xMin, xMax, indexMax;
-
+    
     private int scaleZoomY = 1;     // factor to expand the y-axis by: 1, 2, 4, or 8
     private int scaleZoomX = 2;     // factor/2 to expand the x-axis by: 1/2 1, 2, or 4
     private double scaleX;          // pixels / millisecond
@@ -84,7 +97,7 @@ public class GraphView extends JPanel {
     private boolean twoG = true;    // using 2G or 6G accelerometer range
     
     private long[] timeMS;          // reported latest time for each guy.
-
+    
     private double[] yDataG;        // Raw data collected as it comes in
     private double[] yDataX;
     private double[] yDataY;
@@ -93,11 +106,11 @@ public class GraphView extends JPanel {
     private int[] yGraphValsX;
     private int[] yGraphValsY;
     private int[] yGraphValsZ;
-
+    
     private int[] xVals;            // x's used when drawing polyline in graph
-
+    
     private int currentXs;          // most recent position on graph.
-
+    
     private JPanel axisPanel = null;
     private double maxG = 0;
     private JLabel maxGLabel = null;
@@ -117,11 +130,12 @@ public class GraphView extends JPanel {
     private double[] velx;
     private double[] vely;
     private double[] velz;
-
+    
     private double[] distx;
     private double[] disty;
     private double[] distz;
-
+    
+    private TelemetryFrame parent = null;
     /** For 3d visualization */
     private TransformGroup transformGroup = null;
     
@@ -129,13 +143,16 @@ public class GraphView extends JPanel {
     public GraphView() {
         init();
     }
-
+    
+    public void setGUI(TelemetryFrame gui) {
+        parent = gui;
+    }
     /**
      * Specify the transform group for a 3d visualization
      *
      * @param tg the transformgroup parenting the 3d object
      */
-    public void setTransformGroup (TransformGroup tg) {
+    public void setTransformGroup(TransformGroup tg) {
         transformGroup = tg;
     }
     
@@ -144,20 +161,20 @@ public class GraphView extends JPanel {
      *
      * @param ax the panel to be used to display the y-axis
      */
-    public void setAxisPanel (JPanel ax) {
+    public void setAxisPanel(JPanel ax) {
         axisPanel = ax;
         resetDisplaySize();
     }
-
+    
     /**
      * Returns whether the accelerometer data using the 2G or 6G scales.
      *
      * @return true if using the 2G scale, false if using the 6G scale
      */
-    public boolean is2G () {
+    public boolean is2G() {
         return twoG;
     }
-
+    
     /**
      * Returns the height of the viewport displaying the graphed data.
      *
@@ -171,7 +188,7 @@ public class GraphView extends JPanel {
      * Update the display size of the graphed data. Called after changing the X zoom factor or
      * after changing the number of samples displayed.
      */
-    private void setDisplaySize () {
+    private void setDisplaySize() {
         int oldWidth = getWidth();
         if (port != null) {
             viewRect = port.getViewRect();
@@ -191,7 +208,7 @@ public class GraphView extends JPanel {
             viewRect = port.getViewRect();
         }
     }
-
+    
     /**
      * Update the display size of the graphed data after the window is resized.
      */
@@ -205,11 +222,11 @@ public class GraphView extends JPanel {
             axisPanel.repaint();
         }
     }
-
+    
     /**
      * Set up our data structures (= simple arrays) and define some constants
      */
-    private void init () {
+    private void init() {
         setBackground(Color.WHITE);
         borderY = 20;
         borderX = AXIS_WIDTH;
@@ -225,7 +242,7 @@ public class GraphView extends JPanel {
         yGraphValsY = new int[xMax - xMin];
         yDataZ = new double[xMax - xMin];
         yGraphValsZ = new int[xMax - xMin];
-
+        
         velx = new double[xMax - xMin];
         vely = new double[xMax - xMin];
         velz = new double[xMax - xMin];
@@ -235,7 +252,7 @@ public class GraphView extends JPanel {
         
         velx[0] = vely[0] = velz[0] = 0;
         distx[0] = disty[0] = distz[0] = 0;
-
+        
         // Fill in initial values
         for (int i = 0; i < xVals.length; i++) {
             xVals[i]  = (int) (orgX + i * scaleX);
@@ -244,37 +261,37 @@ public class GraphView extends JPanel {
         indexMax = currentXs = 0;
         repaint();
     }
-
+    
     /**
      * Set parameters for drawing graph appropriately.
      */
-    private void setGraphingAttributes () {
+    private void setGraphingAttributes() {
         xMin = 0;                               // min sample array index used
         xMax = MSEC_OF_DATA / MSEC_PER_PIXEL;   // max sample array index used.
         scaleX = scaleZoomX / (double) (2 * MSEC_PER_PIXEL);   // pixel / msec
         orgX = 0;
-
+        
         yMin = -6.0;
         yMax =  6.0;
         double yMaxP = yMax / scaleZoomY;
         double yMinP = yMin / scaleZoomY;
-
+        
         yMinPixels = (getContainerHeight() - borderY);
         scaleY = scaleZoomY * (yMinPixels - borderY) / (yMax - yMin);
         orgY = (int)(yMinPixels + yMinP * scaleY);
         orgG = orgY; // to show G's at bottom set to yMinPixels;
     }
-
+    
     /**
      * Return the width that the current telemetry data occupies.
      *
      * @return the width (in pixels) that the current telemetry data occupies
      */
-    public int getMaxWidth () {
+    public int getMaxWidth() {
         return xVals[indexMax == 0 ? (xVals.length - 1) : indexMax] + borderX;
     }
-
-
+    
+    
     /* Routines to read & write telemetry data to a file */
     
     /**
@@ -283,14 +300,14 @@ public class GraphView extends JPanel {
      * @param file the file to write the data into
      * @return true if successful, false otherwise
      */
-    public boolean writeData (File file) {
+    public boolean writeData(File file) {
         boolean results = false;
         try {
             BufferedWriter logFile = new BufferedWriter(new FileWriter(file));
             for (int i = 0; i < indexMax; i++) {
                 logFile.write(id + ";" + timeMS[i] + ";" + i + ";" +
-                              yDataX[i] + ";" + yDataY[i] + ";" + yDataZ[i] + ";" + 
-                              yDataG[i] + ";" + twoG + ";" + "\n");
+                        yDataX[i] + ";" + yDataY[i] + ";" + yDataZ[i] + ";" +
+                        yDataG[i] + ";" + twoG + ";" + "\n");
             }
             results = true;
             logFile.close();
@@ -320,10 +337,10 @@ public class GraphView extends JPanel {
                     double x  = Double.parseDouble(stk.nextToken());
                     double y  = Double.parseDouble(stk.nextToken());
                     double z  = Double.parseDouble(stk.nextToken());
-                    double g = Double.parseDouble(stk.nextToken());
+                    double g  = Double.parseDouble(stk.nextToken());
                     // if Java 1.5 can use Boolean.parseBoolean(stk.nextToken());
                     boolean twoG = ("true".compareToIgnoreCase(stk.nextToken()) == 0);
-                    takeData(address, timeMS, index, x, y, z, g, twoG);
+                    takeData(address, timeMS, index, x, y, z, twoG);
                 } catch (NoSuchElementException nex) {
                     // just ignore malformed lines
                     System.err.println("Unparsable line in telemetry file: " + str);
@@ -341,39 +358,92 @@ public class GraphView extends JPanel {
         }
         return results;
     }
-
+    
     /**
      * Notification that live data will be sent or sending of data has ended.
      *
      * @param sending true if about to receive data, false if data stream is finished
      */
-    public void liveData (boolean sending) {
+    public void liveData(boolean sending) {
         if (sending) {
             // nothing to do here
         } else {
             finishSmoothing();
         }
     }
-
+    
     /**
      * Add new telemetry data from remote SPOT.
      *
      * @param id IEEE address of SPOT sending the data
      * @param tMS time in milliseconds when the data was recorded
      * @param index index of this reading
-     * @param g the combined accelerations of all three dimensions (in gravities)
      * @param x the x-axis acceleration (in gravities)
      * @param y the y-axis acceleration (in gravities)
      * @param z the z-axis acceleration (in gravities)
      * @param twoG true if measured using the 2 G accelerometer scale
      */
-    public void takeData (String id, long tMS, int index, double x, double y, double z, double g, boolean twoG) {
+    public void takeData(String id, long tMS, int index, double x, double y, double z, boolean twoG) {
         if (tMS > MSEC_OF_DATA || index >= yGraphValsG.length) {
             return;  // ignore any more data than we can display
         }
-        
+
+        indexMax = currentXs = index;
+        timeMS[index] = tMS;
+
         this.id = id;
         this.twoG = twoG;
+        
+        // DO OUR SMART FILTERING
+        
+        z = 0;
+        double t = 0;
+        if(index > 0) {
+           t = (timeMS[index] - timeMS[index-1]) / 1000.0;
+        }
+        
+        // Set Threshold for filtering noise.
+        double G_THRESHOLD = 0.06;
+//        double G_THRESHOLD = 0.0165;
+        if(Math.abs(x) < G_THRESHOLD) {
+            timeStoppedX += t;
+            timeStoppedX_count ++;
+            if(stoppedX == true){
+                lastLatestStoppedIndexX = index;
+                x = 0;
+            }
+        } else {
+            timeStoppedX_count = 0;
+            timeStoppedX = 0;
+            stoppedX = false;
+        }
+        if(Math.abs(y) < G_THRESHOLD) {
+            timeStoppedY += t;
+            timeStoppedY_count ++;
+            if(stoppedY == true){
+                lastLatestStoppedIndexY = index;
+                y = 0;
+            }
+        } else {
+            timeStoppedY_count = 0;
+            timeStoppedY = 0;
+            stoppedY = false;
+        }
+        
+        if(Math.abs(z) < G_THRESHOLD) {
+            timeStoppedZ += t;
+            timeStoppedZ_count ++;
+            if(stoppedZ == true){
+                lastLatestStoppedIndexZ = index;
+                z = 0;
+            }
+        } else {
+            timeStoppedZ_count = 0;
+            timeStoppedZ = 0;
+            stoppedZ = false;
+        }
+        
+        double g = Math.sqrt(x*x + y*y + z*z);
         
         if (g > maxG){
             maxG = g;
@@ -382,13 +452,10 @@ public class GraphView extends JPanel {
             }
         }
         
-        indexMax = currentXs = index;
-        timeMS[index] = tMS;
-
         xVals[index] = (int) (orgX + tMS * scaleX);
-
+        
         yDataG[index] = g;
-
+        
         yDataX[index] = x;
         yDataY[index] = y;
         yDataZ[index] = z;
@@ -401,7 +468,7 @@ public class GraphView extends JPanel {
         if (smooth && index > halfWindowSize) {
             smooth(index - halfWindowSize);
         }
-
+        
         repaint();
         if (viewRect != null && xVals[index] >= (viewRect.x + viewRect.width)) {
             port.setViewPosition(new Point(viewRect.x + viewRect.width / 2, 0));
@@ -409,26 +476,143 @@ public class GraphView extends JPanel {
         }
         
         if(index!=0) {
-            double t = (timeMS[index] - timeMS[index-1]) / 1000.0;
-            velx[index] = velx[index-1] + 32 * t * x; //(orgY - yGraphValsX[index]) / scaleY;
-            vely[index] = vely[index-1] + 32 * t * y; //(orgY - yGraphValsY[index]) / scaleY;
-            velz[index] = velz[index-1] + 32 * t * z; //(orgY - yGraphValsZ[index]) / scaleY;
+            // Derive velocity and position
+            velx[index] = velx[index-1] + 9.80665 * t * x; //(orgY - yGraphValsX[index]) / scaleY;
+            vely[index] = vely[index-1] + 9.80665 * t * y; //(orgY - yGraphValsX[index]) / scaleY;
+            velz[index] = velz[index-1] + 9.80665 * t * z; //(orgY - yGraphValsX[index]) / scaleY;
             
-            distx[index] = distx[index-1] + t * (velx[index-1] + velx[index]) / 2;
-            disty[index] = disty[index-1] + t * (vely[index-1] + vely[index]) / 2;
-            distz[index] = distz[index-1] + t * (velz[index-1] + velz[index]) / 2;
-
-            if ((index % 100 == 0) || (index == (indexMax - 1))) {
-                System.out.print(timeMS[index] + " vx = " + velx[index] + " dx = " + distx[index]);
-                System.out.print(timeMS[index] + " vy = " + vely[index] + " dy = " + disty[index]);
-                System.out.print(timeMS[index] + " vz = " + velz[index] + " dz = " + distz[index] + "\n");
+            double drift = 0;
+            int stoppedIndex = 0;
+            long timeInterval = 0;
+            long timeStartInterval = 0;
+            if(!stoppedX && timeStoppedX >= STOP_TIME) {
+                // We've been stopped for this amount of time.  Let's go back to the velocity of the indice where we stopped.
+                stoppedIndex = index-timeStoppedX_count+1;
+                
+                // Account for the drift
+                drift = velx[stoppedIndex];
+                
+                // Distribute the drift over the last stopped interval
+                timeInterval = timeMS[stoppedIndex] - timeMS[lastLatestStoppedIndexX];
+                timeStartInterval = timeMS[lastLatestStoppedIndexX];
+                //System.out.println("X Drift Detected: " + drift + " Current index: " + index + " Latest Index " + lastLatestStoppedIndexX + " stoppedIndex:  " + stoppedIndex);
+                
+                
+                for(int i=lastLatestStoppedIndexX; i<=stoppedIndex; i++) {
+                    // Recalculate velocity
+                    //System.out.print(i + ". Old Vel: " + velx[i]);
+                    double change = drift * (timeMS[i] - timeStartInterval)/timeInterval;
+                    double newVel = velx[i] - change;
+                    velx[i] = newVel;
+                    //System.out.print(" New Vel: " + newVel);
+                    //System.out.print(" Change: " + change);
+                    // Recalculate distance
+                    //System.out.print(" Old Dist: " + distx[i]);
+                    double newDist = distx[i-1] + (t * (velx[i-1] + velx[i]) / 2);
+                    distx[i] = newDist;
+                    //System.out.print(" New Dist: " + newDist + "\n");
+                }
+                 
+                
+                // Now let's zero out the velocities and accelerations and recalculate the distance
+                for(int i=stoppedIndex; i<= index; i++) {
+                    velx[i] = 0;
+                    distx[i] = distx[i-1];
+                }
+                
+                stoppedX = true;
+                lastLatestStoppedIndexX = index;
+                
             }
-            if(transformGroup != null) {
+            if(!stoppedY && timeStoppedY >= STOP_TIME) {
+                // We've been stopped for this amount of time.  Let's go back to the velocity of the indice where we stopped.
+                stoppedIndex = index-timeStoppedY_count+1;
+                drift = vely[stoppedIndex];
+                
+                // Distribute the drift over the last stopped interval
+                timeInterval = timeMS[stoppedIndex] - timeMS[lastLatestStoppedIndexY];
+                timeStartInterval = timeMS[lastLatestStoppedIndexY];
+
+                System.out.println("Y Drift Detected: " + drift + " Current index: " + index + " Latest Index " + lastLatestStoppedIndexY + " stoppedIndex:  " + stoppedIndex);
+                double newDistArray[] = new double[stoppedIndex-lastLatestStoppedIndexY+2]; 
+                int j=1;
+                newDistArray[0] = disty[lastLatestStoppedIndexY-1];
+                for(int i=lastLatestStoppedIndexY; i<=stoppedIndex; i++) {
+                    // Recalculate velocity
+                    System.out.print(i + ". Old Vel: " + vely[i]);
+                    double change = drift * (timeMS[i] - timeStartInterval)/timeInterval;
+                    double newVel = vely[i] - change;
+                    double change_old =  drift * (timeMS[i-1] - timeStartInterval)/timeInterval;
+                    double newVel_old = vely[i-1] - change_old;
+                    //vely[i] = newVel;
+                    System.out.print(" New Vel: " + newVel);
+                    System.out.print(" Change: " + change);
+                    // Recalculate distance
+                    System.out.print(" Old Dist: " + disty[i]);
+                    //double newDist = disty[i-1] + (t * (vely[i-1] + vely[i]) / 2);
+                    newDistArray[j] = newDistArray[j-1] + (t * (newVel_old + newVel) / 2);
+                    //disty[i] = newDist;
+                    System.out.print(" New Dist: " + newDistArray[j] + "\n");
+                    j++;
+                }
+                
+                // Now let's zero out the velocities and recalculate the distance
+                for(int i=stoppedIndex; i<= index; i++) {
+                    vely[i] = 0;
+                    disty[i] = disty[i-1];
+                }
+                
+                stoppedY = true;
+                lastLatestStoppedIndexY = index;
+            }
+/*            if(!stoppedZ && timeStoppedZ >= STOP_TIME) {
+                // We've been stopped for this amount of time.  Let's go back to the velocity of the indice where we stopped.
+                stoppedIndex = index-timeStoppedZ_count+1;
+                drift = velz[stoppedIndex];
+                
+                // Distribute the drift over the last stopped interval
+                timeInterval = timeMS[stoppedIndex] - timeMS[lastLatestStoppedIndexZ];
+                timeStartInterval = timeMS[lastLatestStoppedIndexZ];
+                
+                for(int i=lastLatestStoppedIndexZ; i<=stoppedIndex; i++) {
+                    // Recalculate velocity
+                    velz[i] -= drift * (timeMS[i] - timeStartInterval)/timeInterval;
+                 
+                    // Recalculate distance
+                    distz[i] = distz[i-1] + (t * (velz[i-1] + velz[i]) / 2);
+                }
+                
+                // Now let's zero out the velocities and recalculate the distance
+                for(int i=stoppedIndex; i<= index; i++) {
+                    velz[i] = 0;
+                    distz[i] = distz[i-1];
+                }
+                stoppedZ = true;
+                lastLatestStoppedIndexZ = index;
+            }
+*/            
+            distx[index] = distx[index-1] + (t * (velx[index-1] + velx[index]) / 2);
+            disty[index] = disty[index-1] + (t * (vely[index-1] + vely[index]) / 2);
+ //           distz[index] = distz[index-1] + (t * (velz[index-1] + velz[index]) / 2);
+            
+            // Print out the velocity and distance
+            //  if ((index % 100 == 0) || (index == (indexMax - 1))) {
+            DecimalFormat df = new DecimalFormat("0.####");
+            parent.set_label_distx_data(df.format(distx[index]));
+            parent.set_label_disty_data(df.format(disty[index]));
+//            parent.set_label_distz_data(Double.toString(distz[index]));
+            parent.set_label_velx_data(Double.toString(velx[index]));
+            parent.set_label_vely_data(Double.toString(vely[index]));
+//            parent.set_label_velz_data(Double.toString(velz[index]));
+//           }
+            
+            // Translate the 3D Cube on the screen
+/*            if(transformGroup != null) {
                 Transform3D newTransform = new Transform3D();
                 newTransform.setTranslation(new Vector3d(x,y,z));
                 transformGroup.setTransform(newTransform);
             }
-
+ */
         }
     }
     
@@ -437,7 +621,7 @@ public class GraphView extends JPanel {
      *
      * @param i the index of the data sample to compute
      */
-    private void smooth (int i){
+    private void smooth(int i){
         int i0 = i - halfWindowSize;
         int i1 = i + halfWindowSize;
         int wt = boxcar ? 1 : ((i > halfWindowSize) ? 1 : (2 * (halfWindowSize - i + 1) - 1));
@@ -477,7 +661,7 @@ public class GraphView extends JPanel {
     /**
      * Redraw the data after a change to the scale or filtering.
      */
-    private void redrawData () {
+    private void redrawData() {
         int maxGp = orgG;
         scaleY = scaleZoomY * (yMinPixels - borderY) / (yMax - yMin);
         scaleX = scaleZoomX / (double) (2 * MSEC_PER_PIXEL);
@@ -496,7 +680,7 @@ public class GraphView extends JPanel {
                 maxGp = yGraphValsG[i];
             }
         }
-        maxG = (orgG - maxGp) / scaleY; 
+        maxG = (orgG - maxGp) / scaleY;
         if (maxGLabel != null) {
             maxGLabel.setText(Double.toString(maxG));
         }
@@ -536,12 +720,12 @@ public class GraphView extends JPanel {
             }
         }
     }
-  */  
-
+ */
+    
     /* Routines to connect with GUI components */
     
     /**
-     * Connect us with the view port that is displaying us. Needed so we can 
+     * Connect us with the view port that is displaying us. Needed so we can
      * auto scroll as data is entered.
      *
      * @param viewport the JViewport to scroll to control what data is displayed
@@ -551,94 +735,106 @@ public class GraphView extends JPanel {
         viewRect = port.getViewRect();
         final GraphView gv = this;
         port.addComponentListener(new ComponentAdapter() {
-            public void componentResized (ComponentEvent e) {
+            public void componentResized(ComponentEvent e) {
                 gv.resetDisplaySize();
             }
         });
     }
-
+    
     /**
      * Label to use to display maximum G force recorded.
      *
      * @param lab the label to use to display the maximum G force encountered
      */
-    public void setMaxGLabel (JLabel lab) {
+    public void setMaxGLabel(JLabel lab) {
         maxGLabel = lab;
         maxGLabel.setText(Double.toString(maxG));
     }
-
+    
     
     /* Command routines called by the user via the GUI */
     
     /**
      * Flush any current data and clear the display.
      */
-    public void clearGraph () {
+    public void clearGraph() {
+        stoppedX = true;
+        stoppedY = true;
+        stoppedZ = true;
+        timeStoppedX = 0;
+        timeStoppedY = 0;
+        timeStoppedZ = 0;
+        timeStoppedX_count = 0;
+        timeStoppedY_count = 0;
+        timeStoppedZ_count = 0;
+        lastLatestStoppedIndexX = 0;
+        lastLatestStoppedIndexY = 0;
+        lastLatestStoppedIndexZ = 0;
         indexMax = currentXs = 0;
         smoothIndex = -1;
         repaint();
         port.setViewPosition(new Point(0,0));
         viewRect = port.getViewRect();
         fileData = false;
-    }    
-
+    }
+    
     /**
      * Enable/disable the display of the combined G forces.
      *
      * @param b true if the combined G forces should be displayed
      */
-    public void setShowG (boolean b) {
+    public void setShowG(boolean b) {
         showG = b;
         repaint();
     }
-
+    
     /**
      * Enable/disable the display of the x-axis G forces.
      *
      * @param b true if the x-axis G forces should be displayed
      */
-    public void setShowX (boolean b) {
+    public void setShowX(boolean b) {
         showX = b;
         repaint();
     }
-
+    
     /**
      * Enable/disable the display of the y-axis G forces.
      *
      * @param b true if the y-axis G forces should be displayed
      */
-    public void setShowY (boolean b) {
+    public void setShowY(boolean b) {
         showY = b;
         repaint();
     }
-
+    
     /**
      * Enable/disable the display of the z-axis G forces.
      *
      * @param b true if the z-axis G forces should be displayed
      */
-    public void setShowZ (boolean b) {
+    public void setShowZ(boolean b) {
         showZ = b;
         repaint();
     }
-
+    
     /**
      * Enable/disable the smoothing of the data with a filter.
      *
      * @param b true if the data displayed should be smoothed.
      */
-    public void setSmooth (boolean b) {
+    public void setSmooth(boolean b) {
         smooth = b;
         redrawData();
         repaint();
     }
-
+    
     /**
      * Select which filter to use when smoothing the data.
      *
      * @param b true for the boxcar filter, false for the triangle filter
      */
-    public void setFiltertype (boolean b) {
+    public void setFiltertype(boolean b) {
         boxcar = b;
         if (smooth) {
             redrawData();
@@ -651,7 +847,7 @@ public class GraphView extends JPanel {
      *
      * @param w the number of samples to use when filtering
      */
-    public void setFilterWidth (int w) {
+    public void setFilterWidth(int w) {
         filterWidth = w;
         if ((filterWidth % 2) == 1) {       // make sure filterWidth is even
             filterWidth++;
@@ -668,24 +864,24 @@ public class GraphView extends JPanel {
      *
      * @param s the scale / 2, so s = 1, means 1/2 size, s = 4 means double size
      */
-    public void setZoomX (int s) {
+    public void setZoomX(int s) {
         scaleZoomX = s;
         setDisplaySize();
         redrawData();
         repaint();
     }
-
+    
     /**
      * Set the scale factor for the y-axis.
      *
      * @param s the scale, so s = 1, means normal size, s = 2 means double size
      */
-    public void setZoomY (int s) {
+    public void setZoomY(int s) {
         scaleZoomY = s;
         redrawData();
         repaint();
     }
-
+    
     /**
      * Cause the display to be repainted. Also repaints the y-axis panel.
      */
@@ -695,7 +891,7 @@ public class GraphView extends JPanel {
             axisPanel.repaint();
         }
     }
-
+    
     /**
      * Paint the X-axis & the G forces recorded. The Y-axis is now drawn in a separate panel.
      *
@@ -709,7 +905,7 @@ public class GraphView extends JPanel {
         paintLegend(g);
         drawData(g);
     }
-
+    
     /**
      * Paint a legend showing what color is used to draw each acceleration component.
      * Only paint the legend for forces that are being displayed.
@@ -756,7 +952,7 @@ public class GraphView extends JPanel {
             y0 += ydelta;
         }
     }
-
+    
     /**
      * Draw the G forces recorded.
      *
@@ -780,14 +976,14 @@ public class GraphView extends JPanel {
             g.drawPolyline(xVals, yGraphValsZ, indexMax);
         }
     }
-
+    
     /**
      * Draw the tick marks on the acceleration axis (= y-axis).
      * The y-axis is now drawn in a separate display panel.
      *
      * @param g the graphics component to use
      */
-    public void paintYaxis (Graphics g) {
+    public void paintYaxis(Graphics g) {
         int y;
         int orgX = AXIS_WIDTH - 1;
         double yMaxP = yMax / scaleZoomY;
@@ -795,7 +991,7 @@ public class GraphView extends JPanel {
         
         // Y axis (line)
         g.drawLine(orgX, yMinPixels, orgX, yMinPixels - (int) ((yMaxP - yMinP) * scaleY));
-
+        
         // Paint big deltas
         double dt = (yMaxP - yMinP) / 6.0;
         for (double t = 0.0; t <= (yMaxP - yMinP); t = t + dt) {
@@ -814,15 +1010,15 @@ public class GraphView extends JPanel {
             g.drawLine(orgX - 4, y, orgX, y);
         }
     }
-
+    
     /**
      * Draw the tick marks on the time axis (= x-axis)
      *
      * @param g the graphics component to use
      */
-    private void paintXaxis (Graphics g) {
+    private void paintXaxis(Graphics g) {
         double x;
-
+        
         // X axis (line)
         g.drawLine(orgX, orgY, orgX + (xMax - xMin) * scaleZoomX / 2, orgY);
         
@@ -840,5 +1036,5 @@ public class GraphView extends JPanel {
             g.drawLine(orgX + (int)x, orgY - 5 - extra, orgX + (int)x, orgY + 5 + extra);
         }
     }
-
+    
 }
