@@ -30,26 +30,25 @@ public class GestureRecognizer extends Thread{
     
 
     public void patternMatching(Gesture currentGesture){
-//        double sums[] = {0,0,0};
+        double sums[] = {0,0,0};
         Vector pattern = new Vector();
         Vector dataset = currentGesture.getDataset();
-//        Vector derivatives = new Vector();
-        //determine the inactive axis
-//        
-//        for(int i=0; i<dataset.size(); i++){
-//            
-//            sums[0] += ((DataStruct)dataset.elementAt(i)).getX();
-//            sums[1] += ((DataStruct)dataset.elementAt(i)).getY();
-//            sums[2] += ((DataStruct)dataset.elementAt(i)).getZ();
-//            
-//        }
-//        if(sums[0]<=sums[1] && sums[0]<=sums[2])
-//            currentGesture.setInactiveAxis("x");
-//        else if(sums[1]<=sums[0] && sums[1]<=sums[2])
-//            currentGesture.setInactiveAxis("y");
-//        else
-//            currentGesture.setInactiveAxis("z");
-//        
+       
+        //determine the active axis by calculating the absolute sums of each curve
+        //the greatest sum means it has more activity
+        for(int i=0; i<dataset.size(); i++){
+            sums[0] += Math.abs(((DataStruct)dataset.elementAt(i)).getX());
+            sums[1] += Math.abs(((DataStruct)dataset.elementAt(i)).getY());
+            //sums[2] += Math.abs(((DataStruct)dataset.elementAt(i)).getZ()-1);
+            sums[2] = 0;
+        }
+        if(sums[0]>=sums[1] && sums[0]>=sums[2])
+            currentGesture.setActiveAxis("x");
+        else if(sums[1]>=sums[0] && sums[1]>=sums[2])
+            currentGesture.setActiveAxis("y");
+        else
+            currentGesture.setActiveAxis("z");
+        
         //look at dx
         for(int i=0; i<dataset.size(); i++){
             
@@ -82,7 +81,7 @@ public class GestureRecognizer extends Thread{
         
         System.out.println("Total number of gestures = " + gestures.size());
         System.out.println(leftOrRight((Gesture)gestures.lastElement()));
-        
+        System.out.println((Gesture)gestures.lastElement());
 //        Gesture tempGesture = (Gesture)gestures.lastElement();
 //        Vector tempPattern = tempGesture.getPattern();
 //        Vector simplifiedPattern = new Vector();

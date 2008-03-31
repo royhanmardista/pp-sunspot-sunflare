@@ -19,6 +19,7 @@ public class Gesture {
     private Vector nodes;
     private Vector pattern;
     private String inactiveAxis;
+    private String activeAxis;
     private double endTimeStamp;
     
     /** Creates a new instance of Gesture */
@@ -42,6 +43,9 @@ public class Gesture {
     public void setPattern(Vector p){
         pattern = new Vector(p);
     }
+    public void setActiveAxis(String s){
+        activeAxis = new String(s);
+    }
     public void setData(Vector d){
         dataset = new Vector(d);
     }
@@ -64,6 +68,10 @@ public class Gesture {
     public double getEndTimeStamp(){
         return endTimeStamp;
     }
+    
+    public String getActiveAxis(){
+        return activeAxis;
+    }
     public Vector getPattern(){
         return pattern;
     }
@@ -78,10 +86,12 @@ public class Gesture {
     }
     public String toString(){
         StringBuilder result = new StringBuilder();
-        result.append("pattern size = "+pattern.size()+ " ");
+        
+        result.append("active axis/" + activeAxis + " pattern size = "+pattern.size()+ " ");
         for(int i=0; i<pattern.size(); i++){
             result.append(pattern.elementAt(i) + " ");
         }
         return result.toString();
+
     }
 }
