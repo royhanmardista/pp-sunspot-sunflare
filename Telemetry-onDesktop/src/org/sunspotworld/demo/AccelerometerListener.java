@@ -296,11 +296,12 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         double x = g[0];
         double y = g[1];
         double z = g[2];
+        double dx = 0;
+        double dy = 0;
+        double dz = 0;
         double totalG = g[3];
         double timeStamp = g[4];
-        double dx = g[5];
-        double dy = g[6];
-        double dz = g[7];
+
 //                        DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
 //                dataset.addElement(data);
 //                System.out.println("adding");
@@ -309,6 +310,8 @@ public class AccelerometerListener extends Thread implements PacketTypes {
            if(absoluteSums[0]==0 && absoluteSums[1]==0 && absoluteSums[2]==0){ //going from inactivity to activity, start of a gesture
                System.out.println("GESTURE START");
                dx = x;
+               dy = y;
+               dz = z;
                recordData = true;      
            }
            absoluteSums[0] += Math.abs(x);
@@ -319,8 +322,14 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         } else{
             if(absoluteSums[0]!=0 && absoluteSums[1]!=0 && absoluteSums[2]!=0){ //going from activity to inactivity, end of a gesture
                 recordData = false;
+
+                if(dataset.size()!=0){
+                    dx = (x - ((DataStruct)dataset.lastElement()).getX()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
+                    dy = (y - ((DataStruct)dataset.lastElement()).getY()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
+                    dz = (z - ((DataStruct)dataset.lastElement()).getZ()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
+                }
                 DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
-               dataset.addElement(data);
+                dataset.addElement(data);
                System.out.println(dataset);
                 Global.numGesturesDetected ++;
                 System.out.println("GESTURE END, Num gesture = " + Global.numGesturesDetected);
@@ -341,6 +350,14 @@ public class AccelerometerListener extends Thread implements PacketTypes {
             absoluteSums[2] = 0;
         }
         if(recordData){
+        
+            if(dataset.size()!=0){
+                dx = (x - ((DataStruct)dataset.lastElement()).getX()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
+                dy = (y - ((DataStruct)dataset.lastElement()).getY()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
+                dz = (z - ((DataStruct)dataset.lastElement()).getZ()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
+            }
+                   
+            
            DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
            dataset.addElement(data);
         }
@@ -355,7 +372,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
      */
     private double[] receive (Datagram dg, boolean twoG) {
         boolean skipZeros = (index == 0);
-        double returnVals[] = new double[8];
+        double returnVals[] = new double[5];
         int scale = twoG ? 0 : 1;
         try {
             String address = dg.getAddress();
@@ -450,10 +467,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     returnVals[2]=z_gravity;
                     returnVals[3]=g;
                     returnVals[4]=sampleTime;
-                    returnVals[5]=(x-prevX)/deltaT;
-                    returnVals[6]=(y-prevY)/deltaT;
-                    returnVals[7]=(z-prevZ)/deltaT;
-                    
+
                     
                     
                     prevX = x;
