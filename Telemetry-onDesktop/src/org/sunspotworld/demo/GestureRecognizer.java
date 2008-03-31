@@ -150,7 +150,6 @@ public class GestureRecognizer extends Thread{
               //check timeStamp of the previous gesture to see if they are actually one single gesture
            
                   //do some checking to see if it should be combined with the previous gesture segment
-
               gestureSegmentsIndex++;
           }
               
