@@ -414,7 +414,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     returnVals[4]=sampleTime;
                     if(g>1.3){
                         graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);
-                        recognize(returnVals);
+                        recognize(returnVals); //this weird statement here makes the program work
                     }
                     else
                        graphView.takeData(address,sampleTime,index,0,0,0,0,twoG);
@@ -424,7 +424,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return returnVals;
+        return returnVals; //if you don't return anything, the program breaks. This is a very weird issue.
     }
 
     private void setGOffsets() {
