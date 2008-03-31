@@ -102,9 +102,6 @@ public class GestureRecognizer extends Thread{
            
                   //do some checking to see if it should be combined with the previous gesture segment
 
-//              for(int i = 0; i < dataset.size(); i++){
-//            
-//              }
               gestureSegmentsIndex++;
           }
               
