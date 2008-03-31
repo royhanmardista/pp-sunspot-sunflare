@@ -30,22 +30,22 @@ import java.util.Vector;
 import java.util.StringTokenizer;
 
 /**
- * A simple class to store up to 10 minutes of telemetry data, display it on the screen, 
- * do some simple filtering of the data and read/write it to a file. 
+ * A simple class to store up to 10 minutes of telemetry data, display it on the screen,
+ * do some simple filtering of the data and read/write it to a file.
  *
  * @author Ron Goldman<br>
  * Date: May 2, 2006<br>
  * Revised: August 3, 2007
  */
 public class GraphView extends JPanel {
-
+    
     /** Specifies the width of the y-axis display. */
     public static final int AXIS_WIDTH = 60;
     private static final double BORDER = 20;
     private static final int MSEC_PER_PIXEL = 20;            // define scale for zoom = 1
     private static final int MSEC_OF_DATA = 10 * 60 * 1000;
     private static final int MSEC_PER_SAMPLE = 10;
-
+    
     private static final int PREFERRED_HEIGHT = 500;
     private static final int MINIMUM_WIDTH = 800;
     private static final int MILLISECONDS_PER_SECOND = 1000;
@@ -57,23 +57,23 @@ public class GraphView extends JPanel {
     private static final String Y_GS = "Y  -  Gs";
     private static final String X_GS = "X  -  Gs";
     private static final String TOTAL_GS = "Total Gs";
-
+    
     static private final Color G_COLOR = new Color(255, 140, 0); // Dark Orange
     static private final Color X_COLOR = new Color(0, 150, 0); // Medium Green
     static private final Color Y_COLOR = Color.BLUE;
     static private final Color Z_COLOR = Color.RED;
-
+    
     private int orgX, orgY; // Pixel coord of the X and Y origin of the graph.
     private int yMinPixels; // Pixel coord of the minimal point on the Y axis
     private int orgG;       // as above but for the total Gs graph
-
+    
     private int borderX, borderY; // Width/height of region outside graph in pixels.
-
+    
     private double yMin, yMax; // min and max data values (not pixels, data).
-
+    
     private long xMin, xMax;
     private int indexMax;
-
+    
     private double scaleZoomY = 1;     // factor to expand the y-axis by: 1, 2, 4, or 8
     private double scaleZoomX = 2;     // factor/2 to expand the x-axis by: 1/2 1, 2, or 4
     private double scaleX;          // pixels / millisecond
@@ -86,14 +86,14 @@ public class GraphView extends JPanel {
     private boolean twoG = true;    // using 2G or 6G accelerometer range
     
     private long[] timeMS;          // reported latest time for each guy.
-
+    
     private double[] yDataG;        // Raw data collected as it comes in
     private double[] yDataX;
     private double[] yDataY;
     private double[] yDataZ;
-
+    
     private int currentXs;          // most recent position on graph.
-
+    
     private JPanel axisPanel = null;
     private double maxG = 0;
     private JLabel maxGLabel = null;
@@ -114,16 +114,16 @@ public class GraphView extends JPanel {
     private double threshold = 0.0;
     private boolean ignoreMsgPrinted = false;
     private boolean fromFile = false;
-        
+    
     // make these global to keep some state about the current drawn panel
     private int left = 0;
     private int right = 0;
     
     private double[] vel;
     private double[] dist;
-
     
-      private double yDataX_KF [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
+    
+    private double yDataX_KF [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
     private double yDataX_KF_Cov [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
     private double yDataY_KF [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
     private double yDataY_KF_Cov [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
@@ -131,7 +131,7 @@ public class GraphView extends JPanel {
     private double yDataZ_KF_Cov [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
     
     /**
-     * Creates a new instance of GraphPanel. 
+     * Creates a new instance of GraphPanel.
      * Set up our data structures (= simple arrays) and define some constants.
      */
     public GraphView() {
@@ -143,13 +143,13 @@ public class GraphView extends JPanel {
         yDataG = new double[size];
         yDataX = new double[size];
         yDataY = new double[size];
-        yDataZ = new double[size];        
+        yDataZ = new double[size];
         indexMax = currentXs = 0;
         setGraphingAttributes();
         setDisplaySize();
         repaint();
     }
-
+    
     /**
      * Specify the panel displaying the Y-axis.
      *
@@ -159,7 +159,7 @@ public class GraphView extends JPanel {
         axisPanel = ax;
         resetDisplaySize();
     }
-
+    
     /**
      * Returns whether the accelerometer data using the 2G or 6G scales.
      *
@@ -168,7 +168,7 @@ public class GraphView extends JPanel {
     public boolean is2G() {
         return twoG;
     }
-
+    
     /**
      * Returns the height of the viewport displaying the graphed data.
      *
@@ -177,11 +177,11 @@ public class GraphView extends JPanel {
     private int getContainerHeight() {
         return (port != null && port.getHeight() > 100) ? port.getHeight() : PREFERRED_HEIGHT;
     }
-
+    
     private int getContainerWidth() {
         return (port != null && port.getWidth() > 100) ? port.getWidth() : MINIMUM_WIDTH;
     }
-
+    
     
     /**
      * Update the display size of the graphed data. Called after changing the X zoom factor or
@@ -211,12 +211,12 @@ public class GraphView extends JPanel {
             long curXpos = viewRect.x;
             int curYpos = viewRect.y + viewRect.height / 2;
             port.setViewPosition(new Point((int)(curXpos * (newWidth - BORDER) / (oldWidth - BORDER)),
-                                           curYpos * newHeight / oldHeight - viewRect.height / 2));
+                    curYpos * newHeight / oldHeight - viewRect.height / 2));
             viewRect = port.getViewRect();
             port.setViewSize(size);
         }
     }
-
+    
     /**
      * Update the display size of the graphed data after the window is resized.
      */
@@ -229,8 +229,8 @@ public class GraphView extends JPanel {
             axisPanel.repaint();
         }
     }
-
-
+    
+    
     /**
      * Set parameters for drawing graph appropriately.
      */
@@ -240,7 +240,7 @@ public class GraphView extends JPanel {
         if (scaleZoomX == 0.0) { scaleZoomX = 1; }
         scaleX = scaleZoomX / (double) (2 * MSEC_PER_PIXEL);   // pixel / msec
         orgX = 0;
-
+        
         yMin = -6.0;
         yMax =  6.0;
         if (scaleZoomY < 1.0) {
@@ -256,7 +256,7 @@ public class GraphView extends JPanel {
         orgY = (int)(yMinPixels + yMin * scaleY);
         orgG = orgY; // to show G's at bottom set to yMinPixels;
     }
-
+    
     /**
      * Return the width that the current telemetry data occupies.
      * Used by printing to determine number of pages needed.
@@ -270,8 +270,8 @@ public class GraphView extends JPanel {
             return (int)((xMax - xMin) * scaleZoomX / 10) + borderX;
         }
     }
-
-
+    
+    
     /* Routines to read & write telemetry data to a file */
     
     /**
@@ -286,8 +286,8 @@ public class GraphView extends JPanel {
             BufferedWriter logFile = new BufferedWriter(new FileWriter(file));
             for (int i = 0; i < indexMax; i++) {
                 logFile.write(id + ";" + timeMS[i] + ";" + i + ";" +
-                              yDataX[i] + ";" + yDataY[i] + ";" + yDataZ[i] + ";" + 
-                              yDataG[i] + ";" + twoG + ";" + "\n");
+                        yDataX[i] + ";" + yDataY[i] + ";" + yDataZ[i] + ";" +
+                        yDataG[i] + ";" + twoG + ";" + "\n");
             }
             results = true;
             logFile.close();
@@ -332,7 +332,7 @@ public class GraphView extends JPanel {
         repaint();
         return results;
     }
-
+    
     /**
      * Add new telemetry data from remote SPOT.
      *
@@ -345,7 +345,10 @@ public class GraphView extends JPanel {
      * @param z the z-axis acceleration (in gravities)
      * @param twoG true if measured using the 2 G accelerometer scale
      */
-    public void takeData (String id, long tMS, int index, double x, double y, double z, double g, boolean twoG) {
+    public void takeData(String id, long tMS, int index, double x, double y, double z, double g, boolean twoG) {
+        if(x != 0 && y != 0 && z !=0)
+            System.out.println("Drawing g/" + g + " x/" + x + " t/" + tMS);
+        
         if (tMS > MSEC_OF_DATA || index >= timeMS.length) {
             if (!ignoreMsgPrinted) {
                 System.out.println("Ignoring accelerometer data: not enough memory allocated");
@@ -359,7 +362,7 @@ public class GraphView extends JPanel {
         
         this.id = id;
         this.twoG = twoG;
-    
+        
         /*
                 // Do the Kalman Filtering
         double Q = 0.00001; // 10^-5
@@ -367,7 +370,7 @@ public class GraphView extends JPanel {
         double K = 0;
         double cov_priori = 0;
         double sample_priori = 0;
-        
+         
         // For X
         R = 0.049450549;
         if(index == 0) {
@@ -376,12 +379,12 @@ public class GraphView extends JPanel {
         }
         else {
             sample_priori = yDataX_KF[index-1];
-            cov_priori = yDataX_KF_Cov[index-1] + Q;            
+            cov_priori = yDataX_KF_Cov[index-1] + Q;
         }
         K = cov_priori / (cov_priori + R);
         yDataX_KF[index] = sample_priori + (K  * (x - sample_priori));
         yDataX_KF_Cov[index] = (1-K) * cov_priori;
-        
+         
         // For Y
         R = 0.054945055;
         if(index == 0) {
@@ -390,12 +393,12 @@ public class GraphView extends JPanel {
         }
         else {
             sample_priori = yDataY_KF[index-1];
-            cov_priori = yDataY_KF_Cov[index-1] + Q;            
+            cov_priori = yDataY_KF_Cov[index-1] + Q;
         }
         K = cov_priori / (cov_priori + R);
         yDataY_KF[index] = sample_priori + (K  * (y - sample_priori));
         yDataY_KF_Cov[index] = (1-K) * cov_priori;
-
+         
         // For Z
         R = 0.032967033;
         if(index == 0) {
@@ -404,17 +407,17 @@ public class GraphView extends JPanel {
         }
         else {
             sample_priori = yDataZ_KF[index-1];
-            cov_priori = yDataZ_KF_Cov[index-1] + Q;            
+            cov_priori = yDataZ_KF_Cov[index-1] + Q;
         }
         K = cov_priori / (cov_priori + R);
         yDataZ_KF[index] = sample_priori + (K  * (z - sample_priori));
         yDataZ_KF_Cov[index] = (1-K) * cov_priori;
-        
+         
         x = yDataX_KF[index];
         //x = y;
         y = yDataY_KF[index];
         z = yDataZ_KF[index];
-        */
+         */
         
         if (g > maxG){
             maxG = g;
@@ -426,13 +429,13 @@ public class GraphView extends JPanel {
         
         indexMax = currentXs = index;
         timeMS[index] = tMS;
-
+        
         yDataG[index] = g;
-
+        
         yDataX[index] = x;
         yDataY[index] = y;
         yDataZ[index] = z;
-
+        
         if (!fileData) {
             if (viewRect != null && ((int)(orgX + (tMS - xMin) * scaleX)) >= (viewRect.x + viewRect.width)) {
                 setDisplaySize();
@@ -442,12 +445,12 @@ public class GraphView extends JPanel {
             repaint();
         }
     }
-
+    
     
     /* Routines to connect with GUI components */
     
     /**
-     * Connect us with the view port that is displaying us. Needed so we can 
+     * Connect us with the view port that is displaying us. Needed so we can
      * auto scroll as data is entered.
      *
      * @param viewport the JViewport to scroll to control what data is displayed
@@ -457,30 +460,30 @@ public class GraphView extends JPanel {
         viewRect = port.getViewRect();
         final GraphView gv = this;
         port.addComponentListener(new ComponentAdapter() {
-            public void componentResized (ComponentEvent e) {
+            public void componentResized(ComponentEvent e) {
                 gv.resetDisplaySize();
             }
         });
     }
-
+    
     /**
      * Label to use to display maximum G force recorded.
      *
      * @param lab the label to use to display the maximum G force encountered
      */
-    public void setMaxGLabel (JLabel lab) {
+    public void setMaxGLabel(JLabel lab) {
         maxGLabel = lab;
         int imaxG = (int)(maxG * 100);   // only show 2 decimal digits
         maxGLabel.setText(Double.toString(imaxG / 100.0));
     }
-
+    
     
     /* Command routines called by the user via the GUI */
     
     /**
      * Flush any current data and clear the display.
      */
-    public void clearGraph () {
+    public void clearGraph() {
         indexMax = currentXs = 0;
         smoothIndex = -1;
         maxG = 0;
@@ -489,64 +492,64 @@ public class GraphView extends JPanel {
         ignoreMsgPrinted = false;
         fileData = false;
         resetDisplaySize();
-    }    
-
+    }
+    
     /**
      * Enable/disable the display of the combined G forces.
      *
      * @param b true if the combined G forces should be displayed
      */
-    public void setShowG (boolean b) {
+    public void setShowG(boolean b) {
         showG = b;
         repaint();
     }
-
+    
     /**
      * Enable/disable the display of the x-axis G forces.
      *
      * @param b true if the x-axis G forces should be displayed
      */
-    public void setShowX (boolean b) {
+    public void setShowX(boolean b) {
         showX = b;
         repaint();
     }
-
+    
     /**
      * Enable/disable the display of the y-axis G forces.
      *
      * @param b true if the y-axis G forces should be displayed
      */
-    public void setShowY (boolean b) {
+    public void setShowY(boolean b) {
         showY = b;
         repaint();
     }
-
+    
     /**
      * Enable/disable the display of the z-axis G forces.
      *
      * @param b true if the z-axis G forces should be displayed
      */
-    public void setShowZ (boolean b) {
+    public void setShowZ(boolean b) {
         showZ = b;
         repaint();
     }
-
+    
     /**
      * Enable/disable the smoothing of the data with a filter.
      *
      * @param b true if the data displayed should be smoothed.
      */
-    public void setSmooth (boolean b) {
+    public void setSmooth(boolean b) {
         smooth = b;
         repaint();
     }
-
+    
     /**
      * Select which filter to use when smoothing the data.
      *
      * @param b true for the boxcar filter, false for the triangle filter
      */
-    public void setFiltertype (boolean b) {
+    public void setFiltertype(boolean b) {
         boxcar = b;
         if (smooth) {
             repaint();
@@ -558,7 +561,7 @@ public class GraphView extends JPanel {
      *
      * @param w the number of samples to use when filtering
      */
-    public void setFilterWidth (int w) {
+    public void setFilterWidth(int w) {
         filterWidth = w;
         if ((filterWidth % 2) == 1) {       // make sure filterWidth is even
             filterWidth++;
@@ -574,21 +577,21 @@ public class GraphView extends JPanel {
      *
      * @param s the scale / 2, so s = 1, means 1/2 size, s = 4 means double size
      */
-    public void setZoomX (int s) {
+    public void setZoomX(int s) {
         scaleZoomX = s;
         resetDisplaySize();
     }
-
+    
     /**
      * Set the scale factor for the y-axis.
      *
      * @param s the scale, so s = 1, means normal size, s = 2 means double size
      */
-    public void setZoomY (int s) {
+    public void setZoomY(int s) {
         scaleZoomY = s;
         resetDisplaySize();
     }
-
+    
     /**
      * Set the rest offsets used by the accelerometer.
      * Used when we need the display to include the force of gravity.
@@ -602,7 +605,7 @@ public class GraphView extends JPanel {
         gOffsetY = gy;
         gOffsetZ = gz;
     }
-            
+    
     /**
      * Specify whether the forces displayed should include gravity or not.
      *
@@ -622,7 +625,7 @@ public class GraphView extends JPanel {
             axisPanel.repaint();
         }
     }
-
+    
     /**
      * Paint the X-axis & the G forces recorded. The Y-axis is now drawn in a separate panel.
      *
@@ -636,7 +639,7 @@ public class GraphView extends JPanel {
         paintLegend(g);
         drawData(g);
     }
-
+    
     /**
      * Paint a legend showing what color is used to draw each acceleration component.
      * Only paint the legend for forces that are being displayed.
@@ -683,12 +686,12 @@ public class GraphView extends JPanel {
             y0 += ydelta;
         }
     }
-
+    
     private int findX(long x, boolean prior) {
         // check the bounds
         if (x < timeMS[0] || indexMax == 0) return 0;
         if (x > timeMS[indexMax - 1]) return indexMax - 1;
-
+        
         //  binary search to find the time in the array
         int size = indexMax / 2;
         int index = size;
@@ -702,12 +705,12 @@ public class GraphView extends JPanel {
                 break;  // found it
             }
         }
-
-        // another bounds check? 
+        
+        // another bounds check?
         if (index < 0) { index = 0; }
         if (index >= indexMax) { index = indexMax - 1; }
         
-        // linear search the rest of the path ?   
+        // linear search the rest of the path ?
         if (prior) {
             while (index > 0 && timeMS[index] >= x) { index--; }
         } else {
@@ -750,14 +753,12 @@ public class GraphView extends JPanel {
                     samePixel = true;
                     ymin = ymax = y0;
                 }
-                if (y1 < ymin) { ymin = y1; }
-                else if (y1 > ymax) { ymax = y1; }
+                if (y1 < ymin) { ymin = y1; } else if (y1 > ymax) { ymax = y1; }
             } else {
                 if (samePixel) {
                     samePixel = false;
                     g.drawLine(x0, ymin, x0, ymax);
-                }
-                else {
+                } else {
                     drawVTick(g,t1,x1,y1);
                 }
                 g.drawLine(x0, y0, x1, y1);
@@ -767,7 +768,7 @@ public class GraphView extends JPanel {
             y0 = y1;
         }
     }
-
+    
     /**
      * Smooth the data using a simple boxcar or triangle filter.
      *
@@ -775,7 +776,7 @@ public class GraphView extends JPanel {
      * @param raw the array containing the data values
      * @return the smoothed value for point at index
      */
-    private double smooth (int i, double[] raw) {
+    private double smooth(int i, double[] raw) {
         int i0 = i - halfWindowSize;
         int i1 = i + halfWindowSize;
         int wt = 1;
@@ -792,13 +793,13 @@ public class GraphView extends JPanel {
         }
         return r / (boxcar ? (filterWidth + 1) : (2 * halfWindowSize * (halfWindowSize + 1) + 1));
     }
-
+    
     /**
      * Draw a small tick mark at each sample if zoomed in sufficiently
      */
     private void drawVTick(Graphics g, long t, int x, int y) {
         if (scaleZoomX < 16) return;
-
+        
         int sz = 2;
         Color cache = g.getColor();
         g.setColor(Color.BLACK);
@@ -836,8 +837,7 @@ public class GraphView extends JPanel {
                     samePixel = true;
                     ymin = ymax = y0;
                 }
-                if (y1 < ymin) { ymin = y1; }
-                else if (y1 > ymax) { ymax = y1; }
+                if (y1 < ymin) { ymin = y1; } else if (y1 > ymax) { ymax = y1; }
             } else {
                 if (samePixel) {
                     samePixel = false;
@@ -868,7 +868,7 @@ public class GraphView extends JPanel {
         long xLeft = (long)(xMin + (left - orgX) / scaleX);
         long xRight = (long)(xMin + (right - orgX) / scaleX);
         int i0 = findX(xLeft, true);
-        int i1 = findX(xRight, false);        
+        int i1 = findX(xRight, false);
         if (showG) {    // Draw the total acceleration in Gs
             g.setColor(G_COLOR);
             if (includeGravity) {
@@ -890,14 +890,14 @@ public class GraphView extends JPanel {
             drawDataValues(g, i0, i1, yDataZ, includeGravity ? 0 : gOffsetZ);
         }
     }
-
+    
     /**
      * Draw the tick marks on the acceleration axis (= y-axis).
      * The y-axis is drawn in a separate display panel.
      *
      * @param g the graphics component to use
      */
-    public void paintYaxis (Graphics g) {
+    public void paintYaxis(Graphics g) {
         int y;
         int orgX = AXIS_WIDTH - 1;
         double ySize = yMax - yMin;
@@ -905,7 +905,7 @@ public class GraphView extends JPanel {
         
         // Y axis (line)
         g.drawLine(orgX, yMinPixels - yTop, orgX, yMinPixels - (int) (ySize * scaleY) - yTop);
-
+        
         // Paint big deltas
         double dt = ySize / 6.0;
         if (scaleZoomY > 1) {
@@ -927,13 +927,13 @@ public class GraphView extends JPanel {
             g.drawLine(orgX - 4, y, orgX, y);
         }
     }
-
+    
     /**
      * Draw the tick marks on the time axis (= x-axis)
      *
      * @param g the graphics component to use
      */
-    private void paintXaxis (Graphics g) {
+    private void paintXaxis(Graphics g) {
         Rectangle clip = g.getClipBounds();
         int left = clip.x;
         int right = clip.x + clip.width;
@@ -951,14 +951,14 @@ public class GraphView extends JPanel {
             g.setColor(Color.LIGHT_GRAY);
             int th = (int)(scaleY * rawThreshold);
             g.drawLine(left, orgY - th, right, orgY - th);
-            g.drawLine(left, orgY + th, right, orgY + th);            
+            g.drawLine(left, orgY + th, right, orgY + th);
             g.setColor(Color.BLACK);
         }
         if (threshold > 0) {
             g.setColor(Color.YELLOW);
             int th = (int)(scaleY * threshold);
             g.drawLine(left, orgY - th, right, orgY - th);
-            g.drawLine(left, orgY + th, right, orgY + th);            
+            g.drawLine(left, orgY + th, right, orgY + th);
             g.setColor(Color.BLACK);
         }
         
@@ -966,10 +966,10 @@ public class GraphView extends JPanel {
         // g.drawLine(orgX, orgY, orgX + (int)((xMax - xMin) * scaleZoomX / 2), orgY);
         g.drawLine(left, orgY, right, orgY);
         long xSize = xMax - xMin;
-            
+        
         int oneMinute = (int)(scaleX * MILLISECONDS_PER_MINUTE);
         int minutesShowing = (port != null ? port.getWidth() : 700) / ((oneMinute == 0) ? 1 : oneMinute);
-
+        
         int dx = MILLISECONDS_PER_MINUTE;
         int sx = (int)(xLeft % dx);
         long x;
@@ -979,12 +979,12 @@ public class GraphView extends JPanel {
             g.drawString(minute + ":00", gx - 12, orgY + 25);
             g.drawLine(gx, orgY - 6, gx, orgY + 6);
         }
-
+        
         int oneSecond = (int)(scaleX * MILLISECONDS_PER_SECOND);
-
+        
         if (oneSecond > 0) {     // add marks for some seconds
-            int secsPerMark = (oneSecond > 24) ? 1 : (oneSecond > 10) ? 10 : 30; 
-            int secsPerTime = (oneSecond > 49) ? 1 : (oneSecond > 24) ? 5 : (oneSecond > 10) ? 10 : 30; 
+            int secsPerMark = (oneSecond > 24) ? 1 : (oneSecond > 10) ? 10 : 30;
+            int secsPerTime = (oneSecond > 49) ? 1 : (oneSecond > 24) ? 5 : (oneSecond > 10) ? 10 : 30;
             dx = MILLISECONDS_PER_SECOND;
             sx = (int)(xLeft % dx);
             for (x = xLeft + dx - sx; x <= xRight; x += dx) {
@@ -1002,9 +1002,9 @@ public class GraphView extends JPanel {
                 }
             }
         }
-
+        
         if (scaleX > 0.04) {     // add marks for 500/250/100 milliseconds
-            int msecsPerMark = (scaleX < 0.06) ? 500 : (scaleX < 0.11) ? 250 : 100; 
+            int msecsPerMark = (scaleX < 0.06) ? 500 : (scaleX < 0.11) ? 250 : 100;
             dx = 50;
             sx = (int)(xLeft % 100);
             for (x = xLeft + dx - sx; x <= xRight; x += dx) {
@@ -1015,5 +1015,5 @@ public class GraphView extends JPanel {
             }
         }
     }
-
+    
 }

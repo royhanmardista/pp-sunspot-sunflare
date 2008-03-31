@@ -413,7 +413,8 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     returnVals[3]=g;
                     returnVals[4]=sampleTime;
                     if(g>1.3){
-                        graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);                     
+                        graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);
+                        recognize(returnVals);
                     }
                     else
                        graphView.takeData(address,sampleTime,index,0,0,0,0,twoG);
