@@ -81,9 +81,59 @@ public class GestureRecognizer extends Thread{
         }
         
         System.out.println("Total number of gestures = " + gestures.size());
+        System.out.println(leftOrRight((Gesture)gestures.lastElement()));
         
-       
+//        Gesture tempGesture = (Gesture)gestures.lastElement();
+//        Vector tempPattern = tempGesture.getPattern();
+//        Vector simplifiedPattern = new Vector();
+//        int maxWeight = 0;
+//        int maxIndex = -1;
+//        int limitWeight = 1000;
+//        int currentWeight;
+//        //take the max 3 elements in the pattern
+//        for(int k=0; k<3; k++){
+//            for(int i=0; i<pattern.size(); i++){
+//                currentWeight = ((SlopeWeight)tempPattern.elementAt(i)).weight;
+//               if(currentWeight > maxWeight && currentWeight <= limitWeight && i != maxIndex){
+//                   maxIndex = i;
+//                   maxWeight = currentWeight;
+//               }
+//            }
+//            if(maxIndex>=0)
+//                simplifiedPattern.addElement(tempPattern.elementAt(maxIndex));
+//            limitWeight = maxWeight;
+//            maxWeight = 0;
+//            maxIndex = -1;
+//        }
+        
+            
+
     }
+    
+    
+    public String leftOrRight(Gesture g){
+        Vector dataset = g.getDataset();
+        double max = -1000, min = 1000;
+        int maxIndex = -1, minIndex = -1;
+        for(int i=0; i<dataset.size(); i++){
+            double currX = ((DataStruct)dataset.elementAt(i)).getX();
+            if(currX > max){
+                max = currX;
+                maxIndex = i;
+            }
+            if(currX < min){
+                min = currX;
+                minIndex = i;
+            }
+        }
+        if(minIndex > maxIndex)
+            return "Left";
+        else
+            return "Right";
+        
+    }
+   
+    
     public void recognizer() throws InterruptedException{
        Gesture currentGesture = new Gesture();
        Global.gestureSegmentsLock.writeLock().lock();

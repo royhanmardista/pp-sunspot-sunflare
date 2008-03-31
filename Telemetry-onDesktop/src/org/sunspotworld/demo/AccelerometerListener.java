@@ -84,6 +84,8 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     private double yDataZ_KF [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
     private double yDataZ_KF_Cov [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
 
+    private double maxX=-1000, maxY=-1000, maxZ = -1000;
+    private double minX=1000, minY=1000,minZ=1000;
     /**
      * Create a new AccelerometerListener to connect to the remote SPOT over the radio.
      */
@@ -276,6 +278,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         absoluteSums[0]=0;
         absoluteSums[1]=0;
         absoluteSums[2]=0;
+       
     }
 
     /**
@@ -361,6 +364,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         }
     }
     
+    
     /**
      * Process telemetry data sent by remote SPOT. 
      * Pass the data gathered to the GraphView to be displayed.
@@ -389,7 +393,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                 int xValue = dg.readShort();
                 int yValue = dg.readShort();
                 int zValue = dg.readShort();
-
+                
                 if (skipZeros &&                    // Ignore leading values until they become non-zero
                     ((Math.abs(xValue - (int)restOffsets[scale][0]) > 20) || 
                      (Math.abs(yValue - (int)restOffsets[scale][1]) > 20) || 
@@ -412,9 +416,69 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     returnVals[2]=z_gravity;
                     returnVals[3]=g;
                     returnVals[4]=sampleTime;
+
+                    
+//                    // Do the Kalman Filtering
+//                    double Q = 0.00001; // 10^-5
+//                    double R = 0;
+//                    double K = 0;
+//                    double cov_priori = 0;
+//                    double sample_priori = 0;
+//                    
+//                    y = x;
+//                    
+//                    // For X
+//                      R = 0.241935482;
+//                    //R = 0.049450549;
+//                    if(index == 0) {
+//                        sample_priori = 0;
+//                        cov_priori = Q;
+//                    } else {
+//                        sample_priori = yDataX_KF[index-1];
+//                        cov_priori = yDataX_KF_Cov[index-1] + Q;
+//                    }
+//                    K = cov_priori / (cov_priori + R);
+//                    yDataX_KF[index] = sample_priori + (K * (x - sample_priori));
+//                    yDataX_KF_Cov[index] = (1-K) * cov_priori;
+//                    x = yDataX_KF[index];
+//                    
+//                    
+//                     // For Y
+//                      R = 0.102150537;
+//                    //R = 0.049450549;
+//                    if(index == 0) {
+//                        sample_priori = 0;
+//                        cov_priori = Q;
+//                    } else {
+//                        sample_priori = yDataY_KF[index-1];
+//                        cov_priori = yDataY_KF_Cov[index-1] + Q;
+//                    }
+//                    K = cov_priori / (cov_priori + R);
+//                    yDataY_KF[index] = sample_priori + (K * (x - sample_priori));
+//                    yDataY_KF_Cov[index] = (1-K) * cov_priori;
+//                    //y = yDataY_KF[index];
+//                    
+//                     // For Z
+//                        R = 0.016129032;
+//                    //R = 0.049450549;
+//                    if(index == 0) {
+//                        sample_priori = 0;
+//                        cov_priori = Q;
+//                    } else {
+//                        sample_priori = yDataZ_KF[index-1];
+//                        cov_priori = yDataZ_KF_Cov[index-1] + Q;
+//                    }
+//                    K = cov_priori / (cov_priori + R);
+//                    yDataZ_KF[index] = sample_priori + (K * (x - sample_priori));
+//                    yDataZ_KF_Cov[index] = (1-K) * cov_priori;
+//                    z = yDataZ_KF[index];
+                    
+                    
+                    
+                    
                     if(g>1.3){
-                        graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);
-                        recognize(returnVals); //this weird statement here makes the program work
+                       graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);
+                       recognize(returnVals); //this weird statement here makes the program work
                     }
                     else
                        graphView.takeData(address,sampleTime,index,0,0,0,0,twoG);
