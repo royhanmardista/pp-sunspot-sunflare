@@ -346,8 +346,8 @@ public class GraphView extends JPanel {
      * @param twoG true if measured using the 2 G accelerometer scale
      */
     public void takeData(String id, long tMS, int index, double x, double y, double z, double g, boolean twoG) {
-        if(x != 0 && y != 0 && z !=0)
-            System.out.println("Drawing g/" + g + " x/" + x + " t/" + tMS);
+//        if(x != 0 && y != 0 && z !=0)
+//            System.out.println("Drawing g/" + g + " x/" + x + " t/" + tMS);
         
         if (tMS > MSEC_OF_DATA || index >= timeMS.length) {
             if (!ignoreMsgPrinted) {
