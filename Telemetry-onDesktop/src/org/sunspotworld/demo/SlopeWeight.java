@@ -28,10 +28,10 @@ public class SlopeWeight{
     public String toString(){
         StringBuilder result = new StringBuilder();
         if(slope)
-            result.append("slope = positive ");
+            result.append("positive/");
         else
-            result.append("slope = negative ");
-        result.append("weight = " + weight);
+            result.append("negative/");
+        result.append("" + weight + " ");
         return result.toString();
     }
 

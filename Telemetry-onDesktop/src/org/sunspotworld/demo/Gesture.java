@@ -50,7 +50,15 @@ public class Gesture {
     }
     public void combine(Gesture g){
          dataset.addAll(g.getDataset());
+         int originalPatternSize = pattern.size();
+         //first, combine the patterns
          pattern.addAll(g.getPattern());
+         //check to see if the slope of the last element of the original pattern is the same as the slope of the first element of the newly added pattern
+         if(((SlopeWeight)pattern.elementAt(originalPatternSize-1)).slope == ((SlopeWeight)g.getPattern().firstElement()).slope){
+             int oldWeight = ((SlopeWeight)pattern.elementAt(originalPatternSize-1)).weight;
+             pattern.removeElementAt(originalPatternSize-1);
+             ((SlopeWeight)pattern.elementAt(originalPatternSize-1)).weight += oldWeight;
+         }
          endTimeStamp = g.getEndTimeStamp();
     }
     public double getEndTimeStamp(){

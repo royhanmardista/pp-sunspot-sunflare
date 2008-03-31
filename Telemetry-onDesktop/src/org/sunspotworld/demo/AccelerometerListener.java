@@ -72,7 +72,6 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     private TelemetryFrame guiFrame = null;
 
     private double absoluteSums [] = {0,0,0};
-    private double prevX = 0,prevY = 0,prevZ= 0;
     ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     private Vector dataset = new Vector();
     private boolean recordData = false;
@@ -331,7 +330,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                 System.out.println(dataset);
                 
                 Global.numGesturesDetected ++;
-                System.out.println("GESTURE END, Num gesture = " + Global.numGesturesDetected);
+                System.out.println("GESTURE END");// Num gesture = " + Global.numGesturesDetected);
                 Global.gestureSegmentsLock.writeLock().lock();
                 try{
                    
@@ -405,60 +404,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     double x  = (xValue - zeroOffsets[scale][0]) / gains[scale][0];        // Convert to G's
                     double y  = (yValue - zeroOffsets[scale][1]) / gains[scale][1];
                     double z  = (zValue - zeroOffsets[scale][2]) / gains[scale][2];
-                    double z_gravity = (zValue - zeroOffsets[scale][2]) / gains[scale][2] + 1.0;
-
-                   
-                    /*
-                    // Do the Kalman Filtering
-                    double Q = 0.00001; // 10^-5
-                    double R = 0;
-                    double K = 0;
-                    double cov_priori = 0;
-                    double sample_priori = 0;
-                    
-                    // For X
-                    R = 0.049450549;
-                    if(index == 0) {
-                        sample_priori = 0;
-                        cov_priori = Q;
-                    } else {
-                        sample_priori = yDataX_KF[index-1];
-                        cov_priori = yDataX_KF_Cov[index-1] + Q;
-                    }
-                    K = cov_priori / (cov_priori + R);
-                    yDataX_KF[index] = sample_priori + (K * (x - sample_priori));
-                    yDataX_KF_Cov[index] = (1-K) * cov_priori;
-                    x = yDataX_KF[index];
-                    
-                    
-                     // For Y
-                    R = 0.049450549;
-                    if(index == 0) {
-                        sample_priori = 0;
-                        cov_priori = Q;
-                    } else {
-                        sample_priori = yDataY_KF[index-1];
-                        cov_priori = yDataY_KF_Cov[index-1] + Q;
-                    }
-                    K = cov_priori / (cov_priori + R);
-                    yDataY_KF[index] = sample_priori + (K * (x - sample_priori));
-                    yDataY_KF_Cov[index] = (1-K) * cov_priori;
-                    y = yDataY_KF[index];
-                    
-                     // For Z
-                    R = 0.049450549;
-                    if(index == 0) {
-                        sample_priori = 0;
-                        cov_priori = Q;
-                    } else {
-                        sample_priori = yDataZ_KF[index-1];
-                        cov_priori = yDataZ_KF_Cov[index-1] + Q;
-                    }
-                    K = cov_priori / (cov_priori + R);
-                    yDataZ_KF[index] = sample_priori + (K * (x - sample_priori));
-                    yDataZ_KF_Cov[index] = (1-K) * cov_priori;
-                    z = yDataZ_KF[index];
-                    */
+                    double z_gravity = (zValue - zeroOffsets[scale][2]) / gains[scale][2] + 1.0;                
                     double g = Math.sqrt(x*x + y*y + z*z);      // Square vector of the total Gs
                     double g_gravity = Math.sqrt(x*x + y*y + z_gravity*z_gravity);     
                     returnVals[0]=x;
@@ -466,12 +412,6 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     returnVals[2]=z_gravity;
                     returnVals[3]=g;
                     returnVals[4]=sampleTime;
-
-                    
-                    
-                    prevX = x;
-                    prevY = y;
-                    prevZ = z;
                     if(g>1.3){
                         graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);                     
                     }
