@@ -58,11 +58,11 @@ public class GestureRecognizer extends Thread{
             if(i==0)
                 pattern.addElement(new SlopeWeight(((DataStruct)dataset.elementAt(i)).getDx()>=0,1));
             
-            else if(i>1 && ((SlopeWeight)(pattern.lastElement())).slope == (((DataStruct)dataset.elementAt(i)).getDx()>=0) ){
+            else if(i>0 && ((SlopeWeight)(pattern.lastElement())).slope == (((DataStruct)dataset.elementAt(i)).getDx()>=0) ){
                 System.out.println("continue in the same direction @ i = " + i);
                 ((SlopeWeight)(pattern.lastElement())).weight++;
             }
-            else if(i>1 && (((SlopeWeight)(pattern.lastElement())).slope != (((DataStruct)dataset.elementAt(i)).getDx()>=0)) ){
+            else if(i>0 && (((SlopeWeight)(pattern.lastElement())).slope != (((DataStruct)dataset.elementAt(i)).getDx()>=0)) ){
                 System.out.println("change in direction @ i = " + i );
                 pattern.addElement(new SlopeWeight(((DataStruct)dataset.elementAt(i)).getDx()>=0,1));
             }
@@ -74,7 +74,7 @@ public class GestureRecognizer extends Thread{
             System.out.println(pattern.elementAt(j));
         }
                 
-                
+               
 //        
 //        if(currentGesture.getInactiveAxis().equals("x")){
 //            ((DataStruct)dataset.elementAt(i)).getDx();        

@@ -330,7 +330,9 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                 }
                 DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
                 dataset.addElement(data);
-               System.out.println(dataset);
+                
+                System.out.println(dataset);
+                
                 Global.numGesturesDetected ++;
                 System.out.println("GESTURE END, Num gesture = " + Global.numGesturesDetected);
                 Global.gestureSegmentsLock.writeLock().lock();
