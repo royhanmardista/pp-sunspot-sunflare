@@ -581,7 +581,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                                 break;
                             case ACCEL_2G_DATA_REPLY:
                             case ACCEL_6G_DATA_REPLY:
-                                double g[];
+                                double g[];// = {0,0,0,0,0,0,0};
                                 g = receive(rdg, packetType == ACCEL_2G_DATA_REPLY);
                                 recognize(g);
                                 break;
