@@ -20,13 +20,15 @@ public class GestureRecognizer extends Thread{
         private int index = 0;
         private static int gestureSegmentsIndex = 0;
         private boolean prevTimeStamp = false;
-       
+        private final static double TIME_ALLOWANCE = 270; 
+                
         private Vector data = new Vector();
         private Vector gestureSegments = new Vector();
         private Vector gestures = new Vector();
-    /** Creates a new instance of GestureRecognizer */
+
+        /** Creates a new instance of GestureRecognizer */
     public GestureRecognizer() {
-        
+        gestures = new Vector();
     }
     
 
@@ -70,12 +72,24 @@ public class GestureRecognizer extends Thread{
         for(int j=0; j<pattern.size(); j++){
             System.out.println(pattern.elementAt(j));
         }
-                
-               
-//        
-//        if(currentGesture.getInactiveAxis().equals("x")){
-//            ((DataStruct)dataset.elementAt(i)).getDx();        
-//        
+        currentGesture.setPattern(new Vector(pattern));
+        //in fact it should be combined with the previous gesture
+        if(gestures.size()>0 && currentGesture.getEndTimeStamp()-((Gesture)gestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
+            System.out.println("COMBINE current gesture with previous");
+            ((Gesture)gestures.lastElement()).combine(currentGesture);
+        }
+        else{
+            gestures.addElement(currentGesture);
+        }
+        
+        System.out.println("printing gestures*****");
+        
+        for(int j = 0; j<gestures.size(); j++){
+            System.out.println(gestures.elementAt(j));
+        }
+        System.out.println("**finished***");
+        
+        
        
     }
     public void recognizer() throws InterruptedException{
@@ -88,9 +102,11 @@ public class GestureRecognizer extends Thread{
         
           if(gestureSegmentsIndex < Global.gestureSegments.size()){
               Vector dataset = (Vector)Global.gestureSegments.elementAt(gestureSegmentsIndex);
+              //get the timestamp of the last data point in the set
+              double timeStamp = ((DataStruct)(((Vector)(((Vector)Global.gestureSegments).lastElement())).lastElement())).getTimeStamp();
               System.out.println("Processing gesture signal..num gestures = " + Global.numGesturesDetected);
               System.out.println("dataset size "+ dataset.size());
-              currentGesture = new Gesture(dataset);
+              currentGesture = new Gesture(dataset, timeStamp);
               //check timeStamp of the previous gesture to see if they are actually one single gesture
            
                   //do some checking to see if it should be combined with the previous gesture segment

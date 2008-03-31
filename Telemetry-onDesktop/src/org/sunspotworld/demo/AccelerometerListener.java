@@ -302,16 +302,13 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         double totalG = g[3];
         double timeStamp = g[4];
 
-//                        DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
-//                dataset.addElement(data);
-//                System.out.println("adding");
         if(totalG>totalGThreshold){
            //mark the start of a gesture
            if(absoluteSums[0]==0 && absoluteSums[1]==0 && absoluteSums[2]==0){ //going from inactivity to activity, start of a gesture
                System.out.println("GESTURE START");
-               dx = x;
-               dy = y;
-               dz = z;
+               dx = x/50;    //50 is just an arbitrary time interval between this data point and the previous data point (which is all 0's)
+               dy = y/50;
+               dz = z/50;
                recordData = true;      
            }
            absoluteSums[0] += Math.abs(x);

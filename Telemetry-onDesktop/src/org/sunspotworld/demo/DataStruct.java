@@ -60,7 +60,7 @@ public class DataStruct {
     }
     public String toString(){
         StringBuilder result = new StringBuilder();
-        result.append("x = " + x + " dx = " + dx);
+        result.append("x = " + x + " dx = " + dx + " ts = " + timeStamp);
         return result.toString();
     }
     public double getDy(){
