@@ -69,11 +69,10 @@ public class GestureRecognizer extends Thread{
             System.out.println(pattern.elementAt(j));
         }
         System.out.println("Current gesture segment's pattern " + pattern);
-
         currentGesture.setPattern(new Vector(pattern));
         //in fact it should be combined with the previous gesture
         if(gestures.size()>0 && currentGesture.getEndTimeStamp()-((Gesture)gestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
-            System.out.println("COMBINE current gesture with previous");
+            System.out.println("COMBINING current gesture with previous");
             ((Gesture)gestures.lastElement()).combine(currentGesture);
             System.out.println("Combined gesture's pattern = " + ((Gesture)gestures.lastElement()).getPattern());
         }
