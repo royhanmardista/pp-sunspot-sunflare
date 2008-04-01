@@ -294,7 +294,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
 
     private void recognize(double g[]) {
       
-        double totalGThreshold = 1.3;
+        double totalGThreshold = 1.2;
         double x = g[0];
         double y = g[1];
         double z = g[2];
@@ -413,7 +413,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     double g_gravity = Math.sqrt(x*x + y*y + z_gravity*z_gravity);     
                     returnVals[0]=x;
                     returnVals[1]=y;
-                    returnVals[2]=z_gravity;
+                    returnVals[2]=z-1;
                     returnVals[3]=g;
                     returnVals[4]=sampleTime;
 
@@ -476,12 +476,12 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     
                     
                     
-                    if(g>1.3){
-                       graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);
+                    //if(g>1.3){
+                    //   graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);
                        recognize(returnVals); //this weird statement here makes the program work
-                    }
-                    else
-                       graphView.takeData(address,sampleTime,index,0,0,0,0,twoG);
+                    //}
+                    //else
+                     //  graphView.takeData(address,sampleTime,index,0,0,0,0,twoG);
                     index++;
                 }
             }
