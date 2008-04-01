@@ -80,8 +80,14 @@ public class GestureRecognizer extends Thread{
         }
         
         System.out.println("Total number of gestures = " + gestures.size());
-        System.out.println(leftOrRight((Gesture)gestures.lastElement()));
         System.out.println((Gesture)gestures.lastElement());
+        if(((Gesture)gestures.lastElement()).getActiveAxis().equals("x"))
+            System.out.println(leftOrRight((Gesture)gestures.lastElement()));
+        else if(((Gesture)gestures.lastElement()).getActiveAxis().equals("y"))
+            System.out.println(forwardOrBackward((Gesture)gestures.lastElement()));
+        
+        
+        
 //        Gesture tempGesture = (Gesture)gestures.lastElement();
 //        Vector tempPattern = tempGesture.getPattern();
 //        Vector simplifiedPattern = new Vector();
@@ -131,7 +137,27 @@ public class GestureRecognizer extends Thread{
             return "Right";
         
     }
-   
+       public String forwardOrBackward(Gesture g){
+        Vector dataset = g.getDataset();
+        double max = -1000, min = 1000;
+        int maxIndex = -1, minIndex = -1;
+        for(int i=0; i<dataset.size(); i++){
+            double currY = ((DataStruct)dataset.elementAt(i)).getY();
+            if(currY > max){
+                max = currY;
+                maxIndex = i;
+            }
+            if(currY < min){
+                min = currY;
+                minIndex = i;
+            }
+        }
+        if(minIndex > maxIndex)
+            return "Backward";
+        else
+            return "Forward";
+        
+    }
     
     public void recognizer() throws InterruptedException{
        Gesture currentGesture = new Gesture();
