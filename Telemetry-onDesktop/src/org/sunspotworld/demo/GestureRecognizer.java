@@ -30,10 +30,13 @@ public class GestureRecognizer extends Thread{
     
 
     public void patternMatching(Gesture currentGesture){
-        double sums[] = {0,0,0};
+        double sums[] = {0,0,0,0};
         Vector pattern = new Vector();
         Vector dataset = currentGesture.getDataset();
        
+      
+        
+        
         //determine the active axis by calculating the absolute sums of each curve
         //the greatest sum means it has more activity
         for(int i=0; i<dataset.size(); i++){
@@ -41,8 +44,11 @@ public class GestureRecognizer extends Thread{
             sums[1] += Math.abs(((DataStruct)dataset.elementAt(i)).getY());
             //sums[2] += Math.abs(((DataStruct)dataset.elementAt(i)).getZ()-1);
             sums[2] = 0;
+            sums[3] += ((DataStruct)dataset.elementAt(i)).getTotalG();
         }
-        if(sums[0]>=sums[1] && sums[0]>=sums[2])
+        if (sums[3] > 70)
+            currentGesture.setActiveAxis("s");   //shaking
+        else if(sums[0]>=sums[1] && sums[0]>=sums[2])
             currentGesture.setActiveAxis("x");
         else if(sums[1]>=sums[0] && sums[1]>=sums[2])
             currentGesture.setActiveAxis("y");
@@ -85,7 +91,8 @@ public class GestureRecognizer extends Thread{
             System.out.println(leftOrRight((Gesture)gestures.lastElement()));
         else if(((Gesture)gestures.lastElement()).getActiveAxis().equals("y"))
             System.out.println(forwardOrBackward((Gesture)gestures.lastElement()));
-        
+        else if(((Gesture)gestures.lastElement()).getActiveAxis().equals("s"))
+            System.out.println("Shake");
         
         
 //        Gesture tempGesture = (Gesture)gestures.lastElement();
