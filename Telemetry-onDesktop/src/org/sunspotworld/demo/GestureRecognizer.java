@@ -47,17 +47,17 @@ public class GestureRecognizer extends Thread{
             
         }
         
-        for(int j=0; j<pattern.size(); j++){
-            System.out.println(pattern.elementAt(j));
-        }
-        System.out.println("Current gesture segment's pattern " + pattern);
+//        for(int j=0; j<pattern.size(); j++){
+//            System.out.println(pattern.elementAt(j));
+//        }
+       // System.out.println("Current gesture segment's pattern " + pattern);
         currentGesture.setPattern(new Vector(pattern));
        
         //in fact it should be combined with the previous gesture
         if(gestures.size()>0 && currentGesture.getEndTimeStamp()-((Gesture)gestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
             System.out.println("COMBINING current gesture with previous");
             ((Gesture)gestures.lastElement()).combine(currentGesture);
-            System.out.println("Combined gesture's pattern = " + ((Gesture)gestures.lastElement()).getPattern());
+         //   System.out.println("Combined gesture's pattern = " + ((Gesture)gestures.lastElement()).getPattern());
              calculateActiveAxis((Gesture)gestures.lastElement());
         } else{
             gestures.addElement(currentGesture);
@@ -65,7 +65,7 @@ public class GestureRecognizer extends Thread{
         }
         
         System.out.println("Total number of gestures = " + gestures.size());
-        System.out.println((Gesture)gestures.lastElement());
+       // System.out.println((Gesture)gestures.lastElement());
         
         recognizeGesture(((Gesture)gestures.lastElement()));
         
@@ -94,7 +94,7 @@ public class GestureRecognizer extends Thread{
             g.setActiveAxis("y");
         else
             g.setActiveAxis("z");
-        System.out.println("sums: " + sums[0] + " " + sums[1] + " " + sums[2]);
+        //System.out.println("sums: " + sums[0] + " " + sums[1] + " " + sums[2]);
     }
     
     public void leftOrRight(Gesture g){
