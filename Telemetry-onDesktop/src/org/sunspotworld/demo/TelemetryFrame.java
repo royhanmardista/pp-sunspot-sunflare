@@ -47,6 +47,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     private static int numWindows = 0;
     private static AccelerometerListener listener = null;
     private static BasicGestureRecognizer recognizer = null;
+    private static BasicGestureClassifier classifier = null;
     private static final Font footerFont = new Font("Serif", Font.PLAIN, 9);
     private static final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy  HH:mm z");
 
@@ -146,6 +147,10 @@ public class TelemetryFrame extends JFrame implements Printable {
         if (recognizer == null){
             recognizer = new BasicGestureRecognizer();
             recognizer.start();
+        }
+        if(classifier == null){
+            classifier = new BasicGestureClassifier();
+            classifier.start();
         }
         initComponents();
         setupAcceleratorKeys();
@@ -350,6 +355,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     private void doQuit() {
         listener.doQuit();
         recognizer.doQuit();
+        classifier.doQuit();
         System.exit(0);
     }
     
@@ -1180,6 +1186,7 @@ public class TelemetryFrame extends JFrame implements Printable {
         if (clearedData) {
             listener.clear();
             recognizer.clear();
+            classifier.clear();
         }
         if (listener.is2GScale()) {
             twoGRadioButton.setSelected(true);
@@ -1342,6 +1349,7 @@ public class TelemetryFrame extends JFrame implements Printable {
         graphView.clearGraph();
         listener.clear();
         recognizer.clear();
+        classifier.clear();
         clearedData = true;
         saveMenuItem.setEnabled(sendData);
     }//GEN-LAST:event_clearButtonActionPerformed

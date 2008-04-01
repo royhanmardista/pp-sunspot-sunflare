@@ -336,8 +336,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                 Global.numGesturesDetected ++;
 //                System.out.println("GESTURE END");// Num gesture = " + Global.numGesturesDetected);
                 Global.gestureSegmentsLock.writeLock().lock();
-                try{
-                   
+                try{  
                     Global.gestureSegments.addElement(new Vector(dataset));
                     Global.gestureSegmentsCondition.signal();
                 }
@@ -363,6 +362,16 @@ public class AccelerometerListener extends Thread implements PacketTypes {
            DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
            dataset.addElement(data);
         }
+        
+        //update currentTime variable
+        Global.currentTimeLock.writeLock().lock();
+        try{
+            Global.currentTime = timeStamp;
+        }
+        finally{
+            Global.currentTimeLock.writeLock().unlock();
+        }
+        
     }
     
     

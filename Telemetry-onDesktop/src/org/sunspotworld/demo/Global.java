@@ -27,4 +27,12 @@ public class Global {
     public final static double GESTURE_END = -999;
     
     public static int numGesturesDetected = 0;
+    
+    public static Vector basicGestures = new Vector();
+    public static ReentrantReadWriteLock basicGesturesLock  = new ReentrantReadWriteLock();
+    public static Condition basicGesturesCondition = basicGesturesLock.writeLock().newCondition();
+    
+    public static double currentTime = 0;
+    public static ReentrantReadWriteLock currentTimeLock  = new ReentrantReadWriteLock();
+    public static Condition currentTimeCondition = currentTimeLock.writeLock().newCondition();
 }

@@ -21,11 +21,11 @@ public class BasicGestureRecognizer extends Thread{
     private static int gestureSegmentsIndex = 0;
     private boolean prevTimeStamp = false;
     private final static double TIME_ALLOWANCE = 270;
-    private Vector basicGestures = new Vector();
+
     
     /** Creates a new instance of BasicGestureRecognizer */
     public BasicGestureRecognizer() {
-        basicGestures = new Vector();
+
     }
     
     
@@ -53,22 +53,27 @@ public class BasicGestureRecognizer extends Thread{
        // System.out.println("Current gesture segment's pattern " + pattern);
         currentGesture.setPattern(new Vector(pattern));
        
+        Global.basicGesturesLock.writeLock().lock();
+        try{
         //in fact it should be combined with the previous gesture
-        if(basicGestures.size()>0 && currentGesture.getEndTimeStamp()-((BasicGesture)basicGestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
+        if(Global.basicGestures.size()>0 && currentGesture.getEndTimeStamp()-((BasicGesture)Global.basicGestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
             System.out.println("COMBINING current gesture with previous");
-            ((BasicGesture)basicGestures.lastElement()).combine(currentGesture);
-         //   System.out.println("Combined gesture's pattern = " + ((BasicGesture)basicGestures.lastElement()).getPattern());
-             calculateActiveAxis((BasicGesture)basicGestures.lastElement());
+            ((BasicGesture)Global.basicGestures.lastElement()).combine(currentGesture);
+         //   System.out.println("Combined gesture's pattern = " + ((BasicGesture)Global.basicGestures.lastElement()).getPattern());
+             calculateActiveAxis((BasicGesture)Global.basicGestures.lastElement());
         } else{
-            basicGestures.addElement(currentGesture);
+            Global.basicGestures.addElement(currentGesture);
             calculateActiveAxis(currentGesture);
         }
         
-        System.out.println("Total number of basicGestures = " + basicGestures.size());
-       // System.out.println((BasicGesture)basicGestures.lastElement());
+        System.out.println("Total number of Global.basicGestures = " + Global.basicGestures.size());
+       // System.out.println((BasicGesture)Global.basicGestures.lastElement());
         
-        recognizeBasicGesture(((BasicGesture)basicGestures.lastElement()));
-        
+        //recognizeBasicGesture(((BasicGesture)Global.basicGestures.lastElement()));
+        }
+        finally{
+            Global.basicGesturesLock.writeLock().unlock();
+        }
         
     }
     
@@ -96,7 +101,7 @@ public class BasicGestureRecognizer extends Thread{
             g.setActiveAxis("z");
         //System.out.println("sums: " + sums[0] + " " + sums[1] + " " + sums[2]);
     }
-    
+    /*
     public void leftOrRight(BasicGesture g){
         Vector dataset = g.getDataset();
         double max = -1000, min = 1000;
@@ -170,6 +175,8 @@ public class BasicGestureRecognizer extends Thread{
         else if(g.getActiveAxis().equals("s"))
             System.out.println("Shake");
     }
+     */
+    
     public void recognizer() throws InterruptedException{
         BasicGesture currentGesture = new BasicGesture();
         Global.gestureSegmentsLock.writeLock().lock();
@@ -197,7 +204,14 @@ public class BasicGestureRecognizer extends Thread{
     
     
     public void clear() {
-        basicGestures.removeAllElements();
+        Global.basicGesturesLock.writeLock().lock();
+        try{
+            Global.basicGestures.removeAllElements();
+        }
+        finally{
+            Global.basicGesturesLock.writeLock().unlock();
+        }
+        
         // clear private data
     }
     public void run() {
