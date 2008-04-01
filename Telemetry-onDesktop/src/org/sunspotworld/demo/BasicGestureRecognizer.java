@@ -1,5 +1,5 @@
 /*
- * GestureRecognizer.java
+ * BasicGestureRecognizer.java
  *
  * Created on March 27, 2008, 11:08 PM
  *
@@ -15,7 +15,7 @@ import java.util.concurrent.locks.*;
  *
  * @author Winnie
  */
-public class GestureRecognizer extends Thread{
+public class BasicGestureRecognizer extends Thread{
     private boolean running = true;
     private int index = 0;
     private static int gestureSegmentsIndex = 0;
@@ -23,13 +23,13 @@ public class GestureRecognizer extends Thread{
     private final static double TIME_ALLOWANCE = 270;
     private Vector gestures = new Vector();
     
-    /** Creates a new instance of GestureRecognizer */
-    public GestureRecognizer() {
+    /** Creates a new instance of BasicGestureRecognizer */
+    public BasicGestureRecognizer() {
         gestures = new Vector();
     }
     
     
-    public void patternMatching(Gesture currentGesture){
+    public void patternMatching(BasicGesture currentGesture){
         Vector pattern = new Vector();
         Vector dataset = currentGesture.getDataset();
 
@@ -54,25 +54,25 @@ public class GestureRecognizer extends Thread{
         currentGesture.setPattern(new Vector(pattern));
        
         //in fact it should be combined with the previous gesture
-        if(gestures.size()>0 && currentGesture.getEndTimeStamp()-((Gesture)gestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
+        if(gestures.size()>0 && currentGesture.getEndTimeStamp()-((BasicGesture)gestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
             System.out.println("COMBINING current gesture with previous");
-            ((Gesture)gestures.lastElement()).combine(currentGesture);
-         //   System.out.println("Combined gesture's pattern = " + ((Gesture)gestures.lastElement()).getPattern());
-             calculateActiveAxis((Gesture)gestures.lastElement());
+            ((BasicGesture)gestures.lastElement()).combine(currentGesture);
+         //   System.out.println("Combined gesture's pattern = " + ((BasicGesture)gestures.lastElement()).getPattern());
+             calculateActiveAxis((BasicGesture)gestures.lastElement());
         } else{
             gestures.addElement(currentGesture);
             calculateActiveAxis(currentGesture);
         }
         
         System.out.println("Total number of gestures = " + gestures.size());
-       // System.out.println((Gesture)gestures.lastElement());
+       // System.out.println((BasicGesture)gestures.lastElement());
         
-        recognizeGesture(((Gesture)gestures.lastElement()));
+        recognizeBasicGesture(((BasicGesture)gestures.lastElement()));
         
         
     }
     
-    public void calculateActiveAxis(Gesture g){
+    public void calculateActiveAxis(BasicGesture g){
         double sums[] = {0,0,0,0};
         
         Vector dataset = g.getDataset();
@@ -97,7 +97,7 @@ public class GestureRecognizer extends Thread{
         //System.out.println("sums: " + sums[0] + " " + sums[1] + " " + sums[2]);
     }
     
-    public void leftOrRight(Gesture g){
+    public void leftOrRight(BasicGesture g){
         Vector dataset = g.getDataset();
         double max = -1000, min = 1000;
         int maxIndex = -1, minIndex = -1;
@@ -118,7 +118,7 @@ public class GestureRecognizer extends Thread{
             System.out.println("Right");
         
     }
-    public void forwardOrBackward(Gesture g){
+    public void forwardOrBackward(BasicGesture g){
         Vector dataset = g.getDataset();
         double max = -1000, min = 1000;
         int maxIndex = -1, minIndex = -1;
@@ -139,7 +139,7 @@ public class GestureRecognizer extends Thread{
             System.out.println("Forward");
         
     }
-    public void upOrDown(Gesture g){
+    public void upOrDown(BasicGesture g){
         Vector dataset = g.getDataset();
         double max = -1000, min = 1000;
         int maxIndex = -1, minIndex = -1;
@@ -160,7 +160,7 @@ public class GestureRecognizer extends Thread{
             System.out.println("Down");
         System.out.println("minT/" + ((DataStruct)dataset.elementAt(minIndex)).getTimeStamp() + " maxT/" + ((DataStruct)dataset.elementAt(maxIndex)).getTimeStamp());
     }
-    public void recognizeGesture(Gesture g){
+    public void recognizeBasicGesture(BasicGesture g){
         if(g.getActiveAxis().equals("x"))
             leftOrRight(g);
         else if(g.getActiveAxis().equals("y"))
@@ -171,7 +171,7 @@ public class GestureRecognizer extends Thread{
             System.out.println("Shake");
     }
     public void recognizer() throws InterruptedException{
-        Gesture currentGesture = new Gesture();
+        BasicGesture currentGesture = new BasicGesture();
         Global.gestureSegmentsLock.writeLock().lock();
         
         try{
@@ -182,7 +182,7 @@ public class GestureRecognizer extends Thread{
                 Vector dataset = (Vector)Global.gestureSegments.elementAt(gestureSegmentsIndex);
                 //get the timestamp of the last data point in the set
                 double timeStamp = ((DataStruct)(((Vector)(((Vector)Global.gestureSegments).lastElement())).lastElement())).getTimeStamp();
-                currentGesture = new Gesture(dataset, timeStamp);
+                currentGesture = new BasicGesture(dataset, timeStamp);
                 gestureSegmentsIndex++;
             }
             
@@ -201,7 +201,7 @@ public class GestureRecognizer extends Thread{
         // clear private data
     }
     public void run() {
-        System.out.println("Gesture Recognizer Thread started ...");
+        System.out.println("BasicGesture Recognizer Thread started ...");
         hostLoop();
     }
     

@@ -46,7 +46,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     private static String versionDate = "August 1, 2007";
     private static int numWindows = 0;
     private static AccelerometerListener listener = null;
-    private static GestureRecognizer recognizer = null;
+    private static BasicGestureRecognizer recognizer = null;
     private static final Font footerFont = new Font("Serif", Font.PLAIN, 9);
     private static final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy  HH:mm z");
 
@@ -144,7 +144,7 @@ public class TelemetryFrame extends JFrame implements Printable {
             aboutIcon = new ImageIcon(getClass().getResource("/org/sunspotworld/demo/racecar.gif"));
         }
         if (recognizer == null){
-            recognizer = new GestureRecognizer();
+            recognizer = new BasicGestureRecognizer();
             recognizer.start();
         }
         initComponents();

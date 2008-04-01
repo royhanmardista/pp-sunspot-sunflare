@@ -1,5 +1,5 @@
 /*
- * Gesture.java
+ * BasicGesture.java
  *
  * Created on March 30, 2008, 2:18 AM
  *
@@ -14,7 +14,7 @@ import java.util.Vector;
  *
  * @author Winnie
  */
-public class Gesture {
+public class BasicGesture {
     private Vector dataset;
     private Vector nodes;
     private Vector pattern;
@@ -22,18 +22,18 @@ public class Gesture {
     private String activeAxis;
     private double endTimeStamp;
     
-    /** Creates a new instance of Gesture */
-    public Gesture() {
+    /** Creates a new instance of BasicGesture */
+    public BasicGesture() {
         dataset = new Vector();
         nodes = new Vector();
         pattern = new Vector();
         inactiveAxis = "";
         endTimeStamp = 0;
     }
-    public Gesture(Vector d){
+    public BasicGesture(Vector d){
         dataset = d;
     }
-    public Gesture(Vector d, double ts){
+    public BasicGesture(Vector d, double ts){
         dataset = d;
         endTimeStamp = ts;
     }
@@ -52,7 +52,7 @@ public class Gesture {
     public void appendData(Vector d){
         dataset.addAll(d);
     }
-    public void combine(Gesture g){
+    public void combine(BasicGesture g){
          dataset.addAll(g.getDataset());
          int originalPatternSize = pattern.size();
          //first, combine the patterns
