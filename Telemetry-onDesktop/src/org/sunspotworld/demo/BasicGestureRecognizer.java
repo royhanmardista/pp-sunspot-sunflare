@@ -29,10 +29,12 @@ public class BasicGestureRecognizer extends Thread{
     }
     
     
-    public void patternMatching(BasicGesture currentGesture){
+    public void analyze(BasicGesture currentGesture){
         Vector pattern = new Vector();
         Vector dataset = currentGesture.getDataset();
 
+        //NOTE: the following chunk of code analyzing slope pattern is not useless (at least for now)
+        
         //look at dx
         for(int i=0; i<dataset.size(); i++){
             
@@ -53,6 +55,9 @@ public class BasicGestureRecognizer extends Thread{
        // System.out.println("Current gesture segment's pattern " + pattern);
         currentGesture.setPattern(new Vector(pattern));
        
+        
+        //end useless code
+        
         Global.basicGesturesLock.writeLock().lock();
         try{
         //in fact it should be combined with the previous gesture
@@ -66,10 +71,8 @@ public class BasicGestureRecognizer extends Thread{
             calculateActiveAxis(currentGesture);
         }
         
-        System.out.println("Total number of Global.basicGestures = " + Global.basicGestures.size());
-       // System.out.println((BasicGesture)Global.basicGestures.lastElement());
-        
-        //recognizeBasicGesture(((BasicGesture)Global.basicGestures.lastElement()));
+        System.out.println("Total number of basicGestures = " + Global.basicGestures.size());
+
         }
         finally{
             Global.basicGesturesLock.writeLock().unlock();
@@ -101,81 +104,7 @@ public class BasicGestureRecognizer extends Thread{
             g.setActiveAxis("z");
         //System.out.println("sums: " + sums[0] + " " + sums[1] + " " + sums[2]);
     }
-    /*
-    public void leftOrRight(BasicGesture g){
-        Vector dataset = g.getDataset();
-        double max = -1000, min = 1000;
-        int maxIndex = -1, minIndex = -1;
-        for(int i=0; i<dataset.size(); i++){
-            double currX = ((DataStruct)dataset.elementAt(i)).getX();
-            if(currX > max){
-                max = currX;
-                maxIndex = i;
-            }
-            if(currX < min){
-                min = currX;
-                minIndex = i;
-            }
-        }
-        if(minIndex > maxIndex)
-            System.out.println("Left");
-        else
-            System.out.println("Right");
-        
-    }
-    public void forwardOrBackward(BasicGesture g){
-        Vector dataset = g.getDataset();
-        double max = -1000, min = 1000;
-        int maxIndex = -1, minIndex = -1;
-        for(int i=0; i<dataset.size(); i++){
-            double currY = ((DataStruct)dataset.elementAt(i)).getY();
-            if(currY > max){
-                max = currY;
-                maxIndex = i;
-            }
-            if(currY < min){
-                min = currY;
-                minIndex = i;
-            }
-        }
-        if(minIndex > maxIndex)
-            System.out.println("Backward");
-        else
-            System.out.println("Forward");
-        
-    }
-    public void upOrDown(BasicGesture g){
-        Vector dataset = g.getDataset();
-        double max = -1000, min = 1000;
-        int maxIndex = -1, minIndex = -1;
-        for(int i=0; i<dataset.size(); i++){
-            double currZ = ((DataStruct)dataset.elementAt(i)).getZ();
-            if(currZ > max){
-                max = currZ;
-                maxIndex = i;
-            }
-            if(currZ < min){
-                min = currZ;
-                minIndex = i;
-            }
-        }
-        if(minIndex > maxIndex)
-            System.out.println("Up");
-        else
-            System.out.println("Down");
-        System.out.println("minT/" + ((DataStruct)dataset.elementAt(minIndex)).getTimeStamp() + " maxT/" + ((DataStruct)dataset.elementAt(maxIndex)).getTimeStamp());
-    }
-    public void recognizeBasicGesture(BasicGesture g){
-        if(g.getActiveAxis().equals("x"))
-            leftOrRight(g);
-        else if(g.getActiveAxis().equals("y"))
-            forwardOrBackward(g);
-        else if(g.getActiveAxis().equals("z"))
-            upOrDown(g);
-        else if(g.getActiveAxis().equals("s"))
-            System.out.println("Shake");
-    }
-     */
+   
     
     public void recognizer() throws InterruptedException{
         BasicGesture currentGesture = new BasicGesture();
@@ -197,7 +126,7 @@ public class BasicGestureRecognizer extends Thread{
         } finally{
             Global.gestureSegmentsLock.writeLock().unlock();
         }
-        patternMatching(currentGesture);
+        analyze(currentGesture);
         
     }
     
