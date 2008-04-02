@@ -133,7 +133,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
-    <Property name="title" type="java.lang.String" value="Sun SPOTs Telemetry Demo"/>
+    <Property name="title" type="java.lang.String" value="SunFLARE Demo"/>
     <Property name="name" type="java.lang.String" value="spotTelemetry"/>
   </Properties>
   <SyntheticProperties>
@@ -141,8 +141,8 @@
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
   </SyntheticProperties>
   <Events>
-    <EventHandler event="windowClosed" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosed"/>
     <EventHandler event="windowActivated" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowActivated"/>
+    <EventHandler event="windowClosed" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosed"/>
     <EventHandler event="windowDeactivated" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowDeactivated"/>
   </Events>
   <AuxValues>

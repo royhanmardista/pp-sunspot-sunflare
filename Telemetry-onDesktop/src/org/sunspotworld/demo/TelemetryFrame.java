@@ -531,14 +531,14 @@ public class TelemetryFrame extends JFrame implements Printable {
         getContentPane().setLayout(new java.awt.BorderLayout(0, 5));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Sun SPOTs Telemetry Demo");
+        setTitle("SunFLARE Demo");
         setName("spotTelemetry");
         addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosed(java.awt.event.WindowEvent evt) {
-                formWindowClosed(evt);
-            }
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
+            }
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
             }
             public void windowDeactivated(java.awt.event.WindowEvent evt) {
                 formWindowDeactivated(evt);
