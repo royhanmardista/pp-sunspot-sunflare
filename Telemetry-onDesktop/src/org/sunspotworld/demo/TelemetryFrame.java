@@ -499,8 +499,6 @@ public class TelemetryFrame extends JFrame implements Printable {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
-
         fullscaleGroup = new javax.swing.ButtonGroup();
         xZoomGroup = new javax.swing.ButtonGroup();
         yZoomGroup = new javax.swing.ButtonGroup();
