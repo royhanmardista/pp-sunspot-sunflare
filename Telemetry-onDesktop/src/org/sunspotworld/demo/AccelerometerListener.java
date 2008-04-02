@@ -87,7 +87,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     private double maxX=-1000, maxY=-1000, maxZ = -1000;
     private double minX=1000, minY=1000,minZ=1000;
     
-    private double totalGThreshold = 1.2;
+    private double totalGThreshold = 1.9;//1.2;
     /**
      * Create a new AccelerometerListener to connect to the remote SPOT over the radio.
      */

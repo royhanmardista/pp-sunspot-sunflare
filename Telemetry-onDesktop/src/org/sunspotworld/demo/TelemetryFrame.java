@@ -48,6 +48,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     private static AccelerometerListener listener = null;
     private static BasicGestureRecognizer recognizer = null;
     private static BasicGestureClassifier classifier = null;
+    private static GestureClassifier gestureClassifier = null;
     private static final Font footerFont = new Font("Serif", Font.PLAIN, 9);
     private static final DateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy  HH:mm z");
 
@@ -152,6 +153,11 @@ public class TelemetryFrame extends JFrame implements Printable {
             classifier = new BasicGestureClassifier();
             classifier.start();
         }
+        if(gestureClassifier == null){
+            gestureClassifier = new GestureClassifier();
+            gestureClassifier.start();
+        }
+        new Global();
         initComponents();
         setupAcceleratorKeys();
         this.file = file;
@@ -356,6 +362,7 @@ public class TelemetryFrame extends JFrame implements Printable {
         listener.doQuit();
         recognizer.doQuit();
         classifier.doQuit();
+        gestureClassifier.doQuit();
         System.exit(0);
     }
     

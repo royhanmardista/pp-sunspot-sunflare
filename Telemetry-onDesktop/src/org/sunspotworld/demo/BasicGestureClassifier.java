@@ -28,6 +28,7 @@ public class BasicGestureClassifier extends Thread{
     public void classifier(){
         Global.basicGesturesLock.writeLock().lock();
         try{
+          //  System.err.println("Inside the basic gesture classifier classifier");
             BasicGesture g = new BasicGesture();
             Vector dataset = new Vector();
             if(Global.basicGestures.size()>0 && basicGesturesIndex < Global.basicGestures.size()){
@@ -62,10 +63,24 @@ public class BasicGestureClassifier extends Thread{
                     minIndex = i;
                 }
             }
-            if(minIndex > maxIndex)
+            if(minIndex > maxIndex){
                 System.out.println("Left");
-            else
+                Global.gestureLock.writeLock().lock();
+                try{
+                    Global.gesture.addToVector(Global.LEFT);
+                } finally{
+                    Global.gestureLock.writeLock().unlock();
+                }                
+            }else{
                 System.out.println("Right");
+                Global.gestureLock.writeLock().lock();
+                try{
+                    Global.gesture.addToVector(Global.RIGHT);
+                } finally{
+                    Global.gestureLock.writeLock().unlock();
+                }                                
+            }
+            
             
         }
         public void forwardOrBackward(BasicGesture g){
@@ -83,10 +98,24 @@ public class BasicGestureClassifier extends Thread{
                     minIndex = i;
                 }
             }
-            if(minIndex > maxIndex)
+            if(minIndex > maxIndex){
                 System.out.println("Backward");
-            else
+                Global.gestureLock.writeLock().lock();
+                try{
+                    Global.gesture.addToVector(Global.BACKWARD);
+                } finally{
+                    Global.gestureLock.writeLock().unlock();
+                }                                
+            }else{
                 System.out.println("Forward");
+                Global.gestureLock.writeLock().lock();
+                try{
+                    Global.gesture.addToVector(Global.FORWARD);
+                } finally{
+                    Global.gestureLock.writeLock().unlock();
+                }                                                
+            }
+            
             
         }
         public void upOrDown(BasicGesture g){
@@ -104,10 +133,24 @@ public class BasicGestureClassifier extends Thread{
                     minIndex = i;
                 }
             }
-            if(minIndex > maxIndex)
+            if(minIndex > maxIndex){
                 System.out.println("Up");
-            else
+                Global.gestureLock.writeLock().lock();
+                try{
+                    Global.gesture.addToVector(Global.UP);
+                } finally{
+                    Global.gestureLock.writeLock().unlock();
+                }
+            }else{
                 System.out.println("Down");
+                Global.gestureLock.writeLock().lock();
+                try{
+                    Global.gesture.addToVector(Global.DOWN);
+                } finally{
+                    Global.gestureLock.writeLock().unlock();
+                }                                                                
+            }
+            
             System.out.println("minT/" + ((DataStruct)dataset.elementAt(minIndex)).getTimeStamp() + " maxT/" + ((DataStruct)dataset.elementAt(maxIndex)).getTimeStamp());
         }
         public void classifyBasicGesture(BasicGesture g){
@@ -141,6 +184,7 @@ public class BasicGestureClassifier extends Thread{
             running = true;
             while(running)
                 try{
+             //       System.err.println("Inside the basic gesture classifier run");
                     classifier();
                 } catch(Exception e){
                     System.out.println(e);
