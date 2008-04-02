@@ -64,6 +64,8 @@ public class TelemetryFrame extends JFrame implements Printable {
 
     private PrinterJob printJob = PrinterJob.getPrinterJob();
     private PageFormat pageFormat = printJob.defaultPage();
+    
+    
 
     /**
      * Create an initial new window and display it.
@@ -98,6 +100,8 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         }
         windows.add(telemetryFrame);
+        telemetryFrame.setupGestureVisualization();
+        Global.mainWindow = telemetryFrame;
         numWindows++;
         return telemetryFrame;
     }
@@ -135,7 +139,111 @@ public class TelemetryFrame extends JFrame implements Printable {
     public TelemetryFrame(File file) {
         init(file);
     }
+    
+    public void setGesture(int first, int second)
+    {
+        firstMovement.setGesture(first);
+        secondMovement.setGesture(second);
+    }
 
+    public void setupGestureVisualization()
+    {
+        
+        mainContainer = new javax.swing.JPanel();
+        firstMovementContainer = new javax.swing.JPanel();
+        secondMovementContainer = new javax.swing.JPanel();
+
+        mainContainer.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        firstMovementContainer.setBackground(new java.awt.Color(255, 255, 255));
+        firstMovementContainer.setBorder(javax.swing.BorderFactory.createTitledBorder("First Movement"));
+        javax.swing.GroupLayout firstMovementContainerLayout = new javax.swing.GroupLayout(firstMovementContainer);
+        firstMovementContainer.setLayout(firstMovementContainerLayout);
+        firstMovementContainerLayout.setHorizontalGroup(
+            firstMovementContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 252, Short.MAX_VALUE)
+        );
+        firstMovementContainerLayout.setVerticalGroup(
+            firstMovementContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 227, Short.MAX_VALUE)
+        );
+
+        secondMovementContainer.setBackground(new java.awt.Color(255, 255, 255));
+        secondMovementContainer.setBorder(javax.swing.BorderFactory.createTitledBorder("Second Movement"));
+        javax.swing.GroupLayout secondMovementContainerLayout = new javax.swing.GroupLayout(secondMovementContainer);
+        secondMovementContainer.setLayout(secondMovementContainerLayout);
+        secondMovementContainerLayout.setHorizontalGroup(
+            secondMovementContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 252, Short.MAX_VALUE)
+        );
+        secondMovementContainerLayout.setVerticalGroup(
+            secondMovementContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 227, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout mainContainerLayout = new javax.swing.GroupLayout(mainContainer);
+        mainContainer.setLayout(mainContainerLayout);
+        mainContainerLayout.setHorizontalGroup(
+            mainContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mainContainerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(firstMovementContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addComponent(secondMovementContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        mainContainerLayout.setVerticalGroup(
+            mainContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(secondMovementContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(mainContainerLayout.createSequentialGroup()
+                .addComponent(firstMovementContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(21, Short.MAX_VALUE)
+                .addComponent(mainContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(90, Short.MAX_VALUE)
+                .addComponent(mainContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        
+        mainContainer.setSize(300,300);
+        mainContainer.setLocation(10,200);
+        
+        pack();
+        
+        try{
+        firstMovement = new GestureDrawingPanel();
+        secondMovement = new GestureDrawingPanel();
+        }
+        catch (Exception ex)
+        {
+        
+        }
+        
+        firstMovement.setSize(100,100);
+        //firstMovement.setGesture(2);
+        firstMovement.setBackground(new Color(255,255,255));
+        firstMovementContainer.add(firstMovement);
+        firstMovement.setLocation(firstMovementContainer.getWidth()/2-firstMovement.getWidth()/2,
+                firstMovementContainer.getHeight()/2-firstMovement.getHeight()/2);
+        
+        secondMovement.setSize(100,100);
+        //secondMovement.setGesture(5);
+        secondMovement.setBackground(new Color(255,255,255));
+        secondMovementContainer.add(secondMovement);
+        secondMovement.setLocation(secondMovementContainer.getWidth()/2-secondMovement.getWidth()/2,
+                secondMovementContainer.getHeight()/2-secondMovement.getHeight()/2);
+        
+    }
     /**
      * Initialize the new TelemetryFrame
      */
@@ -165,10 +273,10 @@ public class TelemetryFrame extends JFrame implements Printable {
             this.setTitle(file.getName());
             fixedData = true;
             clearedData = false;
-            twoGRadioButton.setEnabled(false);
-            sixGRadioButton.setEnabled(false);
+            
+            
             sendDataButton.setEnabled(false);
-            clearButton.setEnabled(false);
+            
             calibrateButton.setEnabled(false);
         }
         pageFormat.setOrientation(PageFormat.LANDSCAPE);
@@ -192,11 +300,11 @@ public class TelemetryFrame extends JFrame implements Printable {
      */
     private void setGraphView(GraphView gv) {
         graphView = gv;
-        graphViewScrollPane.setViewportView(gv);
-        gv.setViewport(graphViewScrollPane.getViewport());
-        gv.setMaxGLabel(maxGLabel);
-        Integer fieldWidth = (Integer)filterWidthField.getValue();
-        graphView.setFilterWidth(fieldWidth.intValue() - 1);
+        //graphViewScrollPane.setViewportView(gv);
+        //gv.setViewport(graphViewScrollPane.getViewport());
+        //gv.setMaxGLabel(maxGLabel);
+        //Integer fieldWidth = (Integer)filterWidthField.getValue();
+        //graphView.setFilterWidth(fieldWidth.intValue() - 1);
         final GraphView gview = gv;
         axisView = new JPanel(){
             public Dimension getPreferredSize() {
@@ -209,16 +317,16 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         };
         axisView.setBackground(Color.WHITE);
-        y_axisPanel.add(axisView);
+        //y_axisPanel.add(axisView);
         gv.setAxisPanel(axisView);
         if (fixedData) {
             if (graphView.is2G()) {
-                twoGRadioButton.setSelected(true);
+                //twoGRadioButton.setSelected(true);
             } else {
-                sixGRadioButton.setSelected(true);
+                //sixGRadioButton.setSelected(true);
             }
-            twoGRadioButton.setEnabled(false);
-            sixGRadioButton.setEnabled(false);
+            //twoGRadioButton.setEnabled(false);
+            //sixGRadioButton.setEnabled(false);
         }
     }
 
@@ -231,19 +339,19 @@ public class TelemetryFrame extends JFrame implements Printable {
      */
     public void setConnectionStatus(boolean conn, String msg) {
         connStatusLabel.setText(msg);
-        blinkButton.setEnabled(conn);
-        pingButton.setEnabled(conn);
+        //blinkButton.setEnabled(conn);
+        //pingButton.setEnabled(conn);
         reconnButton.setEnabled(conn);
         if (!fixedData) {
             if (listener.is2GScale()) {
-                twoGRadioButton.setSelected(true);
+                //twoGRadioButton.setSelected(true);
             } else {
-                sixGRadioButton.setSelected(true);
+                //sixGRadioButton.setSelected(true);
             }
-            twoGRadioButton.setEnabled(conn);
-            sixGRadioButton.setEnabled(conn);
+            //twoGRadioButton.setEnabled(conn);
+            //sixGRadioButton.setEnabled(conn);
             sendDataButton.setEnabled(conn);
-            clearButton.setEnabled(conn);
+            //clearButton.setEnabled(conn);
             calibrateButton.setEnabled(conn);
         }
     }
@@ -381,54 +489,12 @@ public class TelemetryFrame extends JFrame implements Printable {
         xZoomGroup = new javax.swing.ButtonGroup();
         yZoomGroup = new javax.swing.ButtonGroup();
         smoothGroup = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        y_axisPanel = new javax.swing.JPanel();
-        graphViewScrollPane = new javax.swing.JScrollPane();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        axisPanel = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        xZoomButton1 = new javax.swing.JRadioButton();
-        xZoomButton2 = new javax.swing.JRadioButton();
-        xZoomButton3 = new javax.swing.JRadioButton();
-        xZoomButton4 = new javax.swing.JRadioButton();
-        jPanel6 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        yZoomButton1 = new javax.swing.JRadioButton();
-        yZoomButton2 = new javax.swing.JRadioButton();
-        yZoomButton3 = new javax.swing.JRadioButton();
-        yZoomButton4 = new javax.swing.JRadioButton();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        xCheckBox = new javax.swing.JCheckBox();
-        yCheckBox = new javax.swing.JCheckBox();
-        zCheckBox = new javax.swing.JCheckBox();
-        gCheckBox = new javax.swing.JCheckBox();
-        jPanel4 = new javax.swing.JPanel();
-        gPanel = new javax.swing.JPanel();
-        jLabel8 = new javax.swing.JLabel();
-        twoGRadioButton = new javax.swing.JRadioButton();
-        sixGRadioButton = new javax.swing.JRadioButton();
-        jLabel9 = new javax.swing.JLabel();
-        maxGLabel = new javax.swing.JLabel();
-        connStatusLabel = new javax.swing.JLabel();
-        smoothPanel = new javax.swing.JPanel();
-        gravityCheckBox = new javax.swing.JCheckBox();
-        jLabel3 = new javax.swing.JLabel();
-        noSmoothingButton = new javax.swing.JRadioButton();
-        boxcarSmoothingButton = new javax.swing.JRadioButton();
-        triangleSmoothingButton = new javax.swing.JRadioButton();
-        jLabel4 = new javax.swing.JLabel();
-        filterWidthField = new javax.swing.JFormattedTextField();
         buttonPanel = new javax.swing.JPanel();
-        clearButton = new javax.swing.JButton();
         calibrateButton = new javax.swing.JButton();
         sendDataButton = new javax.swing.JButton();
-        pingButton = new javax.swing.JButton();
-        blinkButton = new javax.swing.JButton();
         reconnButton = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        connStatusLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
@@ -464,459 +530,6 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         });
 
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-
-        jPanel1.setPreferredSize(new java.awt.Dimension(870, 525));
-        y_axisPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 0, 0));
-
-        y_axisPanel.setAlignmentX(1.0F);
-        y_axisPanel.setAlignmentY(0.0F);
-        y_axisPanel.setMaximumSize(new java.awt.Dimension(65, 3725));
-        y_axisPanel.setMinimumSize(new java.awt.Dimension(65, 125));
-        y_axisPanel.setPreferredSize(new java.awt.Dimension(65, 525));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        jPanel1.add(y_axisPanel, gridBagConstraints);
-
-        graphViewScrollPane.setBorder(null);
-        graphViewScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        graphViewScrollPane.setAutoscrolls(true);
-        graphViewScrollPane.setMaximumSize(new java.awt.Dimension(32767, 7725));
-        graphViewScrollPane.setMinimumSize(new java.awt.Dimension(350, 125));
-        graphViewScrollPane.setPreferredSize(new java.awt.Dimension(800, 525));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(graphViewScrollPane, gridBagConstraints);
-
-        jPanel2.setMaximumSize(new java.awt.Dimension(5, 7725));
-        jPanel2.setMinimumSize(new java.awt.Dimension(5, 125));
-        jPanel2.setPreferredSize(new java.awt.Dimension(5, 525));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanel1.add(jPanel2, gridBagConstraints);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
-
-        jPanel3.setLayout(new java.awt.GridBagLayout());
-
-        jPanel3.setAlignmentX(0.0F);
-        jPanel3.setAlignmentY(0.0F);
-        jPanel3.setMaximumSize(new java.awt.Dimension(32767, 147));
-        jPanel3.setMinimumSize(new java.awt.Dimension(605, 103));
-        jPanel3.setPreferredSize(new java.awt.Dimension(950, 103));
-        axisPanel.setLayout(new java.awt.GridLayout(3, 1));
-
-        axisPanel.setAlignmentX(0.0F);
-        axisPanel.setAlignmentY(0.0F);
-        axisPanel.setMaximumSize(new java.awt.Dimension(350, 90));
-        axisPanel.setMinimumSize(new java.awt.Dimension(275, 84));
-        axisPanel.setPreferredSize(new java.awt.Dimension(295, 86));
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jPanel5.setAlignmentX(0.0F);
-        jPanel5.setMinimumSize(new java.awt.Dimension(350, 28));
-        jPanel5.setPreferredSize(new java.awt.Dimension(350, 28));
-        jLabel5.setText(" Zoom x-axis:");
-        jPanel5.add(jLabel5);
-
-        xZoomGroup.add(xZoomButton1);
-        xZoomButton1.setText("0.5x");
-        xZoomButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        xZoomButton1.setIconTextGap(2);
-        xZoomButton1.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        xZoomButton1.setMaximumSize(new java.awt.Dimension(48, 18));
-        xZoomButton1.setMinimumSize(new java.awt.Dimension(48, 18));
-        xZoomButton1.setPreferredSize(new java.awt.Dimension(48, 18));
-        xZoomButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                xZoomButton1ActionPerformed(evt);
-            }
-        });
-
-        jPanel5.add(xZoomButton1);
-
-        xZoomGroup.add(xZoomButton2);
-        xZoomButton2.setSelected(true);
-        xZoomButton2.setText("1x");
-        xZoomButton2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        xZoomButton2.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        xZoomButton2.setMaximumSize(new java.awt.Dimension(45, 18));
-        xZoomButton2.setMinimumSize(new java.awt.Dimension(45, 18));
-        xZoomButton2.setPreferredSize(new java.awt.Dimension(45, 18));
-        xZoomButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                xZoomButton2ActionPerformed(evt);
-            }
-        });
-
-        jPanel5.add(xZoomButton2);
-
-        xZoomGroup.add(xZoomButton3);
-        xZoomButton3.setText("2x");
-        xZoomButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        xZoomButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        xZoomButton3.setMaximumSize(new java.awt.Dimension(45, 18));
-        xZoomButton3.setMinimumSize(new java.awt.Dimension(45, 18));
-        xZoomButton3.setPreferredSize(new java.awt.Dimension(45, 18));
-        xZoomButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                xZoomButton3ActionPerformed(evt);
-            }
-        });
-
-        jPanel5.add(xZoomButton3);
-
-        xZoomGroup.add(xZoomButton4);
-        xZoomButton4.setText("4x");
-        xZoomButton4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        xZoomButton4.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        xZoomButton4.setMaximumSize(new java.awt.Dimension(45, 18));
-        xZoomButton4.setMinimumSize(new java.awt.Dimension(45, 18));
-        xZoomButton4.setPreferredSize(new java.awt.Dimension(45, 18));
-        xZoomButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                xZoomButton4ActionPerformed(evt);
-            }
-        });
-
-        jPanel5.add(xZoomButton4);
-
-        axisPanel.add(jPanel5);
-
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jPanel6.setAlignmentX(0.0F);
-        jPanel6.setMinimumSize(new java.awt.Dimension(350, 28));
-        jPanel6.setPreferredSize(new java.awt.Dimension(350, 28));
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("y-axis:");
-        jLabel2.setMaximumSize(new java.awt.Dimension(90, 16));
-        jLabel2.setMinimumSize(new java.awt.Dimension(90, 16));
-        jLabel2.setPreferredSize(new java.awt.Dimension(90, 16));
-        jPanel6.add(jLabel2);
-
-        yZoomGroup.add(yZoomButton1);
-        yZoomButton1.setSelected(true);
-        yZoomButton1.setText("1x  ");
-        yZoomButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        yZoomButton1.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        yZoomButton1.setMaximumSize(new java.awt.Dimension(48, 18));
-        yZoomButton1.setMinimumSize(new java.awt.Dimension(48, 18));
-        yZoomButton1.setPreferredSize(new java.awt.Dimension(48, 18));
-        yZoomButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                yZoomButton1ActionPerformed(evt);
-            }
-        });
-
-        jPanel6.add(yZoomButton1);
-
-        yZoomGroup.add(yZoomButton2);
-        yZoomButton2.setText("2x");
-        yZoomButton2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        yZoomButton2.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        yZoomButton2.setMaximumSize(new java.awt.Dimension(45, 18));
-        yZoomButton2.setMinimumSize(new java.awt.Dimension(45, 18));
-        yZoomButton2.setPreferredSize(new java.awt.Dimension(45, 18));
-        yZoomButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                yZoomButton2ActionPerformed(evt);
-            }
-        });
-
-        jPanel6.add(yZoomButton2);
-
-        yZoomGroup.add(yZoomButton3);
-        yZoomButton3.setText("4x");
-        yZoomButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        yZoomButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        yZoomButton3.setMaximumSize(new java.awt.Dimension(45, 18));
-        yZoomButton3.setMinimumSize(new java.awt.Dimension(45, 18));
-        yZoomButton3.setPreferredSize(new java.awt.Dimension(45, 18));
-        yZoomButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                yZoomButton3ActionPerformed(evt);
-            }
-        });
-
-        jPanel6.add(yZoomButton3);
-
-        yZoomGroup.add(yZoomButton4);
-        yZoomButton4.setText("8x");
-        yZoomButton4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        yZoomButton4.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        yZoomButton4.setMaximumSize(new java.awt.Dimension(45, 18));
-        yZoomButton4.setMinimumSize(new java.awt.Dimension(45, 18));
-        yZoomButton4.setPreferredSize(new java.awt.Dimension(45, 18));
-        yZoomButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                yZoomButton4ActionPerformed(evt);
-            }
-        });
-
-        jPanel6.add(yZoomButton4);
-
-        axisPanel.add(jPanel6);
-
-        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        jPanel7.setMinimumSize(new java.awt.Dimension(350, 28));
-        jPanel7.setPreferredSize(new java.awt.Dimension(350, 28));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel1.setText("Show accel:");
-        jLabel1.setMaximumSize(new java.awt.Dimension(90, 16));
-        jLabel1.setMinimumSize(new java.awt.Dimension(90, 16));
-        jLabel1.setPreferredSize(new java.awt.Dimension(90, 16));
-        jPanel7.add(jLabel1);
-        jLabel1.getAccessibleContext().setAccessibleName("Show accel: ");
-
-        xCheckBox.setForeground(new java.awt.Color(0, 150, 0));
-        xCheckBox.setSelected(true);
-        xCheckBox.setText("aX ");
-        xCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        xCheckBox.setMargin(new java.awt.Insets(0, 1, 0, 0));
-        xCheckBox.setMaximumSize(new java.awt.Dimension(48, 18));
-        xCheckBox.setMinimumSize(new java.awt.Dimension(48, 18));
-        xCheckBox.setPreferredSize(new java.awt.Dimension(48, 18));
-        xCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                xCheckBoxActionPerformed(evt);
-            }
-        });
-
-        jPanel7.add(xCheckBox);
-
-        yCheckBox.setForeground(java.awt.Color.blue);
-        yCheckBox.setSelected(true);
-        yCheckBox.setText("aY");
-        yCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        yCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        yCheckBox.setMaximumSize(new java.awt.Dimension(45, 18));
-        yCheckBox.setMinimumSize(new java.awt.Dimension(45, 18));
-        yCheckBox.setPreferredSize(new java.awt.Dimension(45, 18));
-        yCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                yCheckBoxActionPerformed(evt);
-            }
-        });
-
-        jPanel7.add(yCheckBox);
-
-        zCheckBox.setForeground(java.awt.Color.red);
-        zCheckBox.setSelected(true);
-        zCheckBox.setText("aZ");
-        zCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        zCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        zCheckBox.setMaximumSize(new java.awt.Dimension(45, 18));
-        zCheckBox.setMinimumSize(new java.awt.Dimension(45, 18));
-        zCheckBox.setPreferredSize(new java.awt.Dimension(45, 18));
-        zCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                zCheckBoxActionPerformed(evt);
-            }
-        });
-
-        jPanel7.add(zCheckBox);
-
-        gCheckBox.setFont(new java.awt.Font("Lucida Grande", 1, 13));
-        gCheckBox.setForeground(new java.awt.Color(255, 140, 0));
-        gCheckBox.setSelected(true);
-        gCheckBox.setText("|a|");
-        gCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        gCheckBox.setIconTextGap(2);
-        gCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        gCheckBox.setMaximumSize(new java.awt.Dimension(45, 18));
-        gCheckBox.setMinimumSize(new java.awt.Dimension(45, 18));
-        gCheckBox.setPreferredSize(new java.awt.Dimension(45, 18));
-        gCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                gCheckBoxActionPerformed(evt);
-            }
-        });
-
-        jPanel7.add(gCheckBox);
-
-        axisPanel.add(jPanel7);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 0.5;
-        jPanel3.add(axisPanel, gridBagConstraints);
-
-        jPanel4.setLayout(new java.awt.GridLayout(2, 1));
-
-        jPanel4.setMinimumSize(new java.awt.Dimension(591, 56));
-        jPanel4.setPreferredSize(new java.awt.Dimension(455, 56));
-        gPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        gPanel.setAlignmentX(0.0F);
-        gPanel.setAlignmentY(0.75F);
-        gPanel.setMaximumSize(new java.awt.Dimension(32767, 28));
-        gPanel.setMinimumSize(new java.awt.Dimension(345, 28));
-        gPanel.setPreferredSize(new java.awt.Dimension(611, 28));
-        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel8.setText("Scale: ");
-        gPanel.add(jLabel8);
-
-        fullscaleGroup.add(twoGRadioButton);
-        twoGRadioButton.setSelected(true);
-        twoGRadioButton.setText("2G ");
-        twoGRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        twoGRadioButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        twoGRadioButton.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-        twoGRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                twoGRadioButtonActionPerformed(evt);
-            }
-        });
-
-        gPanel.add(twoGRadioButton);
-
-        fullscaleGroup.add(sixGRadioButton);
-        sixGRadioButton.setText("6G    ");
-        sixGRadioButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        sixGRadioButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        sixGRadioButton.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-        sixGRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sixGRadioButtonActionPerformed(evt);
-            }
-        });
-
-        gPanel.add(sixGRadioButton);
-
-        jLabel9.setText("  Max acceleration |a| = ");
-        gPanel.add(jLabel9);
-
-        maxGLabel.setText("0.0");
-        maxGLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        maxGLabel.setMaximumSize(new java.awt.Dimension(80, 16));
-        maxGLabel.setMinimumSize(new java.awt.Dimension(40, 16));
-        maxGLabel.setPreferredSize(new java.awt.Dimension(40, 16));
-        gPanel.add(maxGLabel);
-
-        connStatusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        connStatusLabel.setText("Not connected");
-        connStatusLabel.setFocusTraversalPolicyProvider(true);
-        connStatusLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        connStatusLabel.setMaximumSize(new java.awt.Dimension(320, 16));
-        connStatusLabel.setMinimumSize(new java.awt.Dimension(145, 16));
-        connStatusLabel.setPreferredSize(new java.awt.Dimension(245, 16));
-        connStatusLabel.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                connStatusLabelPropertyChange(evt);
-            }
-        });
-
-        gPanel.add(connStatusLabel);
-
-        jPanel4.add(gPanel);
-
-        smoothPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        smoothPanel.setAlignmentX(0.0F);
-        smoothPanel.setAlignmentY(0.0F);
-        smoothPanel.setMaximumSize(new java.awt.Dimension(32767, 26));
-        gravityCheckBox.setText("Include Gravity    ");
-        gravityCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        gravityCheckBox.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        gravityCheckBox.setMargin(new java.awt.Insets(0, 2, 2, 0));
-        gravityCheckBox.setMaximumSize(new java.awt.Dimension(155, 18));
-        gravityCheckBox.setMinimumSize(new java.awt.Dimension(155, 18));
-        gravityCheckBox.setPreferredSize(new java.awt.Dimension(155, 18));
-        gravityCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                gravityCheckBoxActionPerformed(evt);
-            }
-        });
-
-        smoothPanel.add(gravityCheckBox);
-
-        jLabel3.setText("Smooth data: ");
-        smoothPanel.add(jLabel3);
-
-        smoothGroup.add(noSmoothingButton);
-        noSmoothingButton.setSelected(true);
-        noSmoothingButton.setText("No ");
-        noSmoothingButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        noSmoothingButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        noSmoothingButton.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-        noSmoothingButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                noSmoothingButtonActionPerformed(evt);
-            }
-        });
-
-        smoothPanel.add(noSmoothingButton);
-
-        smoothGroup.add(boxcarSmoothingButton);
-        boxcarSmoothingButton.setText("Boxcar ");
-        boxcarSmoothingButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        boxcarSmoothingButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        boxcarSmoothingButton.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-        boxcarSmoothingButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                boxcarSmoothingButtonActionPerformed(evt);
-            }
-        });
-
-        smoothPanel.add(boxcarSmoothingButton);
-
-        smoothGroup.add(triangleSmoothingButton);
-        triangleSmoothingButton.setText("Triangle");
-        triangleSmoothingButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        triangleSmoothingButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        triangleSmoothingButton.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-        triangleSmoothingButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                triangleSmoothingButtonActionPerformed(evt);
-            }
-        });
-
-        smoothPanel.add(triangleSmoothingButton);
-
-        jLabel4.setText("    Filter Width:");
-        smoothPanel.add(jLabel4);
-
-        filterWidthField.setColumns(2);
-        filterWidthField.setText("5");
-        filterWidthField.setAlignmentY(1.0F);
-        filterWidthField.setMaximumSize(new java.awt.Dimension(32, 22));
-        filterWidthField.setMinimumSize(new java.awt.Dimension(32, 22));
-        filterWidthField.setValue(new Integer(5));
-        filterWidthField.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                filterWidthFieldPropertyChange(evt);
-            }
-        });
-
-        smoothPanel.add(filterWidthField);
-
-        jPanel4.add(smoothPanel);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        jPanel3.add(jPanel4, gridBagConstraints);
-
         buttonPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 5));
 
         buttonPanel.setAlignmentX(0.0F);
@@ -924,15 +537,6 @@ public class TelemetryFrame extends JFrame implements Printable {
         buttonPanel.setMaximumSize(new java.awt.Dimension(566, 39));
         buttonPanel.setMinimumSize(new java.awt.Dimension(550, 30));
         buttonPanel.setPreferredSize(new java.awt.Dimension(550, 35));
-        clearButton.setText("Clear Graph");
-        clearButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                clearButtonActionPerformed(evt);
-            }
-        });
-
-        buttonPanel.add(clearButton);
-
         calibrateButton.setText("Calibrate");
         calibrateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -951,24 +555,6 @@ public class TelemetryFrame extends JFrame implements Printable {
 
         buttonPanel.add(sendDataButton);
 
-        pingButton.setText("Ping Spot");
-        pingButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                pingButtonActionPerformed(evt);
-            }
-        });
-
-        buttonPanel.add(pingButton);
-
-        blinkButton.setText("Blink LEDs");
-        blinkButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                blinkButtonActionPerformed(evt);
-            }
-        });
-
-        buttonPanel.add(blinkButton);
-
         reconnButton.setText("Reconnect");
         reconnButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -981,15 +567,22 @@ public class TelemetryFrame extends JFrame implements Printable {
         jLabel6.setText("   ");
         buttonPanel.add(jLabel6);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        jPanel3.add(buttonPanel, gridBagConstraints);
+        connStatusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        connStatusLabel.setText("Not connected");
+        connStatusLabel.setFocusTraversalPolicyProvider(true);
+        connStatusLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        connStatusLabel.setMaximumSize(new java.awt.Dimension(320, 16));
+        connStatusLabel.setMinimumSize(new java.awt.Dimension(145, 16));
+        connStatusLabel.setPreferredSize(new java.awt.Dimension(245, 16));
+        connStatusLabel.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                connStatusLabelPropertyChange(evt);
+            }
+        });
 
-        getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
+        buttonPanel.add(connStatusLabel);
+
+        getContentPane().add(buttonPanel, java.awt.BorderLayout.CENTER);
 
         fileMenu.setText("File");
         aboutMenuItem.setText("About...");
@@ -1094,12 +687,12 @@ public class TelemetryFrame extends JFrame implements Printable {
 
         windowMenu.setText("Windows");
         windowMenu.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                windowMenuMenuSelected(evt);
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
             }
             public void menuDeselected(javax.swing.event.MenuEvent evt) {
             }
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                windowMenuMenuSelected(evt);
             }
         });
 
@@ -1109,14 +702,6 @@ public class TelemetryFrame extends JFrame implements Printable {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void gravityCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gravityCheckBoxActionPerformed
-        graphView.setIncludeGravity(gravityCheckBox.isSelected());
-    }//GEN-LAST:event_gravityCheckBoxActionPerformed
-
-    private void blinkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blinkButtonActionPerformed
-        listener.doBlink();
-    }//GEN-LAST:event_blinkButtonActionPerformed
 
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
         JOptionPane.showMessageDialog(this,
@@ -1147,43 +732,12 @@ public class TelemetryFrame extends JFrame implements Printable {
         }
     }//GEN-LAST:event_windowMenuMenuSelected
 
-    private void xZoomButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xZoomButton4ActionPerformed
-        graphView.setZoomX(8);
-    }//GEN-LAST:event_xZoomButton4ActionPerformed
-
-    private void xZoomButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xZoomButton3ActionPerformed
-        graphView.setZoomX(4);
-    }//GEN-LAST:event_xZoomButton3ActionPerformed
-
-    private void xZoomButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xZoomButton2ActionPerformed
-        graphView.setZoomX(2);
-    }//GEN-LAST:event_xZoomButton2ActionPerformed
-
-    private void xZoomButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xZoomButton1ActionPerformed
-        graphView.setZoomX(1);
-    }//GEN-LAST:event_xZoomButton1ActionPerformed
-
-    private void filterWidthFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_filterWidthFieldPropertyChange
-        Integer fieldWidth = (Integer)filterWidthField.getValue();
-        int w = fieldWidth.intValue();
-        if (w <= 0) {
-            w = 2;
-        }
-        if ((w % 2) == 0) {
-            w++;
-            filterWidthField.setValue(new Integer(w));
-        }
-        if (graphView != null) {
-            graphView.setFilterWidth(w - 1);
-        }
-    }//GEN-LAST:event_filterWidthFieldPropertyChange
-
     private void connStatusLabelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_connStatusLabelPropertyChange
         if (connStatusLabel.getText().startsWith("Connected")) {
             if (listener.is2GScale()) {
-                twoGRadioButton.setSelected(true);
+                //twoGRadioButton.setSelected(true);
             } else {
-                sixGRadioButton.setSelected(true);
+                //sixGRadioButton.setSelected(true);
             }
         }
     }//GEN-LAST:event_connStatusLabelPropertyChange
@@ -1196,45 +750,15 @@ public class TelemetryFrame extends JFrame implements Printable {
             classifier.clear();
         }
         if (listener.is2GScale()) {
-            twoGRadioButton.setSelected(true);
+            //twoGRadioButton.setSelected(true);
         } else {
-            sixGRadioButton.setSelected(true);
+            //sixGRadioButton.setSelected(true);
         }
     }//GEN-LAST:event_formWindowActivated
 
     private void formWindowDeactivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeactivated
         listener.setGUI(null);
     }//GEN-LAST:event_formWindowDeactivated
-
-    private void triangleSmoothingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_triangleSmoothingButtonActionPerformed
-        graphView.setSmooth(true);
-        graphView.setFiltertype(false);
-    }//GEN-LAST:event_triangleSmoothingButtonActionPerformed
-
-    private void boxcarSmoothingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boxcarSmoothingButtonActionPerformed
-        graphView.setSmooth(true);
-        graphView.setFiltertype(true);
-    }//GEN-LAST:event_boxcarSmoothingButtonActionPerformed
-
-    private void noSmoothingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noSmoothingButtonActionPerformed
-        graphView.setSmooth(false);
-    }//GEN-LAST:event_noSmoothingButtonActionPerformed
-
-    private void yZoomButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yZoomButton4ActionPerformed
-        graphView.setZoomY(8);
-    }//GEN-LAST:event_yZoomButton4ActionPerformed
-
-    private void yZoomButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yZoomButton3ActionPerformed
-        graphView.setZoomY(4);
-    }//GEN-LAST:event_yZoomButton3ActionPerformed
-
-    private void yZoomButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yZoomButton2ActionPerformed
-        graphView.setZoomY(2);
-    }//GEN-LAST:event_yZoomButton2ActionPerformed
-
-    private void yZoomButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yZoomButton1ActionPerformed
-        graphView.setZoomY(1);
-    }//GEN-LAST:event_yZoomButton1ActionPerformed
 
     private void quitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitMenuItemActionPerformed
         doQuit();
@@ -1299,34 +823,6 @@ public class TelemetryFrame extends JFrame implements Printable {
         frameGraph(null, new GraphView());
     }//GEN-LAST:event_newMenuItemActionPerformed
 
-    private void xCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xCheckBoxActionPerformed
-        graphView.setShowX(xCheckBox.isSelected());
-    }//GEN-LAST:event_xCheckBoxActionPerformed
-
-    private void yCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yCheckBoxActionPerformed
-        graphView.setShowY(yCheckBox.isSelected());
-    }//GEN-LAST:event_yCheckBoxActionPerformed
-
-    private void zCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zCheckBoxActionPerformed
-        graphView.setShowZ(zCheckBox.isSelected());
-    }//GEN-LAST:event_zCheckBoxActionPerformed
-
-    private void gCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gCheckBoxActionPerformed
-        graphView.setShowG(gCheckBox.isSelected());
-    }//GEN-LAST:event_gCheckBoxActionPerformed
-
-    private void pingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pingButtonActionPerformed
-        listener.doPing();
-    }//GEN-LAST:event_pingButtonActionPerformed
-
-    private void sixGRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sixGRadioButtonActionPerformed
-        listener.doSetScale(6);
-    }//GEN-LAST:event_sixGRadioButtonActionPerformed
-
-    private void twoGRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_twoGRadioButtonActionPerformed
-        listener.doSetScale(2);
-    }//GEN-LAST:event_twoGRadioButtonActionPerformed
-
     private void calibrateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calibrateButtonActionPerformed
         listener.doCalibrate();
     }//GEN-LAST:event_calibrateButtonActionPerformed
@@ -1338,100 +834,42 @@ public class TelemetryFrame extends JFrame implements Printable {
         saveMenuItem.setEnabled(true);
         clearedData = false;
     }//GEN-LAST:event_sendDataButtonActionPerformed
-
-    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
-        if (saveMenuItem.isEnabled()) {
-            int n = JOptionPane.showConfirmDialog(this, "The current data has not been saved to a file. " + 
-                                                  "Do you wish to delete it?",
-                                                  "Data Not Saved",
-                                                  JOptionPane.YES_NO_OPTION);
-            if (n != JOptionPane.YES_OPTION) {
-                return;                             // cancel the Clear command
-            }
-        }
-
-        if (sendData) {                             // if currently sending data, then stop
-            listener.doSendData(false, graphView);            
-        }
-        graphView.clearGraph();
-        listener.clear();
-        recognizer.clear();
-        classifier.clear();
-        clearedData = true;
-        saveMenuItem.setEnabled(sendData);
-    }//GEN-LAST:event_clearButtonActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutMenuItem;
-    private javax.swing.JPanel axisPanel;
-    private javax.swing.JButton blinkButton;
-    private javax.swing.JRadioButton boxcarSmoothingButton;
     private javax.swing.JPanel buttonPanel;
     private javax.swing.JButton calibrateButton;
-    private javax.swing.JButton clearButton;
     private javax.swing.JMenuItem closeMenuItem;
     private javax.swing.JLabel connStatusLabel;
     private javax.swing.JMenu fileMenu;
-    private javax.swing.JFormattedTextField filterWidthField;
     private javax.swing.ButtonGroup fullscaleGroup;
-    private javax.swing.JCheckBox gCheckBox;
-    private javax.swing.JPanel gPanel;
-    private javax.swing.JScrollPane graphViewScrollPane;
-    private javax.swing.JCheckBox gravityCheckBox;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
-    private javax.swing.JLabel maxGLabel;
     private javax.swing.JMenuItem newMenuItem;
-    private javax.swing.JRadioButton noSmoothingButton;
     private javax.swing.JMenuItem openMenuItem;
     private javax.swing.JMenuItem pagesetupMenuItem;
-    private javax.swing.JButton pingButton;
     private javax.swing.JMenuItem printMenuItem;
     private javax.swing.JMenuItem quitMenuItem;
     private javax.swing.JButton reconnButton;
     private javax.swing.JMenuItem saveAsMenuItem;
     private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JButton sendDataButton;
-    private javax.swing.JRadioButton sixGRadioButton;
     private javax.swing.ButtonGroup smoothGroup;
-    private javax.swing.JPanel smoothPanel;
-    private javax.swing.JRadioButton triangleSmoothingButton;
-    private javax.swing.JRadioButton twoGRadioButton;
     private javax.swing.JMenu windowMenu;
-    private javax.swing.JCheckBox xCheckBox;
-    private javax.swing.JRadioButton xZoomButton1;
-    private javax.swing.JRadioButton xZoomButton2;
-    private javax.swing.JRadioButton xZoomButton3;
-    private javax.swing.JRadioButton xZoomButton4;
     private javax.swing.ButtonGroup xZoomGroup;
-    private javax.swing.JCheckBox yCheckBox;
-    private javax.swing.JRadioButton yZoomButton1;
-    private javax.swing.JRadioButton yZoomButton2;
-    private javax.swing.JRadioButton yZoomButton3;
-    private javax.swing.JRadioButton yZoomButton4;
     private javax.swing.ButtonGroup yZoomGroup;
-    private javax.swing.JPanel y_axisPanel;
-    private javax.swing.JCheckBox zCheckBox;
     // End of variables declaration//GEN-END:variables
     
+    
+    // for gesture visualization
+    private javax.swing.JPanel firstMovementContainer;
+    private javax.swing.JPanel mainContainer;
+    private javax.swing.JPanel secondMovementContainer;    
+    private GestureDrawingPanel firstMovement, secondMovement;
 }

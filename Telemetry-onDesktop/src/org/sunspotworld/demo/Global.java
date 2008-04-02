@@ -18,6 +18,7 @@ import java.util.concurrent.locks.*;
  * @author Winnie
  */
 public class Global {
+    public static TelemetryFrame mainWindow;
     public static ReentrantReadWriteLock rwData  = new ReentrantReadWriteLock();
     public static Condition rwDataCondition = rwData.writeLock().newCondition();
     

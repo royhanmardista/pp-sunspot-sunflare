@@ -31,8 +31,14 @@ public class GestureClassifier extends Thread{
         System.err.println("Gesture value  == "+gestureValue);
         // clear the vestor so that it starts finding new gestures
         gesture.clearVector();          
+        Global.mainWindow.setGesture((gestureValue/10),gestureValue%10);
+        Global.mainWindow.repaint();
         // Find this gesture value in the map and return the string corresponding to it
         if(Global.definedGestures.get(gestureValue) != null){
+            String g = Global.definedGestures.get(gestureValue).toString();
+            //int first = Integer.parseInt(g.substring(0,0));
+            //int second = Integer.parseInt(g.substring(1,1));
+            //Global.mainWindow.setGesture(first,second);
             System.err.println("Gesture Found :" + Global.definedGestures.get(gestureValue));
         }else{
             System.err.println("Gesture Not Found ");
