@@ -94,7 +94,20 @@ public class Global {
         
         // Shake
         definedGestures.put(77,"SHAKE");
+        
+        definedGestures.put(71,"SR");
+        definedGestures.put(72,"SL");
+        definedGestures.put(73,"SU");
+        definedGestures.put(74,"SD");
+        definedGestures.put(75,"SF");
+        definedGestures.put(76,"SB");
 
+        definedGestures.put(17,"RS");
+        definedGestures.put(27,"LS");
+        definedGestures.put(37,"US");
+        definedGestures.put(47,"DS");
+        definedGestures.put(57,"FS");
+        definedGestures.put(67,"BS");        
         
         
     }

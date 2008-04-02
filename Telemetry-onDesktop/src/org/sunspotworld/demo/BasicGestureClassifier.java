@@ -156,10 +156,10 @@ public class BasicGestureClassifier extends Thread{
         public void shake(){
             Global.gestureLock.writeLock().lock();
             try{
-                Global.gesture.clearVector();
-                for(int i = 0 ; i < Global.NUMBER_OF_MOVEMENTS_PER_GESTURE; i++){
+                //Global.gesture.clearVector();
+                //for(int i = 0 ; i < Global.NUMBER_OF_MOVEMENTS_PER_GESTURE; i++){
                     Global.gesture.addToVector(Global.SHAKE);
-                }
+                //}
             } finally{
                 Global.gestureLock.writeLock().unlock();
             }                                                                            
