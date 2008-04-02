@@ -295,6 +295,7 @@ public class TelemetryFrame extends JFrame implements Printable {
         listener.clear();
         recognizer.clear();
         classifier.clear();
+        gestureClassifier.clear();
         clearedData = true;
     }
     
