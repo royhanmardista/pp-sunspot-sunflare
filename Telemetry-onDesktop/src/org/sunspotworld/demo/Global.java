@@ -26,18 +26,17 @@ public class Global {
     public static Condition gestureSegmentsCondition = gestureSegmentsLock.writeLock().newCondition();
     
     public static Vector gestureSegments = new Vector();
-    public final static double GESTURE_START = -100;
-    public final static double GESTURE_END = -999;
     
-    public static int numGesturesDetected = 0;
+    //
+    public static int numBasicGesturesDetected = 0;
     
     public static Vector basicGestures = new Vector();
     public static ReentrantReadWriteLock basicGesturesLock  = new ReentrantReadWriteLock();
     public static Condition basicGesturesCondition = basicGesturesLock.writeLock().newCondition();
-
+    
     public static Gesture gesture = new Gesture();
     public static ReentrantReadWriteLock gestureLock  = new ReentrantReadWriteLock();
-    public static Condition gestureCondition = gestureLock.writeLock().newCondition();    
+    public static Condition gestureCondition = gestureLock.writeLock().newCondition();
     
     public static double currentTime = 0;
     public static ReentrantReadWriteLock currentTimeLock  = new ReentrantReadWriteLock();
@@ -53,33 +52,51 @@ public class Global {
     public static final int SHAKE       = 7;
     
     public static HashMap definedGestures = new HashMap();
-   
+    
     public Global(){
         // Predefined gestures
-        // RIGHT-LEFT 12
+        definedGestures.put(11,"RR");
         definedGestures.put(12,"RL");
-        // Left- Right 21
+        definedGestures.put(13,"RU");
+        definedGestures.put(14,"RD");
+        definedGestures.put(15,"RF");
+        definedGestures.put(16,"RB");
         definedGestures.put(21,"LR");
-        // Up-down 34
-        definedGestures.put(34,"UD");
-        // Down-Up 43
-        definedGestures.put(43,"DU");
-        // Down-left 42
-        definedGestures.put(42,"DL");
-        // Left-Down 24
+        definedGestures.put(22,"LL");
+        definedGestures.put(23,"LU");
         definedGestures.put(24,"LD");
-        // Down-Right 41
-        definedGestures.put(41,"DL");
-        // Right-Down 14
-        definedGestures.put(14,"LD");
-        // Up-Up
-        definedGestures.put(33,"UU");
-        // Up-Right
+        definedGestures.put(25,"LF");
+        definedGestures.put(26,"LB");
         definedGestures.put(31,"UR");
-        // Up-Left
         definedGestures.put(32,"UL");
+        definedGestures.put(33,"UU");
+        definedGestures.put(34,"UD");
+        definedGestures.put(35,"UF");
+        definedGestures.put(36,"UB");
+        definedGestures.put(41,"DR");
+        definedGestures.put(42,"DL");
+        definedGestures.put(43,"DU");
+        definedGestures.put(44,"DD");
+        definedGestures.put(45,"DF");
+        definedGestures.put(46,"DB");
+        definedGestures.put(51,"FR");
+        definedGestures.put(52,"FL");
+        definedGestures.put(53,"FU");
+        definedGestures.put(54,"FD");
+        definedGestures.put(55,"FF");
+        definedGestures.put(56,"FB");
+        definedGestures.put(61,"BR");
+        definedGestures.put(62,"BL");
+        definedGestures.put(63,"BU");
+        definedGestures.put(64,"BD");
+        definedGestures.put(65,"BF");
+        definedGestures.put(66,"BB");
+        
         // Shake
         definedGestures.put(77,"SHAKE");
+
+        
+        
     }
     
     

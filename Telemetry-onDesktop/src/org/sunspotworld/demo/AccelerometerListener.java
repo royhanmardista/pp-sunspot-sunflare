@@ -276,7 +276,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     public void clear () {
         index = 0;
         timeStampOffset = -1;
-        Global.numGesturesDetected = 0;
+        Global.numBasicGesturesDetected = 0;
         absoluteSums[0]=0;
         absoluteSums[1]=0;
         absoluteSums[2]=0;
@@ -333,8 +333,8 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                 
 //                System.out.println(dataset);
                 
-                Global.numGesturesDetected ++;
-//                System.out.println("GESTURE END");// Num gesture = " + Global.numGesturesDetected);
+                Global.numBasicGesturesDetected ++;
+//                System.out.println("GESTURE END");// Num gesture = " + Global.numBasicGesturesDetected);
                 Global.gestureSegmentsLock.writeLock().lock();
                 try{  
                     Global.gestureSegments.addElement(new Vector(dataset));

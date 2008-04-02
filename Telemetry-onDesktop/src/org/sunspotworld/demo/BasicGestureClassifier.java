@@ -188,6 +188,7 @@ public class BasicGestureClassifier extends Thread{
         }
         public void clear() {
             // clear private data
+            basicGesturesIndex = 0;
         }
         public void run() {
             System.out.println("BasicGestureClassifier Thread started ...");
