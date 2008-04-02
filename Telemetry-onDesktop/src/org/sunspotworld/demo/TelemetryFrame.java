@@ -267,19 +267,35 @@ public class TelemetryFrame extends JFrame implements Printable {
         }
         new Global();
         initComponents();
+        clearButton = new javax.swing.JButton();
+        clearButton.setText("Clear");
+        clearButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearButtonActionPerformed(evt);
+            }
+        });
+        buttonPanel.add(clearButton);
         setupAcceleratorKeys();
         this.file = file;
         if (file != null) {
             this.setTitle(file.getName());
             fixedData = true;
             clearedData = false;
-            
+            clearButton.setEnabled(false);
             
             sendDataButton.setEnabled(false);
             
             calibrateButton.setEnabled(false);
         }
         pageFormat.setOrientation(PageFormat.LANDSCAPE);
+    }
+    
+    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt)
+    {
+        listener.clear();
+        recognizer.clear();
+        classifier.clear();
+        clearedData = true;
     }
     
     /**
@@ -351,7 +367,7 @@ public class TelemetryFrame extends JFrame implements Printable {
             //twoGRadioButton.setEnabled(conn);
             //sixGRadioButton.setEnabled(conn);
             sendDataButton.setEnabled(conn);
-            //clearButton.setEnabled(conn);
+            clearButton.setEnabled(conn);
             calibrateButton.setEnabled(conn);
         }
     }
@@ -493,7 +509,6 @@ public class TelemetryFrame extends JFrame implements Printable {
         calibrateButton = new javax.swing.JButton();
         sendDataButton = new javax.swing.JButton();
         reconnButton = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
         connStatusLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
@@ -564,8 +579,7 @@ public class TelemetryFrame extends JFrame implements Printable {
 
         buttonPanel.add(reconnButton);
 
-        jLabel6.setText("   ");
-        buttonPanel.add(jLabel6);
+        getContentPane().add(buttonPanel, java.awt.BorderLayout.CENTER);
 
         connStatusLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         connStatusLabel.setText("Not connected");
@@ -580,9 +594,7 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         });
 
-        buttonPanel.add(connStatusLabel);
-
-        getContentPane().add(buttonPanel, java.awt.BorderLayout.CENTER);
+        getContentPane().add(connStatusLabel, java.awt.BorderLayout.NORTH);
 
         fileMenu.setText("File");
         aboutMenuItem.setText("About...");
@@ -844,7 +856,6 @@ public class TelemetryFrame extends JFrame implements Printable {
     private javax.swing.JLabel connStatusLabel;
     private javax.swing.JMenu fileMenu;
     private javax.swing.ButtonGroup fullscaleGroup;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
@@ -865,7 +876,7 @@ public class TelemetryFrame extends JFrame implements Printable {
     private javax.swing.ButtonGroup xZoomGroup;
     private javax.swing.ButtonGroup yZoomGroup;
     // End of variables declaration//GEN-END:variables
-    
+    private javax.swing.JButton clearButton;
     
     // for gesture visualization
     private javax.swing.JPanel firstMovementContainer;
