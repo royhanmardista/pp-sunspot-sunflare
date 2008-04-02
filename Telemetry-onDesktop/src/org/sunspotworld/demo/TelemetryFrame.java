@@ -229,14 +229,14 @@ public class TelemetryFrame extends JFrame implements Printable {
         
         }
         
-        firstMovement.setSize(100,100);
+        firstMovement.setSize(200,200);
         //firstMovement.setGesture(2);
         firstMovement.setBackground(new Color(255,255,255));
         firstMovementContainer.add(firstMovement);
         firstMovement.setLocation(firstMovementContainer.getWidth()/2-firstMovement.getWidth()/2,
                 firstMovementContainer.getHeight()/2-firstMovement.getHeight()/2);
         
-        secondMovement.setSize(100,100);
+        secondMovement.setSize(200,200);
         //secondMovement.setGesture(5);
         secondMovement.setBackground(new Color(255,255,255));
         secondMovementContainer.add(secondMovement);
