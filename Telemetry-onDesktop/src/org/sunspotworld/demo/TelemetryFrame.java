@@ -545,7 +545,7 @@ public class TelemetryFrame extends JFrame implements Printable {
             }
         });
 
-        buttonPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 5));
+        buttonPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 3, 5));
 
         buttonPanel.setAlignmentX(0.0F);
         buttonPanel.setAlignmentY(0.0F);
