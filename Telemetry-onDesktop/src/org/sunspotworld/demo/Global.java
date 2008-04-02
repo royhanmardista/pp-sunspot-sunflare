@@ -49,6 +49,7 @@ public class Global {
     public static final int DOWN        = 4;
     public static final int FORWARD     = 5;
     public static final int BACKWARD    = 6;
+    public static final int SHAKE       = 7;
     
     public static HashMap definedGestures = new HashMap();
    
@@ -58,10 +59,10 @@ public class Global {
         definedGestures.put(12,"RL");
         // Left- Right 21
         definedGestures.put(21,"LR");
-        // Up-down 45
-        definedGestures.put(45,"UD");
-        // Down-Up 54
-        definedGestures.put(54,"DU");
+        // Up-down 34
+        definedGestures.put(34,"UD");
+        // Down-Up 43
+        definedGestures.put(43,"DU");
         // Down-left 42
         definedGestures.put(42,"DL");
         // Left-Down 24
@@ -75,8 +76,9 @@ public class Global {
         // Up-Right
         definedGestures.put(31,"UR");
         // Up-Left
-        definedGestures.put(32,"UL");                
-
+        definedGestures.put(32,"UL");
+        // Shake
+        definedGestures.put(77,"SHAKE");
     }
     
     

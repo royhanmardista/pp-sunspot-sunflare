@@ -153,6 +153,17 @@ public class BasicGestureClassifier extends Thread{
             
             System.out.println("minT/" + ((DataStruct)dataset.elementAt(minIndex)).getTimeStamp() + " maxT/" + ((DataStruct)dataset.elementAt(maxIndex)).getTimeStamp());
         }
+        public void shake(){
+            Global.gestureLock.writeLock().lock();
+            try{
+                Global.gesture.clearVector();
+                for(int i = 0 ; i < Global.NUMBER_OF_MOVEMENTS_PER_GESTURE; i++){
+                    Global.gesture.addToVector(Global.SHAKE);
+                }
+            } finally{
+                Global.gestureLock.writeLock().unlock();
+            }                                                                            
+        }
         public void classifyBasicGesture(BasicGesture g){
             if(g.getActiveAxis().equals("x"))
                 leftOrRight(g);
@@ -160,8 +171,12 @@ public class BasicGestureClassifier extends Thread{
                 forwardOrBackward(g);
             else if(g.getActiveAxis().equals("z"))
                 upOrDown(g);
-            else if(g.getActiveAxis().equals("s"))
+            else if(g.getActiveAxis().equals("s")){
                 System.out.println("Shake");
+                shake();
+            }
+                
+                
         }
         public void updateCurrentTimeStamp(){
             Global.currentTimeLock.writeLock().lock();
