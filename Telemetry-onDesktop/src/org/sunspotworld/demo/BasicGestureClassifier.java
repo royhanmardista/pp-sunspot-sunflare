@@ -33,7 +33,7 @@ public class BasicGestureClassifier extends Thread{
             if(Global.basicGestures.size()>0 && basicGesturesIndex < Global.basicGestures.size()){
                 g = (BasicGesture)Global.basicGestures.elementAt(basicGesturesIndex);
                 dataset = g.getDataset();
-                getCurrentTimeStamp();
+                updateCurrentTimeStamp();
                 
                 if(Global.basicGestures.size() > (basicGesturesIndex+1) ||
                         currentTime > (((DataStruct)dataset.lastElement()).getTimeStamp() + IDLE_TIME)) {
@@ -120,7 +120,7 @@ public class BasicGestureClassifier extends Thread{
             else if(g.getActiveAxis().equals("s"))
                 System.out.println("Shake");
         }
-        public void getCurrentTimeStamp(){
+        public void updateCurrentTimeStamp(){
             Global.currentTimeLock.writeLock().lock();
             try{
                 currentTime = Global.currentTime;
