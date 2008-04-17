@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+<class name="gestures.DataStruct" table="GESTURES">
+        <id name="id" column="GESTURE_ID">
+            <generator class="native"/>
+        </id>
+        <property name="x" column="X"/>
+        <property name="y" column="Y"/>
+		<property name="z" column="Z"/>
+		<property name="totalG" column="TOTALG"/>
+		<property name="timeStamp" column="GESTURE_TIMESTAMP"/>
+		<property name="dx" column="DX"/>
+		<property name="dy" column="DY"/>
+		<property name="dz" column="Dz"/>
+		<property name="inactiveAxis" column="INACTIVEAXIS"/>
+    </class>
+
+</hibernate-mapping>
