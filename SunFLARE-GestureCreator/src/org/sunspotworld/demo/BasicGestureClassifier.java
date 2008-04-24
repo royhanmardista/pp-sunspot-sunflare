@@ -142,7 +142,7 @@ public class BasicGestureClassifier extends Thread{
         else if(g.getActiveAxis().equals("s")){
             thisBasicGesture = shake();
         }
-        
+        //if systemstate is recognition mode
         Global.gestureLock.writeLock().lock();
         try{     
             Global.gesture.addToVector(thisBasicGesture);

@@ -42,6 +42,10 @@ public class Global {
     public static double currentTime = 0;
     public static ReentrantReadWriteLock currentTimeLock  = new ReentrantReadWriteLock();
     public static Condition currentTimeCondition = currentTimeLock.writeLock().newCondition();
+
+    public static int systemState = 0;
+    public static ReentrantReadWriteLock systemStateLock  = new ReentrantReadWriteLock();
+    public static Condition systemStateCondition = systemStateLock.writeLock().newCondition();
     
     public static final int NUMBER_OF_MOVEMENTS_PER_GESTURE = 2;
     public static final int RIGHT       = 1;
@@ -51,6 +55,12 @@ public class Global {
     public static final int FORWARD     = 5;
     public static final int BACKWARD    = 6;
     public static final int SHAKE       = 7;
+    
+    //system states
+    public static final int SYS_IDLE = 0;
+    public static final int SYS_RECORDING_MODE = 1;
+    public static final int SYS_CONFIRM_MODE = 2;
+    public static final int SYS_RECOGNITION_MODE = 3;
     
     public static HashMap definedGestures = new HashMap();
     
