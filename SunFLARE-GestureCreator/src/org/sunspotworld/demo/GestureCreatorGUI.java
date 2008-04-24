@@ -25,8 +25,7 @@ import java.text.*;
  *
  * @author Sean Bachelder
  */
-public class GestureCreatorGUI extends JFrame
-{
+public class GestureCreatorGUI extends JFrame {
     // constants
     public static final int MOVEMENTS_PER_GESTURE = 3;
     public enum State {
@@ -54,11 +53,12 @@ public class GestureCreatorGUI extends JFrame
     private BasicGestureRecognizer recognizer = null;
     private BasicGestureClassifier classifier = null;
     private GestureClassifier gestureClassifier = null;
+    private Controller controller = null;
     private boolean sendData = false;
     private boolean fixedData = false;
     private boolean clearedData = true;
     
-
+    
     private State currentState = State.STATE_INITIAL;
     private Font currentStepFont = null;
     private Font normalFont = null;
@@ -76,6 +76,7 @@ public class GestureCreatorGUI extends JFrame
     //
     // components
     //
+    private boolean debug = true;
     
     // buttons related to gestures
     private JButton buttonCreateNewGesture;
@@ -122,19 +123,17 @@ public class GestureCreatorGUI extends JFrame
      * Creates and displays the GUI
      * @author Sean Bachelder
      */
-    public static void main(String args[])
-    {
+    public static void main(String args[]) {
         // Set system properties for Mac OS X before AWT & Swing get loaded - doesn't hurt if not on a MAC
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "SunFLARE Gesture Creator");
-
+        
         GestureCreatorGUI gui = new GestureCreatorGUI();
         gui.show();
     }
     
     /** Creates a new instance of GestureCreatorGUI */
-    public GestureCreatorGUI()
-    {
+    public GestureCreatorGUI() {
         initializeComponents(); // initializes all buttons, panels, etc...
         init();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // the doQuit() function exits the app
@@ -160,7 +159,7 @@ public class GestureCreatorGUI extends JFrame
         // set window variables
         setTitle(windowTitle);
         setVisible(true);
-        setMinimumSize(new Dimension(getWidth(),getHeight())); 
+        setMinimumSize(new Dimension(getWidth(),getHeight()));
         
         Global.mainWindow = this;
         
@@ -169,8 +168,7 @@ public class GestureCreatorGUI extends JFrame
     }
     
     // initializes gesture identification/sunspot stuff
-    private void init()
-    {
+    private void init() {
         if (listener == null) {
             listener = new AccelerometerListener();
             listener.start();
@@ -187,25 +185,26 @@ public class GestureCreatorGUI extends JFrame
             gestureClassifier = new GestureClassifier();
             gestureClassifier.start();
         }
+        if(controller == null){
+            controller = new Controller();
+            controller.start();
+        }
         new Global();
     }
     
     /**
-     * Display the current connection status to a remote SPOT. 
+     * Display the current connection status to a remote SPOT.
      * Called by the AccelerometerListener whenever the radio connection status changes.
      *
      * @param conn true if now connected to a remote SPOT
-     * @param msg the String message to display, includes the 
+     * @param msg the String message to display, includes the
      */
     public void setConnectionStatus(boolean conn, String msg) {
         labelConnected.setText(msg);
-        if (conn)
-        {
+        if (conn) {
             // is connected
             labelConnected.setForeground(Color.green);
-        }
-        else
-        {
+        } else {
             labelConnected.setForeground(Color.red);
         }
         //blinkButton.setEnabled(conn);
@@ -235,17 +234,14 @@ public class GestureCreatorGUI extends JFrame
      * @param index Index of the display to be updated
      * @param id ID number of the gesture to be displayed
      */
-    public void setGesture(int index, int id)
-    {
-        if (index >= 0 || index < MOVEMENTS_PER_GESTURE)
-        {
+    public void setGesture(int index, int id) {
+        if (index >= 0 || index < MOVEMENTS_PER_GESTURE) {
             drawingPanel[index].setGesture(id);
         }
     }
     
     // clean exit
-    private void doQuit()
-    {
+    private void doQuit() {
         listener.doQuit();
         recognizer.doQuit();
         classifier.doQuit();
@@ -254,8 +250,7 @@ public class GestureCreatorGUI extends JFrame
     }
     
     // initializes all the GUI components
-    private void initializeComponents()
-    {
+    private void initializeComponents() {
         //
         // buttons
         //
@@ -376,7 +371,7 @@ public class GestureCreatorGUI extends JFrame
         // labels for sunspot info
         labelConnected = new JLabel("Not Connected");
         labelConnected.setForeground(Color.red);
-               
+        
         //
         // panels
         //
@@ -466,7 +461,7 @@ public class GestureCreatorGUI extends JFrame
         panelDrawingPanels.setPreferredSize(new Dimension(700,350));
         panelDrawingPanels.setMinimumSize(new Dimension(700,350));
         panelDrawingPanels.setMaximumSize(new Dimension(700,350));
-
+        
         for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++) {
             try {
                 drawingPanel[i] = new GestureDrawingPanel();
@@ -476,15 +471,14 @@ public class GestureCreatorGUI extends JFrame
         }
         
         panelDrawingPanels.add(Box.createHorizontalGlue());
-        for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++)
-        {
+        for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++) {
             drawingPanel[i].setBorder(BorderFactory.createLineBorder(Color.black));
             drawingPanel[i].setBackground(new Color(255,255,255));
             drawingPanel[i].setSize(new Dimension(200,300));
             drawingPanel[i].setPreferredSize(new Dimension(200,300));
             drawingPanel[i].setMinimumSize(new Dimension(200,300));
             drawingPanel[i].setMaximumSize(new Dimension(200,300));
-
+            
             drawingPanel[i].setAlignmentY(Component.CENTER_ALIGNMENT);
             panelDrawingPanels.add(drawingPanel[i]);
             panelDrawingPanels.add(Box.createHorizontalGlue());
@@ -544,13 +538,10 @@ public class GestureCreatorGUI extends JFrame
     // changes the state of the system
     // updates user instruction panel to help guide them
     // updates any buttons that need to be enabled/disabled
-    private void changeState(State state)
-    {
-        switch (state)
-        {
+    private void changeState(State state) {
+        switch (state) {
             case STATE_NEW_GESTURE:
-                if (currentState != state)
-                {
+                if (currentState != state) {
                     // TODO: perhaps display a warning message to user asking if they are sure
                     // TODO: setup for a new gesture
                     labelCreateNewGesture.setFont(currentStepFont);
@@ -567,8 +558,7 @@ public class GestureCreatorGUI extends JFrame
                     labelAssignAction.setForeground(normalColor);
                     
                     // check to see if we're in the middle of recording
-                    if (currentState == state.STATE_RECORDING_GESTURE)
-                    {
+                    if (currentState == state.STATE_RECORDING_GESTURE) {
                         // need to stop recording
                         recording = false;
                         sendData = !sendData;
@@ -580,10 +570,8 @@ public class GestureCreatorGUI extends JFrame
                 }
                 break;
             case STATE_RECORDING_GESTURE:
-                if (currentState != state)
-                {
-                    if (currentState != State.STATE_NEW_GESTURE)
-                    {
+                if (currentState != state) {
+                    if (currentState != State.STATE_NEW_GESTURE) {
                         // This means that the user is coming from some state where they've already
                         // recorded a gesture. Should this be allowed? Should they be forced to go to
                         // new gesture state?
@@ -612,13 +600,10 @@ public class GestureCreatorGUI extends JFrame
                 currentState = state;
                 break;
             case STATE_TEST_GESTURE:
-                if (currentState != State.STATE_DONE_RECORDING_GESTURE)
-                {
+                if (currentState != State.STATE_DONE_RECORDING_GESTURE) {
                     // a gesture hasn't been recorded yet!
                     // TODO: let the user know...
-                }
-                else
-                {
+                } else {
                     // don't need to check if we're already in this state. if the user
                     // wants to test the gesture again, we'll allow it
                     labelCreateNewGesture.setFont(completedStepFont);
@@ -698,23 +683,35 @@ public class GestureCreatorGUI extends JFrame
     //
     // event handlers
     //
-    private void buttonCreateNewGestureActionPerformed(java.awt.event.ActionEvent evt)
-    {
+    private void buttonCreateNewGestureActionPerformed(java.awt.event.ActionEvent evt) {
         changeState(State.STATE_NEW_GESTURE);
     }
     
-    private void buttonRecordGestureActionPerformed(java.awt.event.ActionEvent evt) 
-    {
+    private void buttonRecordGestureActionPerformed(java.awt.event.ActionEvent evt) {
         if (!recording) {
             // TODO: add in code to disable buttons: test, save, assign
             changeState(State.STATE_RECORDING_GESTURE);
             recording = true;
-        }
-        else
-        {
+            Global.systemStateLock.writeLock().lock();
+            try{
+                Global.systemState = Global.SYS_RECORDING_MODE;
+                debug("System state has been changed to SYS_RECORDING_MODE");
+            }
+            finally{
+                Global.systemStateLock.writeLock().unlock();
+            }
+        } else {
             // TODO: add in code to enable buttons: test, save, assign
             changeState(State.STATE_DONE_RECORDING_GESTURE);
             recording = false;
+            Global.systemStateLock.writeLock().lock();
+            try{
+                Global.systemState = Global.SYS_STOP_RECORDING;
+                debug("System state has been changed to SYS_STOP_RECORDING");
+            }
+            finally{
+                Global.systemStateLock.writeLock().unlock();
+            }
         }
         sendData = !sendData;
         listener.doSendData(sendData);
@@ -722,29 +719,39 @@ public class GestureCreatorGUI extends JFrame
         clearedData = false;
     }
     
-    private void buttonTestGestureActionPerformed(java.awt.event.ActionEvent evt) 
-    {
-        changeState(State.STATE_TEST_GESTURE);        
+    private void buttonTestGestureActionPerformed(java.awt.event.ActionEvent evt) {
+        Global.classifiedBasicGesturesLock.writeLock().lock();
+        try{
+            Global.classifiedBasicGestures.removeAllElements();
+            debug("classifiedBasicGestures vector cleared");
+        } finally{
+            Global.classifiedBasicGesturesLock.writeLock().unlock();
+        }
+        
+        Global.systemStateLock.writeLock().lock();
+        try{
+            Global.systemState = Global.SYS_TEST_GESTURE;
+            debug("System state has been changed to Test Gesture");
+        } finally{
+            Global.systemStateLock.writeLock().unlock();
+        }
+        changeState(State.STATE_TEST_GESTURE);
     }
     
-    private void buttonSaveGestureActionPerformed(java.awt.event.ActionEvent evt) 
-    {
+    private void buttonSaveGestureActionPerformed(java.awt.event.ActionEvent evt) {
         changeState(State.STATE_SAVE_GESTURE);
     }
     
-    private void buttonAssignActionActionPerformed(java.awt.event.ActionEvent evt) 
-    {
+    private void buttonAssignActionActionPerformed(java.awt.event.ActionEvent evt) {
         changeState(State.STATE_ASSIGN_ACTION);
     }
     
-    private void buttonLoadGestureActionPerformed(java.awt.event.ActionEvent evt) 
-    {
+    private void buttonLoadGestureActionPerformed(java.awt.event.ActionEvent evt) {
         
     }
     
     // sunspot stuff
-    private void buttonClearActionPerformed(java.awt.event.ActionEvent evt) 
-    {
+    private void buttonClearActionPerformed(java.awt.event.ActionEvent evt) {
         listener.clear();
         recognizer.clear();
         classifier.clear();
@@ -752,17 +759,15 @@ public class GestureCreatorGUI extends JFrame
         clearedData = true;
     }
     
-    private void buttonCalibrateActionPerformed(java.awt.event.ActionEvent evt) 
-    {
+    private void buttonCalibrateActionPerformed(java.awt.event.ActionEvent evt) {
         listener.doCalibrate();
     }
     
-    private void buttonConnectActionPerformed(java.awt.event.ActionEvent evt) 
-    {
+    private void buttonConnectActionPerformed(java.awt.event.ActionEvent evt) {
         listener.reconnect();
     }
-
-    private void formWindowActivated(java.awt.event.WindowEvent evt) {                                     
+    
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {
         listener.setGUI(this);
         if (clearedData) {
             listener.clear();
@@ -776,7 +781,11 @@ public class GestureCreatorGUI extends JFrame
         }
     }
     
-    private void formWindowClosed(java.awt.event.WindowEvent evt) {                                  
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {
         doQuit();
-    }  
+    }
+    private void debug(String s){
+        if(debug)
+            System.out.println("GestureCreatorGUI: " + s);
+    }
 }

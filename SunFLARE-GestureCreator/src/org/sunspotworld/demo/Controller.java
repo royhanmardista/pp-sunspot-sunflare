@@ -18,7 +18,7 @@ public class Controller extends Thread{
     private Vector recordedBasicGestures = new Vector();
     private int numPerformedBasicGesture = 0;
     private boolean confirmed;
-    
+    private boolean debug = true;
     /** Creates a new instance of Controller */
     public Controller() {
     }
@@ -26,6 +26,10 @@ public class Controller extends Thread{
         if(a<b)
             return a;
         return b;
+    }
+    public void debug(String s){
+        if(debug)
+         System.out.println("Controller: "+s);
     }
     public void doIt(){
         boolean stopRecording = false;
@@ -40,7 +44,11 @@ public class Controller extends Thread{
                         recordedBasicGestures.addElement(Global.classifiedBasicGestures.elementAt(i));
                     }
                     Global.classifiedBasicGestures.removeAllElements();   //clear the vector after copying to the local recordedBasicGestures vector
+                    debug("recordedBasicGesturess has size " + recordedBasicGestures.size());
+                    debug("classifedBasicGestures vector is cleared");
                     Global.systemState = Global.SYS_IDLE;
+                    debug("System state has been changed to SYS_IDLE");
+                   
                 } finally{
                     Global.classifiedBasicGesturesLock.writeLock().unlock();
                 }
@@ -50,7 +58,8 @@ public class Controller extends Thread{
                 int matched = 0;
                 Global.classifiedBasicGesturesLock.writeLock().lock();
                 try{
-                    if(Global.classifiedBasicGestures.size()>=recordedBasicGestures.size()){
+                    //first check if the user has performed the correct number of gestures
+                    if(Global.classifiedBasicGestures.size()>=recordedBasicGestures.size() && recordedBasicGestures.size()!=0){
                         for(int i=0; i<recordedBasicGestures.size();i++){
                             if(Global.classifiedBasicGestures.elementAt(i) == recordedBasicGestures.elementAt(i))
                                 matched++;
@@ -58,15 +67,28 @@ public class Controller extends Thread{
                         if(matched == recordedBasicGestures.size() && matched != 0){
                             //confirmed!
                             //store it
-                            System.out.println("Gesture confirmed!");
+                            debug("Gesture confirmed!");
                             Global.systemState = Global.SYS_IDLE;//set system to idle so that it won't stay in confirm mode
+                            debug("System state has been changed to SYS_IDLE");
                             recordedBasicGestures.removeAllElements();//empty out the vector
                         } else{
                             //gesture not confirmed
-                            System.out.println("Gesture not confirmed, try again!");
+                            debug("Gesture not confirmed, try again!");
                             Global.classifiedBasicGestures.removeAllElements();//start over
                             //need to clear GUI 
                         }
+                    }
+                    
+                    //nothing has been recorded, cannot test
+                    else if(recordedBasicGestures.size() == 0 ){
+                        Global.classifiedBasicGestures.removeAllElements();
+                        Global.systemState = Global.SYS_IDLE;
+                        debug("You did not record any gestures, click on 'Record Gesture' to start over");
+                        debug("System state has been changed to SYS_IDLE");
+                    }
+                    else{
+                        debug("waiting");
+                        
                     }
                     //else do nothing, wait for the next turn
                     
