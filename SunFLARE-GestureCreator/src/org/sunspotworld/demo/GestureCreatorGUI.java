@@ -27,8 +27,29 @@ import java.text.*;
  */
 public class GestureCreatorGUI extends JFrame
 {
+    // constants
     public static final int MOVEMENTS_PER_GESTURE = 3;
+    public enum State {
+        STATE_INITIAL,
+        STATE_NEW_GESTURE,
+        STATE_RECORDING_GESTURE,
+        STATE_DONE_RECORDING_GESTURE,
+        STATE_TEST_GESTURE,
+        STATE_VALIDATE_GESTURE,
+        STATE_SAVE_GESTURE,
+        STATE_ASSIGN_ACTION,
+        STATE_LOAD_GESTURE
+    }
+//    public static final int STATE_NEW_GESTURE = 0;
+//    public static final int STATE_RECORDING_GESTURE = 1;
+//    public static final int STATE_DONE_RECORDING_GESTURE = 2;
+//    public static final int STATE_TEST_GESTURE = 3;
+//    public static final int STATE_VALIDATE_GESTURE = 3;
+//    public static final int STATE_SAVE_GESTURE = 4;
+//    public static final int STATE_ASSIGN_ACTION = 5;
+//    public static final int STATE_LOAD_GESTURE = 6; // TODO: we'll see if this actually gets implemented
     
+    // sunspot variables
     private AccelerometerListener listener = null;
     private BasicGestureRecognizer recognizer = null;
     private BasicGestureClassifier classifier = null;
@@ -36,6 +57,15 @@ public class GestureCreatorGUI extends JFrame
     private boolean sendData = false;
     private boolean fixedData = false;
     private boolean clearedData = true;
+    
+
+    private State currentState = State.STATE_INITIAL;
+    private Font currentStepFont = null;
+    private Font normalFont = null;
+    private Font completedStepFont = null;
+    private Color highlightColor = null;
+    private Color normalColor = null;
+    private boolean recording = false;
     
     // window data
     private int windowSizeX = 500;
@@ -107,7 +137,7 @@ public class GestureCreatorGUI extends JFrame
     {
         initializeComponents(); // initializes all buttons, panels, etc...
         init();
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // the doQuit() function exits the app
         
         // activates functions on startup and close
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -119,13 +149,26 @@ public class GestureCreatorGUI extends JFrame
             }
         });
         
+        // initialize fonts to be used
+        String fontName = getFont().getFontName(); // get default font name
+        currentStepFont = new Font(fontName,Font.BOLD,16);
+        normalFont = new Font(fontName,Font.BOLD,12);
+        completedStepFont = new Font(fontName,Font.ITALIC,12);
+        highlightColor = Color.blue;
+        normalColor = Color.black;
+        
+        // set window variables
         setTitle(windowTitle);
         setVisible(true);
-        setMinimumSize(new Dimension(getWidth(),getHeight()));
+        setMinimumSize(new Dimension(getWidth(),getHeight())); 
         
         Global.mainWindow = this;
+        
+        // change the state to initial state
+        changeState(State.STATE_NEW_GESTURE);
     }
     
+    // initializes gesture identification/sunspot stuff
     private void init()
     {
         if (listener == null) {
@@ -156,6 +199,15 @@ public class GestureCreatorGUI extends JFrame
      */
     public void setConnectionStatus(boolean conn, String msg) {
         labelConnected.setText(msg);
+        if (conn)
+        {
+            // is connected
+            labelConnected.setForeground(Color.green);
+        }
+        else
+        {
+            labelConnected.setForeground(Color.red);
+        }
         //blinkButton.setEnabled(conn);
         //pingButton.setEnabled(conn);
         buttonConnect.setEnabled(conn);
@@ -178,6 +230,11 @@ public class GestureCreatorGUI extends JFrame
         }
     }
     
+    /**
+     * Sets the display at the specified index to the specified gesture
+     * @param index Index of the display to be updated
+     * @param id ID number of the gesture to be displayed
+     */
     public void setGesture(int index, int id)
     {
         if (index >= 0 || index < MOVEMENTS_PER_GESTURE)
@@ -196,8 +253,13 @@ public class GestureCreatorGUI extends JFrame
         System.exit(0);
     }
     
+    // initializes all the GUI components
     private void initializeComponents()
     {
+        //
+        // buttons
+        //
+        
         // buttons related to gestures
         buttonCreateNewGesture = new JButton("New Gesture");
         buttonCreateNewGesture.setSize(new Dimension(140,90));
@@ -299,6 +361,10 @@ public class GestureCreatorGUI extends JFrame
             }
         });
         
+        //
+        // labels
+        //
+        
         // labels for instruction
         labelCreateNewGesture = new JLabel("New Gesture");
         labelRecordGesture = new JLabel("Record Gesture");
@@ -306,11 +372,10 @@ public class GestureCreatorGUI extends JFrame
         labelValidateGesture = new JLabel("Validate Gesture");
         labelSaveGesture = new JLabel("Save Gesture");
         labelAssignAction = new JLabel("Assign Action");
-        labelSeparator = new JLabel("*"); // may not need
         
         // labels for sunspot info
-        labelConnected = new JLabel("Not Connected!");
-        
+        labelConnected = new JLabel("Not Connected");
+        labelConnected.setForeground(Color.red);
                
         //
         // panels
@@ -476,16 +541,181 @@ public class GestureCreatorGUI extends JFrame
         pack();
     }
     
+    // changes the state of the system
+    // updates user instruction panel to help guide them
+    // updates any buttons that need to be enabled/disabled
+    private void changeState(State state)
+    {
+        switch (state)
+        {
+            case STATE_NEW_GESTURE:
+                if (currentState != state)
+                {
+                    // TODO: perhaps display a warning message to user asking if they are sure
+                    // TODO: setup for a new gesture
+                    labelCreateNewGesture.setFont(currentStepFont);
+                    labelCreateNewGesture.setForeground(highlightColor);
+                    labelRecordGesture.setFont(normalFont);
+                    labelRecordGesture.setForeground(normalColor);
+                    labelTestGesture.setFont(normalFont);
+                    labelTestGesture.setForeground(normalColor);
+                    labelValidateGesture.setFont(normalFont);
+                    labelValidateGesture.setForeground(normalColor);
+                    labelSaveGesture.setFont(normalFont);
+                    labelSaveGesture.setForeground(normalColor);
+                    labelAssignAction.setFont(normalFont);
+                    labelAssignAction.setForeground(normalColor);
+                    
+                    // check to see if we're in the middle of recording
+                    if (currentState == state.STATE_RECORDING_GESTURE)
+                    {
+                        // need to stop recording
+                        recording = false;
+                        sendData = !sendData;
+                        listener.doSendData(sendData);
+                        buttonRecordGesture.setText(sendData ? "Stop Recording" : "Record Gesture");
+                        clearedData = false;
+                    }
+                    currentState = state;
+                }
+                break;
+            case STATE_RECORDING_GESTURE:
+                if (currentState != state)
+                {
+                    if (currentState != State.STATE_NEW_GESTURE)
+                    {
+                        // This means that the user is coming from some state where they've already
+                        // recorded a gesture. Should this be allowed? Should they be forced to go to
+                        // new gesture state?
+                        // What if the user records the gesture and doesn't get the expected outcome?
+                        // Probably shouldn't force them back NEW_GESTURE in that case...
+                        // TODO: perhaps display a warning message to user asking if they are sure
+                    }
+                    labelCreateNewGesture.setFont(completedStepFont);
+                    labelCreateNewGesture.setForeground(normalColor);
+                    labelRecordGesture.setFont(currentStepFont);
+                    labelRecordGesture.setForeground(highlightColor);
+                    labelTestGesture.setFont(normalFont);
+                    labelTestGesture.setForeground(normalColor);
+                    labelValidateGesture.setFont(normalFont);
+                    labelValidateGesture.setForeground(normalColor);
+                    labelSaveGesture.setFont(normalFont);
+                    labelSaveGesture.setForeground(normalColor);
+                    labelAssignAction.setFont(normalFont);
+                    labelAssignAction.setForeground(normalColor);
+                    currentState = state;
+                }
+                break;
+            case STATE_DONE_RECORDING_GESTURE:
+                // TODO: is there much else to do here?
+                // not much to do here
+                currentState = state;
+                break;
+            case STATE_TEST_GESTURE:
+                if (currentState != State.STATE_DONE_RECORDING_GESTURE)
+                {
+                    // a gesture hasn't been recorded yet!
+                    // TODO: let the user know...
+                }
+                else
+                {
+                    // don't need to check if we're already in this state. if the user
+                    // wants to test the gesture again, we'll allow it
+                    labelCreateNewGesture.setFont(completedStepFont);
+                    labelCreateNewGesture.setForeground(normalColor);
+                    labelRecordGesture.setFont(completedStepFont);
+                    labelRecordGesture.setForeground(normalColor);
+                    labelTestGesture.setFont(currentStepFont);
+                    labelTestGesture.setForeground(highlightColor);
+                    labelValidateGesture.setFont(normalFont);
+                    labelValidateGesture.setForeground(normalColor);
+                    labelSaveGesture.setFont(normalFont);
+                    labelSaveGesture.setForeground(normalColor);
+                    labelAssignAction.setFont(normalFont);
+                    labelAssignAction.setForeground(normalColor);
+                    currentState = state;
+                }
+                break;
+            case STATE_VALIDATE_GESTURE:
+                // TODO: should the user be allowed to come here straight after recording the gesture?
+                // should they be forced to test it first?
+                // TODO: need to interact with the server and find out if gesture already exists
+                // TODO: what happens if the gesture already exists? ask if the user wants to
+                // assign a new action?
+                labelCreateNewGesture.setFont(completedStepFont);
+                labelCreateNewGesture.setForeground(normalColor);
+                labelRecordGesture.setFont(completedStepFont);
+                labelRecordGesture.setForeground(normalColor);
+                labelTestGesture.setFont(completedStepFont);
+                labelTestGesture.setForeground(normalColor);
+                labelValidateGesture.setFont(currentStepFont);
+                labelValidateGesture.setForeground(highlightColor);
+                labelSaveGesture.setFont(normalFont);
+                labelSaveGesture.setForeground(normalColor);
+                labelAssignAction.setFont(normalFont);
+                labelAssignAction.setForeground(normalColor);
+                currentState = state;
+                break;
+            case STATE_SAVE_GESTURE:
+                labelCreateNewGesture.setFont(completedStepFont);
+                labelCreateNewGesture.setForeground(normalColor);
+                labelRecordGesture.setFont(completedStepFont);
+                labelRecordGesture.setForeground(normalColor);
+                labelTestGesture.setFont(completedStepFont);
+                labelTestGesture.setForeground(normalColor);
+                labelValidateGesture.setFont(completedStepFont);
+                labelValidateGesture.setForeground(normalColor);
+                labelSaveGesture.setFont(currentStepFont);
+                labelSaveGesture.setForeground(highlightColor);
+                labelAssignAction.setFont(normalFont);
+                labelAssignAction.setForeground(normalColor);
+                currentState = state;
+                break;
+            case STATE_ASSIGN_ACTION:
+                labelCreateNewGesture.setFont(completedStepFont);
+                labelCreateNewGesture.setForeground(normalColor);
+                labelRecordGesture.setFont(completedStepFont);
+                labelRecordGesture.setForeground(normalColor);
+                labelTestGesture.setFont(completedStepFont);
+                labelTestGesture.setForeground(normalColor);
+                labelValidateGesture.setFont(completedStepFont);
+                labelValidateGesture.setForeground(normalColor);
+                labelSaveGesture.setFont(completedStepFont);
+                labelSaveGesture.setForeground(normalColor);
+                labelAssignAction.setFont(currentStepFont);
+                labelAssignAction.setForeground(highlightColor);
+                currentState = state;
+                break;
+            case STATE_LOAD_GESTURE:
+                currentState = state;
+                break;
+            default:
+                // invalid state
+                break;
+        }
+    }
+    
     //
     // event handlers
     //
     private void buttonCreateNewGestureActionPerformed(java.awt.event.ActionEvent evt)
     {
-        
+        changeState(State.STATE_NEW_GESTURE);
     }
     
     private void buttonRecordGestureActionPerformed(java.awt.event.ActionEvent evt) 
     {
+        if (!recording) {
+            // TODO: add in code to disable buttons: test, save, assign
+            changeState(State.STATE_RECORDING_GESTURE);
+            recording = true;
+        }
+        else
+        {
+            // TODO: add in code to enable buttons: test, save, assign
+            changeState(State.STATE_DONE_RECORDING_GESTURE);
+            recording = false;
+        }
         sendData = !sendData;
         listener.doSendData(sendData);
         buttonRecordGesture.setText(sendData ? "Stop Recording" : "Record Gesture");
@@ -494,17 +724,17 @@ public class GestureCreatorGUI extends JFrame
     
     private void buttonTestGestureActionPerformed(java.awt.event.ActionEvent evt) 
     {
-        
+        changeState(State.STATE_TEST_GESTURE);        
     }
     
     private void buttonSaveGestureActionPerformed(java.awt.event.ActionEvent evt) 
     {
-        
+        changeState(State.STATE_SAVE_GESTURE);
     }
     
     private void buttonAssignActionActionPerformed(java.awt.event.ActionEvent evt) 
     {
-        
+        changeState(State.STATE_ASSIGN_ACTION);
     }
     
     private void buttonLoadGestureActionPerformed(java.awt.event.ActionEvent evt) 
