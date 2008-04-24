@@ -149,6 +149,18 @@ public class BasicGestureClassifier extends Thread{
         } finally{
             Global.gestureLock.writeLock().unlock();
         }
+        
+        //classifiedBasicGestures is for the Controller thread
+        Global.classifiedBasicGesturesLock.writeLock().lock();
+        try{
+            Global.classifiedBasicGestures.addElement(thisBasicGesture);
+        }
+        finally{
+            Global.classifiedBasicGesturesLock.writeLock().unlock();
+        }
+        
+        
+        
         //update GUI's movement box
         
         

@@ -31,9 +31,15 @@ public class Global {
     //
     public static int numBasicGesturesDetected = 0;
     
+    //vector of type BasicGesture
     public static Vector basicGestures = new Vector();
     public static ReentrantReadWriteLock basicGesturesLock  = new ReentrantReadWriteLock();
     public static Condition basicGesturesCondition = basicGesturesLock.writeLock().newCondition();
+    
+    //vector of ints that represent types of movement
+    public static Vector classifiedBasicGestures = new Vector();
+    public static ReentrantReadWriteLock classifiedBasicGesturesLock  = new ReentrantReadWriteLock();
+    public static Condition classifiedBasicGesturesCondition = classifiedBasicGesturesLock.writeLock().newCondition();
     
     public static Gesture gesture = new Gesture();
     public static ReentrantReadWriteLock gestureLock  = new ReentrantReadWriteLock();
@@ -42,7 +48,7 @@ public class Global {
     public static double currentTime = 0;
     public static ReentrantReadWriteLock currentTimeLock  = new ReentrantReadWriteLock();
     public static Condition currentTimeCondition = currentTimeLock.writeLock().newCondition();
-
+    
     public static int systemState = 0;
     public static ReentrantReadWriteLock systemStateLock  = new ReentrantReadWriteLock();
     public static Condition systemStateCondition = systemStateLock.writeLock().newCondition();
@@ -61,7 +67,10 @@ public class Global {
     public static final int SYS_RECORDING_MODE = 1;
     public static final int SYS_CONFIRM_MODE = 2;
     public static final int SYS_RECOGNITION_MODE = 3;
+    public static final int SYS_TEST_GESTURE = 4;
+    public static final int SYS_STOP_RECORDING = 5;
     
+    public static final int MAX_NUM_BASIC_GESTURE = 3;
     public static HashMap definedGestures = new HashMap();
     
     public Global(){
@@ -112,13 +121,13 @@ public class Global {
         definedGestures.put(74,"SD");
         definedGestures.put(75,"SF");
         definedGestures.put(76,"SB");
-
+        
         definedGestures.put(17,"RS");
         definedGestures.put(27,"LS");
         definedGestures.put(37,"US");
         definedGestures.put(47,"DS");
         definedGestures.put(57,"FS");
-        definedGestures.put(67,"BS");        
+        definedGestures.put(67,"BS");
         
         
     }
