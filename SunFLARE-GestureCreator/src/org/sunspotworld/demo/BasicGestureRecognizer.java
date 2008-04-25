@@ -21,13 +21,16 @@ public class BasicGestureRecognizer extends Thread{
     private static int gestureSegmentsIndex = 0;
     private boolean prevTimeStamp = false;
     private final static double TIME_ALLOWANCE = 270;
-
+    private boolean debug = false;
     
     /** Creates a new instance of BasicGestureRecognizer */
     public BasicGestureRecognizer() {
 
     }
-    
+    public void debug(String s){
+        if(debug)
+            System.out.println("BasicGestureRecognizer: " + s);
+    }
     
     public void analyze(BasicGesture currentGesture){
         Vector pattern = new Vector();
@@ -62,7 +65,7 @@ public class BasicGestureRecognizer extends Thread{
         try{
         //in fact it should be combined with the previous gesture
         if(Global.basicGestures.size()>0 && currentGesture.getEndTimeStamp()-((BasicGesture)Global.basicGestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
-            System.out.println("COMBINING current gesture with previous");
+            debug("COMBINING current gesture with previous");
             ((BasicGesture)Global.basicGestures.lastElement()).combine(currentGesture);
          //   System.out.println("Combined gesture's pattern = " + ((BasicGesture)Global.basicGestures.lastElement()).getPattern());
              calculateActiveAxis((BasicGesture)Global.basicGestures.lastElement());
@@ -71,7 +74,7 @@ public class BasicGestureRecognizer extends Thread{
             calculateActiveAxis(currentGesture);
         }
         
-        System.out.println("Total number of basicGestures = " + Global.basicGestures.size());
+        debug("Total number of basicGestures = " + Global.basicGestures.size());
 
         }
         finally{

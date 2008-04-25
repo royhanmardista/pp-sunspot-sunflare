@@ -37,4 +37,7 @@ public class Gesture {
     public void clearVector(){
         basicGestures.removeAllElements();
     }
+    public boolean validateGesture(){
+        return false;
+    }
 }

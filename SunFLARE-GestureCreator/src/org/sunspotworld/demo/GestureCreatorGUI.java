@@ -183,7 +183,7 @@ public class GestureCreatorGUI extends JFrame {
         }
         if(gestureClassifier == null){
             gestureClassifier = new GestureClassifier();
-            gestureClassifier.start();
+           // gestureClassifier.start();
         }
         if(controller == null){
             controller = new Controller();
@@ -692,26 +692,14 @@ public class GestureCreatorGUI extends JFrame {
             // TODO: add in code to disable buttons: test, save, assign
             changeState(State.STATE_RECORDING_GESTURE);
             recording = true;
-            Global.systemStateLock.writeLock().lock();
-            try{
-                Global.systemState = Global.SYS_RECORDING_MODE;
-                debug("System state has been changed to SYS_RECORDING_MODE");
-            }
-            finally{
-                Global.systemStateLock.writeLock().unlock();
-            }
+            controller.recordGesture();
+            
         } else {
             // TODO: add in code to enable buttons: test, save, assign
             changeState(State.STATE_DONE_RECORDING_GESTURE);
             recording = false;
-            Global.systemStateLock.writeLock().lock();
-            try{
-                Global.systemState = Global.SYS_STOP_RECORDING;
-                debug("System state has been changed to SYS_STOP_RECORDING");
-            }
-            finally{
-                Global.systemStateLock.writeLock().unlock();
-            }
+            controller.stopRecording();
+            
         }
         sendData = !sendData;
         listener.doSendData(sendData);
@@ -720,21 +708,9 @@ public class GestureCreatorGUI extends JFrame {
     }
     
     private void buttonTestGestureActionPerformed(java.awt.event.ActionEvent evt) {
-        Global.classifiedBasicGesturesLock.writeLock().lock();
-        try{
-            Global.classifiedBasicGestures.removeAllElements();
-            debug("classifiedBasicGestures vector cleared");
-        } finally{
-            Global.classifiedBasicGesturesLock.writeLock().unlock();
-        }
-        
-        Global.systemStateLock.writeLock().lock();
-        try{
-            Global.systemState = Global.SYS_TEST_GESTURE;
-            debug("System state has been changed to Test Gesture");
-        } finally{
-            Global.systemStateLock.writeLock().unlock();
-        }
+        sendData = true;
+        listener.doSendData(sendData);      
+        controller.testGesture();
         changeState(State.STATE_TEST_GESTURE);
     }
     
