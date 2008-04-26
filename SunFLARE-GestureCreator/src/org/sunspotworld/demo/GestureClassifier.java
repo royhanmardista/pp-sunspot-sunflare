@@ -16,11 +16,11 @@ import java.util.Vector;
  */
 public class GestureClassifier extends Thread{
     private boolean running = false;
-    
+    private Gesture recordedGesture = new Gesture();
     private boolean debug=true;
     /** Creates a new instance of GestureClassifier */
     public GestureClassifier() {
-  
+        
     }
     public void classifyGesture(Gesture gesture){
         PluginRef p;
@@ -30,16 +30,40 @@ public class GestureClassifier extends Thread{
         } finally{
             Global.gestureDBLock.writeLock().unlock();
         }
-        if(p!=null){
-            debug("Gesture found: " + p.getName()+ " " + p.getActionDescription());
-            
-            //cannot add duplicate gesture to db
-        } else{
-            debug("Gesture not found");
-            
-            //add gesture to db
-        }
         
+        
+            //in testing mode
+        /*
+            if(Global.systemState == Global.SYS_TEST_GESTURE){
+                if(gesture.equals(recordedGesture)){
+                    if(Global.gestureDB.addGesture(g))
+                        debug("Gesture added to the database");
+                    else
+                        debug("The same gesture is found in the database, cannot add duplicate gesture");
+                    recordedGesture = new Gesture();
+                }
+                else{
+                    debug("Try again");
+                }
+            }
+         */
+            if(p!=null){
+                debug("Gesture found: " + p.getName()+ " " + p.getActionDescription());
+                //cannot add duplicate gesture to db
+                
+               /* if(Global.systemState == Global.SYS_RECORDING_MODE){
+                    debug("Gesture already exists in database");
+                    Global.systemState = Global.SYS_IDLE;
+                    Global.endTestGesture();
+                }*/
+                
+            }//not in database 
+            else{
+                debug("Gesture not found");                
+
+                //add gesture to db
+            }
+ 
         
         // since the classified is always the first one in the gestures vector, it is safe to remove it from the vector
         Global.gesturesLock.writeLock().lock();
@@ -49,7 +73,7 @@ public class GestureClassifier extends Thread{
         }finally{
             Global.gesturesLock.writeLock().unlock();
         }
-
+        
     }
     public void classifier(){
         //get current time

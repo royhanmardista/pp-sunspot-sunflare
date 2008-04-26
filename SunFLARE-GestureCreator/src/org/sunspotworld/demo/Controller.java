@@ -145,6 +145,134 @@ public class Controller extends Thread{
         }
         
     }
+    /*
+    public void doIt2(){
+        boolean stopRecording = false;
+        Global.systemStateLock.writeLock().lock();
+      
+        Gesture gesturePerformed;
+        PluginRef p;
+        try{
+            if(Global.systemState == Global.SYS_STOP_RECORDING){
+                //capture the basic gestures that the user has done, this happens when the stop recording button is clicked
+                Global.classifiedBasicGesturesLock.writeLock().lock();
+                try{
+                    //always take the first MAX_NUM_BASIC_GESTURE basic gestures
+                    for(int i=0; i<min(Global.MAX_NUM_BASIC_GESTURE,Global.classifiedBasicGestures.size()); i++){
+                        recordedBasicGestures.addElement(Global.classifiedBasicGestures.elementAt(i));
+                        
+                    }
+                    Global.classifiedBasicGestures.removeAllElements();   //clear the vector after copying to the local recordedBasicGestures vector
+                    debug("recordedBasicGesturess has size " + recordedBasicGestures.size());
+                    debug("classifedBasicGestures vector is cleared");
+                    Global.systemState = Global.SYS_IDLE;
+                    debug("System state has been changed to SYS_IDLE");
+                    p = new PluginRef("TestApp","blah");
+                    recordedGesture = new Gesture(new Vector(recordedBasicGestures), p);
+                    
+                    if(Global.gestureDB.gestureExists(recordedGesture)){
+                        debug("The same gesture already exists.  Please record a different gesture.");
+                        recordedBasicGestures.removeAllElements();
+                        recordedGesture = null;
+                    }
+           
+                } finally{
+                    Global.classifiedBasicGesturesLock.writeLock().unlock();
+                }
+                
+            }else if(Global.systemState == Global.SYS_TEST_GESTURE){
+                //we know our freshly recorded basic gestures, now compare it to what the user is doing
+                int matched = 0;
+                Global.classifiedBasicGesturesLock.writeLock().lock();
+                try{
+                    //first check if the user has performed the correct number of gestures
+                    if(Global.classifiedBasicGestures.size()==recordedBasicGestures.size() && recordedBasicGestures.size()!=0){
+                        p = new PluginRef("TestApp","blah");
+                        gesturePerformed = new Gesture(new Vector(Global.classifiedBasicGestures),p);
+
+                        if(gesturePerformed.equals(recordedGesture)){
+                            //confirmed!
+                            //store it
+                            Vector v = new Vector(recordedGesture.getBasicGestures());
+                            
+                            Gesture g = new Gesture(v, p);
+                            debug("Gesture confirmed!");
+                            Global.gestureDBLock.writeLock().lock();
+                            try{
+                                if(Global.gestureDB.addGesture(g))
+                                    debug("Gesture added to the database");
+                                else
+                                    debug("The same gesture is found in the database, cannot add duplicate gesture");
+                            }finally{
+                                Global.gestureDBLock.writeLock().unlock();
+                            }
+                            
+                            
+                            Global.systemState = Global.SYS_IDLE;//set system to idle so that it won't stay in confirm mode
+                            debug("System state has been changed to SYS_IDLE");
+                            recordedBasicGestures.removeAllElements();//empty out the vector
+                            //notify GUI
+                            
+                            //run gesture acceptance algorithm to validate the newly recorded gesture
+                        } else{
+                            //gesture not confirmed
+                            debug("Gesture not confirmed, try again!");
+                            Global.classifiedBasicGestures.removeAllElements();//start over
+                            //notify GUI
+                            
+                        }
+                        Global.endTestGesture();
+                    }
+                    
+                    //nothing has been recorded, cannot test
+                    else if(recordedBasicGestures.size() == 0 ){
+                        Global.systemState = Global.SYS_IDLE;
+                        debug("You did not record any gestures, click on 'Record Gesture' to start over");
+                        debug("System state has been changed to SYS_IDLE");
+                        Global.endTestGesture();
+                        Global.classifiedBasicGestures.removeAllElements();
+                        recordedBasicGestures.removeAllElements(); //just to be safe
+                    } else{
+                        //waiting
+                        
+                    }
+                    //else do nothing, wait for the next turn
+                    
+                } finally{
+                    Global.classifiedBasicGesturesLock.writeLock().unlock();
+                }
+            }
+            
+            else if(Global.systemState == Global.SYS_IDLE){
+                //do nothing? clear some global variables and vectors?
+            } else if(Global.systemState == Global.SYS_RECOGNITION_MODE){
+                //look at Global.gesture and find it in database
+                //if not found, do nothing?
+                //if found, fire action
+            }
+            
+        } finally{
+            Global.systemStateLock.writeLock().unlock();
+        }
+        
+    }*/
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public void clear() {
         // clear private data
     }
