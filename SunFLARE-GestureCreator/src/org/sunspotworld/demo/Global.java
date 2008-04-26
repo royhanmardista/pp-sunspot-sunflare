@@ -74,7 +74,7 @@ public class Global {
     public static final int BACKWARD    = 6;
     public static final int SHAKE       = 7;
     
-    public final static double IDLE_TIME_BTWN_GESTURES = 1500;
+    public final static double IDLE_TIME_BTWN_GESTURES = 2000;
     
     //system states
     public static final int SYS_IDLE = 0;
@@ -85,10 +85,12 @@ public class Global {
     public static final int SYS_STOP_RECORDING = 5;
     
     public static final int MAX_NUM_BASIC_GESTURE = 3;
-    public static HashMap definedGestures = new HashMap();
+   
+    //public static HashMap definedGestures = new HashMap();
     
     public Global(){
         // Predefined gestures
+        /*
         definedGestures.put(11,"RR");
         definedGestures.put(12,"RL");
         definedGestures.put(13,"RU");
@@ -142,7 +144,7 @@ public class Global {
         definedGestures.put(47,"DS");
         definedGestures.put(57,"FS");
         definedGestures.put(67,"BS");
-        
+        */
         
     }
     

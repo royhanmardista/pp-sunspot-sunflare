@@ -183,7 +183,7 @@ public class GestureCreatorGUI extends JFrame {
         }
         if(gestureClassifier == null){
             gestureClassifier = new GestureClassifier();
-           // gestureClassifier.start();
+            gestureClassifier.start();
         }
         if(controller == null){
             controller = new Controller();
@@ -752,6 +752,7 @@ public class GestureCreatorGUI extends JFrame {
             listener.clear();
             recognizer.clear();
             classifier.clear();
+            gestureClassifier.clear();
         }
         if (listener.is2GScale()) {
             //twoGRadioButton.setSelected(true);

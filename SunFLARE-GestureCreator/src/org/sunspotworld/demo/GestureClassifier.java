@@ -17,36 +17,12 @@ import java.util.Vector;
 public class GestureClassifier extends Thread{
     private boolean running = false;
     
-    private boolean debug;
+    private boolean debug=true;
     /** Creates a new instance of GestureClassifier */
     public GestureClassifier() {
+  
     }
     public void classifyGesture(Gesture gesture){
-        /*
-        Vector basicGestures = gesture.getBasicGestures();
-        int gestureValue = 0;
-        int tens = 1;
-        for(int i = (basicGestures.size()-1) ; i >= 0 ; i--){
-            gestureValue += ((Integer)basicGestures.elementAt(i)).intValue()*tens;
-            tens*=10;
-        }
-         
-        System.err.println("Gesture value  == "+gestureValue);
-        // clear the vestor so that it starts finding new gestures
-        gesture.removeAllBasicGestures();
-        // Find this gesture value in the map and return the string corresponding to it
-        if(Global.definedGestures.get(gestureValue) != null){
-            String g = Global.definedGestures.get(gestureValue).toString();
-            // update the gesture window
-            Global.mainWindow.setGesture((gestureValue/10),gestureValue%10);
-            Global.mainWindow.repaint();
-         
-            System.err.println("Gesture Found :" + Global.definedGestures.get(gestureValue));
-        }else{
-            System.err.println("Gesture Not Found ");
-        }
-         
-         */
         PluginRef p;
         Global.gestureDBLock.writeLock().lock();
         try{
@@ -56,8 +32,12 @@ public class GestureClassifier extends Thread{
         }
         if(p!=null){
             debug("Gesture found: " + p.getName()+ " " + p.getActionDescription());
+            
+            //cannot add duplicate gesture to db
         } else{
             debug("Gesture not found");
+            
+            //add gesture to db
         }
         
         
@@ -69,24 +49,9 @@ public class GestureClassifier extends Thread{
         }finally{
             Global.gesturesLock.writeLock().unlock();
         }
-        
-        
-        
-        
-        
-        
+
     }
     public void classifier(){
-        /*Global.gestureLock.writeLock().lock();
-        try{
-            if(Global.gesture.getNumBasicGestures() >= Global.NUMBER_OF_MOVEMENTS_PER_GESTURE ){
-                classifyGesture(Global.gesture);
-            }// end of if(Global.gesture.getVectorSize() >= Global.NUMBER_OF_MOVEMENTS_PER_GESTURE )
-        }finally{
-            Global.gestureLock.writeLock().unlock();
-        }
-         */
-        
         //get current time
         double currentTime;
         Global.currentTimeLock.writeLock().lock();
@@ -100,7 +65,7 @@ public class GestureClassifier extends Thread{
         try{
             if(Global.gestures.size()>=2){
                 classifyGesture((Gesture)Global.gestures.firstElement());
-            } else if(Global.gestures.size() == 1 && currentTime + Global.IDLE_TIME_BTWN_GESTURES < ((Gesture)Global.gestures.elementAt(0)).getEndTimestamp()){
+            } else if(Global.gestures.size() == 1 && ((Gesture)Global.gestures.firstElement()).getEndTimestamp()+ Global.IDLE_TIME_BTWN_GESTURES < currentTime){
                 classifyGesture((Gesture)Global.gestures.firstElement());
             } else{
                 //the gesture is not completed by the user yet or the gestures vector is empty
@@ -122,6 +87,7 @@ public class GestureClassifier extends Thread{
     //main loop
     public void hostLoop(){
         running = true;
+        debug("hello");
         while(running)
             try{
                 classifier();

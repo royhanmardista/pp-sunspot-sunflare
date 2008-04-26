@@ -82,7 +82,6 @@ public class GestureDatabase {
 
     boolean gestureExists(Gesture g){
         for(int i = 0; i<definedGestures.size();i++){
-           
             Gesture k = (Gesture)(definedGestures.elementAt(i));
             if(g.equals(k))
                 return true;

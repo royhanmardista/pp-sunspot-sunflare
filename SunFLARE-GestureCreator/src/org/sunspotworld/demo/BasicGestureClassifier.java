@@ -20,7 +20,7 @@ public class BasicGestureClassifier extends Thread{
     private static double currentTime;
     private int basicGesturesIndex;
     private final static double IDLE_TIME = 500;
-    
+    private boolean debug = true;
     private static double latestBasicGestureTimestamp;
     /** Creates a new instance of BasicGestureClassifier */
     public BasicGestureClassifier() {
@@ -167,6 +167,8 @@ public class BasicGestureClassifier extends Thread{
             else{
                 ((Gesture)Global.gestures.lastElement()).addBasicGesture(bg);
             }
+            //for(int k=0; k<Global.gestures.size();k++)
+            //    debug(Global.gestures.elementAt(k).toString());
             //update the timestamp
             latestBasicGestureTimestamp = bg.getEndTimeStamp();
         } finally{
@@ -220,5 +222,10 @@ public class BasicGestureClassifier extends Thread{
     public void doQuit(){
         running = false;
     }
+        public void debug(String s){
+        if(debug)
+            System.out.println("BasicGestureClassifier: "+s);
+    }
+    
     
 }
