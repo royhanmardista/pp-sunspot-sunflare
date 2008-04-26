@@ -26,9 +26,15 @@ public class Global {
     public static ReentrantReadWriteLock gestureSegmentsLock  = new ReentrantReadWriteLock();
     public static Condition gestureSegmentsCondition = gestureSegmentsLock.writeLock().newCondition();
     
+    public static void endTestGesture(){
+        mainWindow.endTest();
+    }
     public static Vector gestureSegments = new Vector();
     
-    //
+    public static GestureDatabase gestureDB = new GestureDatabase();
+    public static ReentrantReadWriteLock gestureDBLock  = new ReentrantReadWriteLock();
+    public static Condition gestureDBCondition = gestureDBLock.writeLock().newCondition();
+    
     public static int numBasicGesturesDetected = 0;
     
     //vector of type BasicGesture
@@ -45,6 +51,11 @@ public class Global {
     public static ReentrantReadWriteLock gestureLock  = new ReentrantReadWriteLock();
     public static Condition gestureCondition = gestureLock.writeLock().newCondition();
     
+    public static Vector gestures = new Vector();
+    public static ReentrantReadWriteLock gesturesLock  = new ReentrantReadWriteLock();
+    public static Condition gesturesCondition = gesturesLock.writeLock().newCondition();
+    
+    
     public static double currentTime = 0;
     public static ReentrantReadWriteLock currentTimeLock  = new ReentrantReadWriteLock();
     public static Condition currentTimeCondition = currentTimeLock.writeLock().newCondition();
@@ -53,7 +64,8 @@ public class Global {
     public static ReentrantReadWriteLock systemStateLock  = new ReentrantReadWriteLock();
     public static Condition systemStateCondition = systemStateLock.writeLock().newCondition();
     
-    public static final int NUMBER_OF_MOVEMENTS_PER_GESTURE = 2;
+    public static final int NUMBER_OF_MOVEMENTS_PER_GESTURE = 3;
+    public static final int UNDEFINED   = 0;
     public static final int RIGHT       = 1;
     public static final int LEFT        = 2;
     public static final int UP          = 3;
@@ -61,6 +73,8 @@ public class Global {
     public static final int FORWARD     = 5;
     public static final int BACKWARD    = 6;
     public static final int SHAKE       = 7;
+    
+    public final static double IDLE_TIME_BTWN_GESTURES = 1500;
     
     //system states
     public static final int SYS_IDLE = 0;

@@ -20,6 +20,7 @@ public class BasicGesture {
     private Vector pattern;
     private String inactiveAxis;
     private String activeAxis;
+    private int ID;
     private double endTimeStamp;
     
     /** Creates a new instance of BasicGesture */
@@ -30,6 +31,11 @@ public class BasicGesture {
         pattern = new Vector();
         inactiveAxis = "";
         endTimeStamp = 0;
+        ID = Global.UNDEFINED;
+    }
+    
+    public BasicGesture(int id){
+        ID = id;
     }
     /**
      * Create a new instance of BasicGesture
@@ -157,7 +163,7 @@ public class BasicGesture {
      * Get active axis
      * @return String representation of the BasicGesture
      */
-    public String toString(){
+    public String toString(){/*
         StringBuilder result = new StringBuilder();
         
         result.append("active axis/" + activeAxis + " pattern size = "+pattern.size()+ " ");
@@ -165,6 +171,18 @@ public class BasicGesture {
             result.append(pattern.elementAt(i) + " ");
         }
         return result.toString();
-        
+        */
+        StringBuilder result = new StringBuilder();
+        result.append("id/" + ID);
+        return result.toString();
+    }
+    
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    public int getID() {
+        return ID;
     }
 }

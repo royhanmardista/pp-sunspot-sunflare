@@ -713,7 +713,10 @@ public class GestureCreatorGUI extends JFrame {
         controller.testGesture();
         changeState(State.STATE_TEST_GESTURE);
     }
-    
+    public void endTest(){
+        sendData = false;
+        listener.doSendData(sendData);
+    }
     private void buttonSaveGestureActionPerformed(java.awt.event.ActionEvent evt) {
         changeState(State.STATE_SAVE_GESTURE);
     }

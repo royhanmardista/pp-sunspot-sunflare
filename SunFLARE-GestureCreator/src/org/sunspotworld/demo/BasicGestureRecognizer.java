@@ -20,7 +20,7 @@ public class BasicGestureRecognizer extends Thread{
     private int index = 0;
     private static int gestureSegmentsIndex = 0;
     private boolean prevTimeStamp = false;
-    private final static double TIME_ALLOWANCE = 270;
+    private final static double TIME_ALLOWANCE_BTW_BASIC_GESTURE_SEGMENTS = 270;
     private boolean debug = false;
     
     /** Creates a new instance of BasicGestureRecognizer */
@@ -64,7 +64,7 @@ public class BasicGestureRecognizer extends Thread{
         Global.basicGesturesLock.writeLock().lock();
         try{
         //in fact it should be combined with the previous gesture
-        if(Global.basicGestures.size()>0 && currentGesture.getEndTimeStamp()-((BasicGesture)Global.basicGestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE){
+        if(Global.basicGestures.size()>0 && currentGesture.getEndTimeStamp()-((BasicGesture)Global.basicGestures.lastElement()).getEndTimeStamp() <= TIME_ALLOWANCE_BTW_BASIC_GESTURE_SEGMENTS){
             debug("COMBINING current gesture with previous");
             ((BasicGesture)Global.basicGestures.lastElement()).combine(currentGesture);
          //   System.out.println("Combined gesture's pattern = " + ((BasicGesture)Global.basicGestures.lastElement()).getPattern());
