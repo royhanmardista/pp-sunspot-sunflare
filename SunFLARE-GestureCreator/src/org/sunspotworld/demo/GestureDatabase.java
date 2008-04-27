@@ -58,7 +58,7 @@ public class GestureDatabase {
         
     }
     
-    PluginRef search(Gesture g){
+    public PluginRef search(Gesture g){
         Vector key = g.getBasicGestures();
         
         for(int i=0; i<definedGestures.size(); i++){
@@ -72,7 +72,7 @@ public class GestureDatabase {
         return null;
     }
     
-    boolean addGesture(Gesture g){
+    public boolean addGesture(Gesture g){
        if(!gestureExists(g)){
            definedGestures.addElement(g);
            return true;
@@ -80,7 +80,7 @@ public class GestureDatabase {
        return false;
     }
 
-    boolean gestureExists(Gesture g){
+    public boolean gestureExists(Gesture g){
         for(int i = 0; i<definedGestures.size();i++){
             Gesture k = (Gesture)(definedGestures.elementAt(i));
             if(g.equals(k))
@@ -89,13 +89,24 @@ public class GestureDatabase {
         return false;
     }
     
-    
-    boolean equal(Vector v, Vector k){
+    private boolean equal(Vector v, Vector k){
         for(int i = 0; i<v.size(); i++){
             if(((BasicGesture)v.elementAt(i)).getID() != ((BasicGesture)k.elementAt(i)).getID())
                 return false;
         }
         return true;
     }
+    public Vector getAllDefinedGestures(){
+        return definedGestures;
+    }
     
+    public Vector getDefinedGesturesForPlugin(PluginRef p){
+        String pluginName = p.getName();
+        Vector returnV = new Vector();
+        for(int i=0; i < definedGestures.size(); i++){
+            if(pluginName.equals(((Gesture)definedGestures.elementAt(i)).getPlugin().getName()))
+                returnV.addElement(definedGestures.elementAt(i));
+        }
+        return returnV;
+    }
 }

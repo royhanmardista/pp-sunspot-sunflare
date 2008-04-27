@@ -35,6 +35,10 @@ public class Global {
     public static ReentrantReadWriteLock gestureDBLock  = new ReentrantReadWriteLock();
     public static Condition gestureDBCondition = gestureDBLock.writeLock().newCondition();
     
+    public static PluginDatabase pluginRefDB = new PluginDatabase();
+    public static ReentrantReadWriteLock pluginDBLock  = new ReentrantReadWriteLock();
+    public static Condition pluginDBCondition = pluginDBLock.writeLock().newCondition();
+    
     public static int numBasicGesturesDetected = 0;
     
     //vector of type BasicGesture
@@ -85,7 +89,7 @@ public class Global {
     public static final int SYS_STOP_RECORDING = 5;
     
     public static final int MAX_NUM_BASIC_GESTURE = 3;
-   
+    
     //public static HashMap definedGestures = new HashMap();
     
     public Global(){
@@ -127,24 +131,24 @@ public class Global {
         definedGestures.put(64,"BD");
         definedGestures.put(65,"BF");
         definedGestures.put(66,"BB");
-        
+         
         // Shake
         definedGestures.put(77,"SHAKE");
-        
+         
         definedGestures.put(71,"SR");
         definedGestures.put(72,"SL");
         definedGestures.put(73,"SU");
         definedGestures.put(74,"SD");
         definedGestures.put(75,"SF");
         definedGestures.put(76,"SB");
-        
+         
         definedGestures.put(17,"RS");
         definedGestures.put(27,"LS");
         definedGestures.put(37,"US");
         definedGestures.put(47,"DS");
         definedGestures.put(57,"FS");
         definedGestures.put(67,"BS");
-        */
+         */
         
     }
     
