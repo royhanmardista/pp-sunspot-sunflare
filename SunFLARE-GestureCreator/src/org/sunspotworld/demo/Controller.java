@@ -230,6 +230,7 @@ public class Controller extends Thread{
                 try{
                     if(Global.gestureDB.gestureExists(recordedGesture)){
                         //notify GUI that the gesture cannot be accepted
+                        Global.systemState = Global.SYS_IDLE;
                     }
                 }finally{
                     Global.gestureDBLock.writeLock().unlock();
@@ -240,6 +241,7 @@ public class Controller extends Thread{
                     if(((Gesture)(Global.gestures.firstElement())).sameMovements(recordedGesture)){
                         //notify GUI that the test is successful
                         //the GUI is responsible for calling gestureTestedState() to change the system state
+                        Global.systemState = Global.SYS_IDLE;
                     } else{
                         debug("");//notify GUI that the test failed
                     }
@@ -249,12 +251,13 @@ public class Controller extends Thread{
                     Global.gesturesLock.writeLock().unlock();
                 }
             } else if(Global.systemState == Global.SYS_SAVE_GESTURE){
-                    Global.gestureDBLock.writeLock().lock();
-                    try{
-                        Global.gestureDB.addGesture(recordedGesture);
-                    }finally{
-                        Global.gestureDBLock.writeLock().unlock();
-                    }
+                Global.gestureDBLock.writeLock().lock();
+                try{
+                    Global.gestureDB.addGesture(recordedGesture);
+                }finally{
+                    Global.gestureDBLock.writeLock().unlock();
+                }
+                Global.systemState = Global.SYS_IDLE;
             }
             
         }finally{
@@ -360,9 +363,13 @@ public class Controller extends Thread{
     public void saveGestureState(){
         changeSystemState(Global.SYS_SAVE_GESTURE);
     }
+    public void systemIdle(){
+        changeSystemState(Global.SYS_IDLE);
+    }
     public void revertToPreviousState(){
         changeSystemState(previousState);
     }
+    
     /*******************end new code***********************/
     
     

@@ -78,6 +78,7 @@ public class Gesture {
     public void setPlugin(PluginRef plugin) {
         this.plugin = plugin;
     }
+    //pluginref and basic movements are all the same
     boolean equals(Gesture h){
         Vector v = this.getBasicGestures();
         Vector k = h.getBasicGestures();
@@ -89,7 +90,7 @@ public class Gesture {
         }
         return true;
     }
-    
+    //returns true if the basic gestures are the same, regardless of the pluginref
     boolean sameMovements(Gesture h){
         Vector v = this.getBasicGestures();
         Vector k = h.getBasicGestures();
