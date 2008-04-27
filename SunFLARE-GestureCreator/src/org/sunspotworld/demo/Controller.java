@@ -249,7 +249,12 @@ public class Controller extends Thread{
                     Global.gesturesLock.writeLock().unlock();
                 }
             } else if(Global.systemState == Global.SYS_SAVE_GESTURE){
-                
+                    Global.gestureDBLock.writeLock().lock();
+                    try{
+                        Global.gestureDB.addGesture(recordedGesture);
+                    }finally{
+                        Global.gestureDBLock.writeLock().unlock();
+                    }
             }
             
         }finally{
@@ -352,7 +357,7 @@ public class Controller extends Thread{
     public void gestureSavedState(){
         changeSystemState(Global.SYS_GESTURE_SAVED);
     }
-    public void saveGesturesState(){
+    public void saveGestureState(){
         changeSystemState(Global.SYS_SAVE_GESTURE);
     }
     public void revertToPreviousState(){
