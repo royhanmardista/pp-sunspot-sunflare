@@ -90,6 +90,18 @@ public class Gesture {
         return true;
     }
     
+    boolean sameMovements(Gesture h){
+        Vector v = this.getBasicGestures();
+        Vector k = h.getBasicGestures();
+        if(v.size() != k.size())
+            return false;
+        for(int i = 0; i<v.size(); i++){
+            if(((BasicGesture)v.elementAt(i)).getID() != ((BasicGesture)k.elementAt(i)).getID())
+                return false;
+        }
+        return true;
+    }
+    
     public String toString(){
         StringBuilder result = new StringBuilder();
         for(int i=0; i<basicGestures.size();i++){

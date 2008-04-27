@@ -35,7 +35,7 @@ public class Global {
     public static ReentrantReadWriteLock gestureDBLock  = new ReentrantReadWriteLock();
     public static Condition gestureDBCondition = gestureDBLock.writeLock().newCondition();
     
-    public static PluginDatabase pluginRefDB = new PluginDatabase();
+    public static PluginDatabase pluginDB = new PluginDatabase();
     public static ReentrantReadWriteLock pluginDBLock  = new ReentrantReadWriteLock();
     public static Condition pluginDBCondition = pluginDBLock.writeLock().newCondition();
     
@@ -64,10 +64,7 @@ public class Global {
     public static ReentrantReadWriteLock currentTimeLock  = new ReentrantReadWriteLock();
     public static Condition currentTimeCondition = currentTimeLock.writeLock().newCondition();
     
-    public static int systemState = 0;
-    public static ReentrantReadWriteLock systemStateLock  = new ReentrantReadWriteLock();
-    public static Condition systemStateCondition = systemStateLock.writeLock().newCondition();
-    
+      
     public static final int NUMBER_OF_MOVEMENTS_PER_GESTURE = 3;
     public static final int UNDEFINED   = 0;
     public static final int RIGHT       = 1;
@@ -87,8 +84,22 @@ public class Global {
     public static final int SYS_RECOGNITION_MODE = 3;
     public static final int SYS_TEST_GESTURE = 4;
     public static final int SYS_STOP_RECORDING = 5;
+    public static final int SYS_SELECT_PLUGINREF = 6;
+    public static final int SYS_NEW_GESTURE = 7;
+    public static final int SYS_ASSIGN_ACTION = 8;
+    public static final int SYS_ACTION_SELECTED = 9;
+    public static final int SYS_GESTURE_TESTED = 10;
+    public static final int SYS_SAVE_GESTURE = 11;
+    public static final int SYS_GESTURE_SAVED = 12;
+    public static final int SYS_GESTURE_RECORDED = 13;
+    public static int systemState = SYS_IDLE;
+    public static ReentrantReadWriteLock systemStateLock  = new ReentrantReadWriteLock();
+    public static Condition systemStateCondition = systemStateLock.writeLock().newCondition();
+  
+    
     
     public static final int MAX_NUM_BASIC_GESTURE = 3;
+    
     
     //public static HashMap definedGestures = new HashMap();
     
