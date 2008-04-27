@@ -152,7 +152,7 @@ public class Controller extends Thread{
         }
         
     }
-         
+    
     
     public void testGesture(){
         Global.classifiedBasicGesturesLock.writeLock().lock();
@@ -206,7 +206,7 @@ public class Controller extends Thread{
     public void selectPlugin(PluginRef pr){
         p = pr;
     }
- 
+    
     
     /**************end old code*********************/
     
@@ -355,9 +355,11 @@ public class Controller extends Thread{
     public void saveGesturesState(){
         changeSystemState(Global.SYS_SAVE_GESTURE);
     }
-   
+    public void revertToPreviousState(){
+        changeSystemState(previousState);
+    }
     /*******************end new code***********************/
     
-   
+    
     
 }
