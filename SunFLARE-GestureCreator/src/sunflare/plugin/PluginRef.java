@@ -16,12 +16,35 @@ package sunflare.plugin;
 public class PluginRef {
     String name;
     String actionDescription;
+    String classpath;
+    String application;
+    String description;
+
     
     /** Creates a new instance of PluginRef */
     public PluginRef() {
 
     }
 
+    public PluginRef(String name, String application, String description, String classpath){
+        this.name = name;
+        this.application = application;
+        this.description = description;
+        this.classpath = classpath;
+    }
+
+   public String getApplication() {
+	   return application;
+   }
+   
+   public String getClassPath(){
+	   return classpath;
+   }
+   
+   public void setApplication(String application) {
+	   this.application = application;
+   }
+      
     public String getActionDescription() {
         return actionDescription;
     }
@@ -41,5 +64,14 @@ public class PluginRef {
     public void setName(String name) {
         this.name = name;
     }
+    
+   public void setClassPath(String classpath){
+	   this.classpath = classpath;
+   }
+
+   public String toString(){
+	  String rep = this.application+": "+this.description;
+	  return rep;
+   }    
 
 }
