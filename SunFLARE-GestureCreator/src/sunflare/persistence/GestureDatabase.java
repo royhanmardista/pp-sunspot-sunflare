@@ -142,12 +142,15 @@ public class GestureDatabase {
     }
     public Vector getAllDefinedGestures(){
         List gestures = listGestures();
-        definedGestures.removeAllElements();
+        //definedGestures.removeAllElements();
+        Vector returnV = new Vector();
         Gesture gesture = null;
         for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
             gesture = new Gesture((PersistentGesture)i.next());
+            returnV.addElement(gesture);
         }        
-        return definedGestures;
+        //return definedGestures;
+        return returnV;
     }
     
     public Vector getDefinedGesturesForPlugin(PluginRef p){
