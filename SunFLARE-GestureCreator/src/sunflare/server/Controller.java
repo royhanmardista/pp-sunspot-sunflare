@@ -360,8 +360,8 @@ public class Controller extends Thread{
         clearGesturesVector();
     }
     public void testingGestureState(){
-        changeSystemState(Global.SYS_TEST_GESTURE);
         clearGesturesVector();
+        changeSystemState(Global.SYS_TEST_GESTURE);
     }
     public void gestureTestedState(){
         changeSystemState(Global.SYS_GESTURE_TESTED);

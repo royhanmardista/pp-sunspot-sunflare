@@ -262,11 +262,24 @@ public class GestureCreatorGUI extends JFrame {
      * @param id ID number of the gesture to be displayed
      */
     public void setGesture(int index, int id) {
-        if (index >= 0 && index < MOVEMENTS_PER_GESTURE) {
-            drawingPanel[index].setGesture(id);
-        }
-        if (index == MOVEMENTS_PER_GESTURE-1) {
-            toggleRecord();
+        if (testing) {
+            // if we're in testing mode, we should highlight the box in green if
+            // that movement was performed correctly, and red if it wasn't...
+            if (index >= 0 && index < MOVEMENTS_PER_GESTURE) {
+                if (drawingPanel[index].getID() == id) {
+                    drawingPanel[index].setBorder(BorderFactory.createLineBorder(Color.green,3));
+                } else {
+                    drawingPanel[index].setBorder(BorderFactory.createLineBorder(Color.red,3));
+                }
+            }
+        } else {
+            
+            if (index >= 0 && index < MOVEMENTS_PER_GESTURE) {
+                drawingPanel[index].setGesture(id);
+            }
+//            if (index == MOVEMENTS_PER_GESTURE-1) {
+//                toggleRecord();
+//            }
         }
     }
     
@@ -844,6 +857,7 @@ public class GestureCreatorGUI extends JFrame {
                     changeState(State.STATE_GESTURE_VALIDATED);
                 } else {
                     // TODO:let the user know and go back to action assigned state
+                    JOptionPane.showMessageDialog(this, "The gesture performed already exists in the database for the assigned action", "Invalid gesture...", JOptionPane.ERROR_MESSAGE);
                     System.out.println("GUI: gesture was not validated");
                     previousState = currentState;
                     currentState = state;
@@ -976,6 +990,9 @@ public class GestureCreatorGUI extends JFrame {
     //
     private void buttonCreateNewGestureActionPerformed(java.awt.event.ActionEvent evt) {
         clearGestures();
+        for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++) {
+            drawingPanel[i].setBorder(BorderFactory.createLineBorder(Color.black,1));
+        }
         repaint();
         changeState(State.STATE_NEW_GESTURE);
         controller.newGestureState();
@@ -986,8 +1003,7 @@ public class GestureCreatorGUI extends JFrame {
         toggleRecord();
     }
     
-    private void toggleRecord()
-    {
+    private void toggleRecord() {
         sendData = !sendData;
         listener.doSendData(sendData);
         buttonRecordGesture.setText(sendData ? "Stop Recording" : "Record Gesture");
@@ -1020,6 +1036,7 @@ public class GestureCreatorGUI extends JFrame {
         
         
         if (!testing) {
+            resetTest();
             changeState(State.STATE_TESTING_GESTURE);
             testing = true;
             //controller.recordGesture();
@@ -1036,6 +1053,7 @@ public class GestureCreatorGUI extends JFrame {
         }
     }
     public void endTest(boolean success) {
+        testing = false;
         sendData = false;
         listener.doSendData(sendData);
         buttonTestGesture.setText(sendData ? "Cancel Testing" : "Test Gesture");
@@ -1043,7 +1061,21 @@ public class GestureCreatorGUI extends JFrame {
         if (success) {
             changeState(State.STATE_DONE_TESTING_GESTURE);
         } else {
+            JOptionPane.showMessageDialog(this, "The gesture was not performed correctly!", "Test failed...", JOptionPane.ERROR_MESSAGE);
+            for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++) {
+                drawingPanel[i].setBorder(BorderFactory.createLineBorder(Color.black,1));
+            }
             changeState(State.STATE_GESTURE_VALIDATED);
+        }
+    }
+    private void resetTest() {
+        listener.clear();
+        recognizer.clear();
+        classifier.clear();
+        gestureClassifier.clear();
+        clearedData = true;
+        for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++) {
+            drawingPanel[i].setBorder(BorderFactory.createLineBorder(Color.black,1));
         }
     }
     private void buttonSaveGestureActionPerformed(java.awt.event.ActionEvent evt) {
