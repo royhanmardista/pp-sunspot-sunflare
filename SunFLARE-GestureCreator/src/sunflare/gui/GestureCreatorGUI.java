@@ -262,11 +262,12 @@ public class GestureCreatorGUI extends JFrame {
      * @param id ID number of the gesture to be displayed
      */
     public void setGesture(int index, int id) {
-        System.out.print("hi");
         if (index >= 0 && index < MOVEMENTS_PER_GESTURE) {
             drawingPanel[index].setGesture(id);
         }
-        System.out.print("hi");
+        if (index == MOVEMENTS_PER_GESTURE-1) {
+            toggleRecord();
+        }
     }
     
     public void clearGestures() {
@@ -982,6 +983,11 @@ public class GestureCreatorGUI extends JFrame {
     
     private void buttonRecordGestureActionPerformed(java.awt.event.ActionEvent evt) {
         
+        toggleRecord();
+    }
+    
+    private void toggleRecord()
+    {
         sendData = !sendData;
         listener.doSendData(sendData);
         buttonRecordGesture.setText(sendData ? "Stop Recording" : "Record Gesture");
