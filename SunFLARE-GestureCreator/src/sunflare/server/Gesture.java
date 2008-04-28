@@ -17,6 +17,7 @@ package sunflare.server;
 
 import java.util.Vector;
 import sunflare.plugin.PluginRef;
+import sunflare.persistence.PersistentGesture;
 
 public class Gesture {
     private Vector basicGestures;
@@ -27,6 +28,21 @@ public class Gesture {
         basicGestures = new Vector();
         plugin = new PluginRef();
     }
+    
+   public Gesture(PersistentGesture p) {
+        plugin = new PluginRef(p.getPluginRef(),p.getAction());
+        basicGestures = new Vector();
+        if(p.getMovment1() != -1){
+            basicGestures.addElement(new BasicGesture(p.getMovment1()));        
+        }
+        if(p.getMovment2() != -1){
+            basicGestures.addElement(new BasicGesture(p.getMovment2()));                
+        }
+        if(p.getMovment3() != -1){
+            basicGestures.addElement(new BasicGesture(p.getMovment3()));                
+        }
+   }
+   
     //this method should be removed in the future
     public Gesture(int basicGestureID){
         basicGestures = new Vector();

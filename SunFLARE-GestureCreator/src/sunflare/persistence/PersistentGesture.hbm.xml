@@ -4,9 +4,14 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="persistence.PersistentGesture" table="GESTURES">
+    <class name="sunflare.persistence.PersistentGesture" table="GESTURES">
         <id name="id" column="GESTURE_ID">
             <generator class="native"/>
         </id>
+        <property name="movment1" column="MOVMENT1"/>
+        <property name="movment2" column="MOVMENT2"/>
+        <property name="movment3" column="MOVMENT3"/>
+        <property name="pluginRef" column="PLUGINREF"/>
+        <property name="action" column="ACTION"/>    
      </class>
 </hibernate-mapping>

@@ -14,8 +14,8 @@ package sunflare.persistence;
  * @author Praveen
  */
 
-//import org.hibernate.SessionFactory;
-//import org.hibernate.cfg.Configuration;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 public class PersistentGestureUtil {
     
@@ -23,25 +23,25 @@ public class PersistentGestureUtil {
     public PersistentGestureUtil() {
     }
 
-//    private static final SessionFactory sessionFactory;
-//
-//    static 
-//    {
-//            //try
-//            //{
-//                    sessionFactory = new Configuration().configure().buildSessionFactory();
-//            //}
-//            //catch( Throwable ex )
-//            //{
-//                    //System.err.println( "Initial SessionFactory creation failed" + ex );
-//                    //throw new ExceptionInitializerError( ex );
-//            //}
-//    }
-//
-//    public static SessionFactory getSessionFactory()
-//    {
-//            return sessionFactory;
-//    }
+    private static final SessionFactory sessionFactory;
+
+    static 
+    {
+            //try
+            //{
+                    sessionFactory = new Configuration().configure().buildSessionFactory();
+            //}
+            //catch( Throwable ex )
+            //{
+                    //System.err.println( "Initial SessionFactory creation failed" + ex );
+                    //throw new ExceptionInitializerError( ex );
+            //}
+    }
+
+    public static SessionFactory getSessionFactory()
+    {
+            return sessionFactory;
+    }
 
     
     

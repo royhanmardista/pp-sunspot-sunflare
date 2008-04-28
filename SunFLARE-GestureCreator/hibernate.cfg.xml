@@ -29,7 +29,7 @@
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">update</property>
 
-        <mapping resource="persistence/PersistentGesture.hbm.xml"/>
+        <mapping resource="PersistentGesture.hbm.xml"/>
 
     </session-factory>
 
