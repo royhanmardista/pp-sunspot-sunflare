@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.text.*;
 import sunflare.server.*;
+import sunflare.plugin.PluginRef;
 
 /**
  * GUI creating code that makes a window that will allow a user to create
@@ -57,6 +58,11 @@ public class GestureCreatorGUI extends JFrame
 	private boolean fixedData = false;
 	private boolean clearedData = true;
 
+        private Thread testerThread = new Thread(new java.lang.Runnable() {
+            public void run() {
+                
+            }
+        });
 
 	private State currentState = State.STATE_INITIAL;
 	private State previousState = State.STATE_NONE;
@@ -66,7 +72,8 @@ public class GestureCreatorGUI extends JFrame
 	private Color highlightColor = null;
 	private Color normalColor = null;
 	private boolean recording = false;
-	private Semaphore validating = new Semaphore(10); // the 10 is arbitrary, it's for max permits
+        private boolean testing = false;
+	private Semaphore validating = new Semaphore(0); // start with no permits...
 	private boolean gestureValidated = false;
 
 	// window data
@@ -720,6 +727,7 @@ public class GestureCreatorGUI extends JFrame
 				if (o != null)
 				{
 					// action selected successfully
+                                        controller.actionSelectedState((PluginRef)o);
 					previousState = currentState;
 					currentState = state;
 					changeState(State.STATE_ACTION_SELECTED);
@@ -865,15 +873,18 @@ public class GestureCreatorGUI extends JFrame
 				buttonTestGesture.setEnabled(false);
 				buttonSaveGesture.setEnabled(false);
 				buttonLoadGesture.setEnabled(false);
+                                
+                                this.repaint(); // window doesn't get updated here for some reason..
 
 				System.out.println("GUI: waiting to validate...");
 				try
 				{
-					validating.acquire(); // waits for controller thread to notify the gui that it's ok to continue
+                                    validating.acquire(); // waits for controller thread to notify the gui that it's ok to continue
 				}
 				catch (InterruptedException e)
 				{
-					// ??
+                                    // ??
+                                    System.out.println("interrupted??");
 				}
 
 				System.out.println("GUI: done validating...");
@@ -1016,6 +1027,7 @@ public class GestureCreatorGUI extends JFrame
 	{
 		gestureValidated = validated;
 		validating.release();
+                System.out.println("here?");
 	}
 
 	//
@@ -1024,6 +1036,7 @@ public class GestureCreatorGUI extends JFrame
 	private void buttonCreateNewGestureActionPerformed(java.awt.event.ActionEvent evt)
 	{
 		changeState(State.STATE_NEW_GESTURE);
+                controller.newGestureState();
 	}
 
 	private void buttonRecordGestureActionPerformed(java.awt.event.ActionEvent evt)
@@ -1039,7 +1052,8 @@ public class GestureCreatorGUI extends JFrame
 			// TODO: add in code to disable buttons: test, save, assign
 			changeState(State.STATE_RECORDING_GESTURE);
 			recording = true;
-			controller.recordGesture();
+			//controller.recordGesture();
+                        controller.gestureRecordingState();
 
 		}
 		else
@@ -1047,23 +1061,44 @@ public class GestureCreatorGUI extends JFrame
 			// TODO: add in code to enable buttons: test, save, assign
 			changeState(State.STATE_DONE_RECORDING_GESTURE);
 			recording = false;
-			controller.stopRecording();
-
+			//controller.stopRecording();
+                        controller.gestureRecordedState();
 			changeState(State.STATE_VALIDATE_GESTURE);
 		}
 	}
 
 	private void buttonTestGestureActionPerformed(java.awt.event.ActionEvent evt)
 	{
-		sendData = true;
+		sendData = !sendData;
 		listener.doSendData(sendData);
-		controller.testGesture();
-		changeState(State.STATE_TESTING_GESTURE);
+		buttonTestGesture.setText(sendData ? "Cancel Testing" : "Test Gesture");
+		clearedData = false;
+                
+                
+		if (!testing)
+		{
+                    changeState(State.STATE_TESTING_GESTURE);
+                    testing = true;
+                    //controller.recordGesture();
+                    controller.testingGestureState();
+
+                    
+                    //testerThread.start();
+		}
+		else
+		{
+			testing = false;
+			//controller.stopRecording();
+                        controller.systemIdle();
+			changeState(State.STATE_GESTURE_VALIDATED);
+                        //testerThread.interrupt();
+		}
 	}
-	public void endTest()
+	public void endTest()//boolean success)
 	{
 		sendData = false;
 		listener.doSendData(sendData);
+                controller.systemIdle();
 	}
 	private void buttonSaveGestureActionPerformed(java.awt.event.ActionEvent evt)
 	{

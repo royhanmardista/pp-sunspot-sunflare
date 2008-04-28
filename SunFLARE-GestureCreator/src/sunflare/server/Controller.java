@@ -231,6 +231,12 @@ public class Controller extends Thread{
                 try{
                     if(Global.gestureDB.gestureExists(recordedGesture)){
                         //notify GUI that the gesture cannot be accepted
+                        Global.mainWindow.validationResults(false);
+                        Global.systemState = Global.SYS_IDLE;
+                    }
+                    else
+                    {
+                        Global.mainWindow.validationResults(true);
                         Global.systemState = Global.SYS_IDLE;
                     }
                 }finally{
