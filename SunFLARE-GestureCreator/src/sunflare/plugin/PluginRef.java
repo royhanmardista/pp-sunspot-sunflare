@@ -55,6 +55,8 @@ public class PluginRef {
      public PluginRef(String application, String description){
         this.application = application;
         this.description = description;
+        this.name = application;
+        this.actionDescription = description;
     }
 
     public String getName() {

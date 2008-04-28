@@ -39,7 +39,7 @@ public class Controller extends Thread{
         if(debug)
             System.out.println("Controller: "+s);
     }
-    /**************************old code (still in use)*******************************/
+    /**************************old code ******************************/
     public void doIt(){
         boolean stopRecording = false;
         Global.systemStateLock.writeLock().lock();
@@ -213,7 +213,7 @@ public class Controller extends Thread{
     
     
     
-    /**************new code (not in effect yet)************************/
+    /**************new code************************/
     public void doIt3(){
         Global.systemStateLock.writeLock().lock();
         try{
@@ -252,7 +252,7 @@ public class Controller extends Thread{
                         Global.mainWindow.endTest(true);
                     } else{
                         Global.mainWindow.endTest(false);
-                        debug("");//notify GUI that the test failed
+                        //debug("");//notify GUI that the test failed
                         Global.systemState = Global.SYS_IDLE;
                     }
                     //Controller is not responsible for the 'Cancel' case
