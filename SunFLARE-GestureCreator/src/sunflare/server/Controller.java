@@ -280,7 +280,7 @@ public class Controller extends Thread{
         running = true;
         while(running)
             try{
-                doIt();
+                doIt3();
             } catch(Exception e){
                 System.out.println(e);
             }
