@@ -121,7 +121,7 @@ public class GestureDrawingPanel  extends JPanel {
         }
         locGesture.x = getWidth() / 2 - gestureImage.getWidth() / 2;
         locGesture.y = getHeight() / 2 - gestureImage.getHeight() / 2;
-       
+        repaint();
     }
  
 //    public Dimension getPreferredSize()
