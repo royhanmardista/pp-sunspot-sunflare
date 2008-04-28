@@ -262,15 +262,22 @@ public class GestureCreatorGUI extends JFrame {
      * @param id ID number of the gesture to be displayed
      */
     public void setGesture(int index, int id) {
-        if (index >= 0 || index < MOVEMENTS_PER_GESTURE) {
+        System.out.print("hi");
+        if (index >= 0 && index < MOVEMENTS_PER_GESTURE) {
             drawingPanel[index].setGesture(id);
         }
+        System.out.print("hi");
     }
     
     public void clearGestures() {
         for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++) {
             drawingPanel[i].setGesture(GestureDrawingPanel.INVALID_GESTURE_ID);
         }
+        listener.clear();
+        recognizer.clear();
+        classifier.clear();
+        gestureClassifier.clear();
+        clearedData = true;
     }
     
     // clean exit
@@ -967,6 +974,8 @@ public class GestureCreatorGUI extends JFrame {
     // event handlers
     //
     private void buttonCreateNewGestureActionPerformed(java.awt.event.ActionEvent evt) {
+        clearGestures();
+        repaint();
         changeState(State.STATE_NEW_GESTURE);
         controller.newGestureState();
     }
