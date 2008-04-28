@@ -748,7 +748,7 @@ public class GestureCreatorGUI extends JFrame
 					{
 						previousState = currentState;
 						currentState = state;
-						changeState(State.STATE_ASSIGN_ACTION);
+						changeState(State.STATE_NEW_GESTURE);
 					}
 				}
 				break;
@@ -1094,15 +1094,25 @@ public class GestureCreatorGUI extends JFrame
                         //testerThread.interrupt();
 		}
 	}
-	public void endTest()//boolean success)
+	public void endTest(boolean success)
 	{
 		sendData = false;
 		listener.doSendData(sendData);
+                buttonTestGesture.setText(sendData ? "Cancel Testing" : "Test Gesture");
                 controller.systemIdle();
+                if (success)
+                {
+                    changeState(State.STATE_DONE_TESTING_GESTURE);
+                }
+                else
+                {
+                    changeState(State.STATE_GESTURE_VALIDATED);
+                }
 	}
 	private void buttonSaveGestureActionPerformed(java.awt.event.ActionEvent evt)
 	{
 		changeState(State.STATE_SAVE_GESTURE);
+                controller.saveGestureState();
 	}
 
 	private void buttonAssignActionActionPerformed(java.awt.event.ActionEvent evt)

@@ -249,8 +249,11 @@ public class Controller extends Thread{
                         //notify GUI that the test is successful
                         //the GUI is responsible for calling gestureTestedState() to change the system state
                         Global.systemState = Global.SYS_IDLE;
+                        Global.mainWindow.endTest(true);
                     } else{
+                        Global.mainWindow.endTest(false);
                         debug("");//notify GUI that the test failed
+                        Global.systemState = Global.SYS_IDLE;
                     }
                     //Controller is not responsible for the 'Cancel' case
                     //GUI needs to handle it and call the appropriate methods to alter system state
