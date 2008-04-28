@@ -47,10 +47,14 @@ public class PluginRef {
       
     public String getActionDescription() {
         return actionDescription;
-    }
+    }/*
     public PluginRef(String pluginName, String action){
         name = pluginName;
         actionDescription = action;
+    }*/
+     public PluginRef(String application, String description){
+        this.application = application;
+        this.description = description;
     }
 
     public String getName() {
