@@ -72,7 +72,9 @@ public class GestureDrawingPanel  extends JPanel {
         
         if (gestureID <= INVALID_GESTURE_ID)
         {
-            // do nothing
+            // draw a large white box to cover up any old stuff...
+            g.setColor(Color.white);
+            g.fillRect(0,0,this.getWidth(),this.getHeight());
         }
         else
         {
