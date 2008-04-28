@@ -223,15 +223,13 @@ public class GestureCreatorGUI extends JFrame
 		}
 		else
 		{
-						labelConnected.setForeground(Color.red);
-						buttonCreateNewGesture.setEnabled(conn);
-						buttonRecordGesture.setEnabled(conn);
-						buttonTestGesture.setEnabled(conn);
-						buttonSaveGesture.setEnabled(conn);
-						buttonAssignAction.setEnabled(conn);
-			buttonLoadGesture.setEnabled(conn);
-			buttonCalibrate.setEnabled(conn);
-			buttonClear.setEnabled(conn);
+                    labelConnected.setForeground(Color.red);
+                    buttonCreateNewGesture.setEnabled(conn);
+                    buttonRecordGesture.setEnabled(conn);
+                    buttonTestGesture.setEnabled(conn);
+                    buttonSaveGesture.setEnabled(conn);
+                    buttonAssignAction.setEnabled(conn);
+                    buttonLoadGesture.setEnabled(conn);
 		}
 		//blinkButton.setEnabled(conn);
 		//pingButton.setEnabled(conn);
@@ -248,6 +246,8 @@ public class GestureCreatorGUI extends JFrame
 			}
 			//twoGRadioButton.setEnabled(conn);
 			//sixGRadioButton.setEnabled(conn);
+                        buttonCalibrate.setEnabled(conn);
+                        buttonClear.setEnabled(conn);
 		}
 	}
 
