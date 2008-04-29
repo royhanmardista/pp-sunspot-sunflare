@@ -11,6 +11,7 @@ package sunflare.server;
 
 import java.util.Vector;
 import sunflare.plugin.PluginRef;
+import sunflare.plugin.PluginLayer;
 /**
  *
  * @author Praveen
@@ -19,29 +20,48 @@ public class GestureClassifier extends Thread{
     private boolean running = false;
     private Gesture recordedGesture = new Gesture();
     private boolean debug=true;
+    private boolean serviceMode;
+    private PluginLayer pLayer;
     /** Creates a new instance of GestureClassifier */
     public GestureClassifier() {
-        
+        //by default it is the GestureCreator mode
+        serviceMode = false;
+        this.pLayer = null;
     }
+    public GestureClassifier(PluginLayer pLayer){
+        this.pLayer = pLayer;
+        this.serviceMode = true;
+    }
+    
     public void classifyGesture(Gesture gesture){
         PluginRef p;
         Global.gestureDBLock.writeLock().lock();
         try{
-           // p = Global.gestureDB.search(gesture);
             gesture.scan();
         } finally{
             Global.gestureDBLock.writeLock().unlock();
         }
+        
+        if(serviceMode){
+            p = Global.gestureDB.search(gesture);
+            if(p!=null){
+                pLayer.executePlugin(p.getName(),gesture);
+                debug("Gesture found: " + p.getApplication()+ " " + p.getName());
+            } else{
+                debug("Gesture not found");
+            }
+        }
+        
         /*
         if(p!=null){
             debug("Gesture found: " + p.getName()+ " " + p.getActionDescription());
         } else{
             debug("Gesture not found");
         }
-        */
+         */
         
         // since the classified is always the first one in the gestures vector, it is safe to remove it from the vector
-        /*
+        if(serviceMode){
         Global.gesturesLock.writeLock().lock();
         try{
             Global.gestures.removeElement(gesture);
@@ -49,8 +69,9 @@ public class GestureClassifier extends Thread{
         }finally{
             Global.gesturesLock.writeLock().unlock();
         }
-     */   
+        }
     }
+    
     public void classifier(){
         //get current time
         double currentTime;

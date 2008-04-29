@@ -5,12 +5,20 @@ import java.util.Vector;
 import sunflare.gui.GestureCreatorGUI;
 import sunflare.plugin.PluginLayer;
 import sunflare.server.Gesture;
+import sunflare.server.AccelerometerListener;
+import sunflare.server.BasicGestureClassifier;
+import sunflare.server.BasicGestureRecognizer;
+import sunflare.server.GestureClassifier;
 import sunflare.plugin.PluginRef;
-
+import sunflare.server.Global;
 public class SunFlareService {
     
     private PluginLayer pLayer;
-    
+    private AccelerometerListener listener = null;
+    private BasicGestureRecognizer recognizer = null;
+    private BasicGestureClassifier classifier = null;
+    private GestureClassifier gestureClassifier = null;
+    private boolean sendData;
     public static void main(String[] args){
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "SunFLARE Gesture Creator");
@@ -19,7 +27,32 @@ public class SunFlareService {
     
     
     public SunFlareService(){
-        pLayer = new PluginLayer();        
+        pLayer = new PluginLayer();
+        if (listener == null) {
+            listener = new AccelerometerListener();
+            sendData = true;
+            listener.start();
+        }
+        if (recognizer == null) {
+            recognizer = new BasicGestureRecognizer();
+            recognizer.start();
+        }
+        if (classifier == null) {
+            classifier = new BasicGestureClassifier();
+            classifier.start();
+        }
+        if (gestureClassifier == null) {
+            gestureClassifier = new GestureClassifier(pLayer);
+            gestureClassifier.start();
+        }
+         new Global();
+        
+    }
+    public void doSendData(boolean sendData){
+        listener.doSendData(sendData);
+    }
+    public void doBlink(){
+        listener.doBlink();
     }
     //gui.show();
     

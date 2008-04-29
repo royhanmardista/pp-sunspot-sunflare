@@ -47,7 +47,7 @@ import sunflare.gui.GestureCreatorGUI;
  * Date: May 2, 2006 
  */
 public class AccelerometerListener extends Thread implements PacketTypes {
-    
+    private boolean debug = false;
     // Non Linearity as specified by data sheet when running at 6G.
     // 200mv/G
     private static final double SENSITIVITY_2G = 182; // was 195;
@@ -107,6 +107,10 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         } catch (InterruptedException ex) { /* ignore */ }
     }
 
+    private void debug(String s){
+        if(debug)
+            System.out.println("Listener: " + s);
+    }
     /**
      * Connect to base station & other initialization.
      */
@@ -217,6 +221,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     public void doSendData (boolean sendIt) {
         //setGOffsets();
         sendCmd(sendIt ? SEND_ACCEL_DATA_REQ : STOP_ACCEL_DATA_REQ);
+        debug("listener: doSendData");
     }
 
     /**
@@ -489,6 +494,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     //if(g>1.3){
                     //   graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);
                        recognize(returnVals); //this weird statement here makes the program work
+                       debug("*** " + x + y + z);
                     //}
                     //else
                      //  graphView.takeData(address,sampleTime,index,0,0,0,0,twoG);
@@ -588,6 +594,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         announceStarting();  // announce we are starting up - in case a Spot thinks it's connected to us
         while (running) {
             waitForSpot();   // connect to a Spot with accelerometer telemetry to display
+            debug("wait for spot done");
             if (spotAddress != 0) {
                 try {
                     conn = (RadiogramConnection)Connector.open("radiogram://" + spotAddress + ":" + CONNECTED_PORT);
@@ -599,6 +606,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     index = 0;
                     timeStampOffset = -1;
                     while (connected) {
+                        //debug("listener is connected");
                         try {
                             conn.receive(rdg);            // wait until we receive a reply
                         } catch (TimeoutException ex) {
@@ -675,6 +683,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     System.out.println("Error communicating with remote Spot: " + ex.toString());
                 } finally {
                     try {
+                        debug("in finally");
                         connected = false;
                         updateConnectionStatus(connected);
                         if (conn != null) { 
@@ -683,8 +692,10 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                             conn.send(xdg);                                // broadcast it
                             conn.close();
                             conn = null;
+
+                                   
                         }
-                    } catch (IOException ex) { /* ignore */ }
+                    } catch (IOException ex) { /* ignore */ System.out.println(ex);}
                 }
             }
         }

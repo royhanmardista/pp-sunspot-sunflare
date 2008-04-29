@@ -22,11 +22,19 @@ public class BasicGestureClassifier extends Thread{
     private final static double IDLE_TIME = 500;
     private boolean debug = true;
     private static double latestBasicGestureTimestamp;
+    private boolean serviceMode;
     /** Creates a new instance of BasicGestureClassifier */
     public BasicGestureClassifier() {
         currentTime = 0;
         basicGesturesIndex = 0;
         latestBasicGestureTimestamp = 0;
+        serviceMode = false;
+    }
+    public BasicGestureClassifier(boolean serviceMode) {
+        currentTime = 0;
+        basicGesturesIndex = 0;
+        latestBasicGestureTimestamp = 0;
+        this.serviceMode = serviceMode;
     }
     public void classifier(){
         Global.basicGesturesLock.writeLock().lock();
@@ -163,7 +171,8 @@ public class BasicGestureClassifier extends Thread{
             || (!Global.gestures.isEmpty() && ((Gesture)(Global.gestures.lastElement())).getNumBasicGestures()>=Global.NUMBER_OF_MOVEMENTS_PER_GESTURE)){
                 Gesture newGesture = new Gesture(bg);
                 Global.gestures.addElement(newGesture);
-                Global.mainWindow.clearGestureBoxes();
+                if(!serviceMode)
+                    Global.mainWindow.clearGestureBoxes();
             }
             //add it to the latest gesture
             else{
@@ -173,7 +182,8 @@ public class BasicGestureClassifier extends Thread{
             //    debug(Global.gestures.elementAt(k).toString());
             //update the timestamp
             latestBasicGestureTimestamp = bg.getEndTimeStamp();
-            Global.mainWindow.setGesture(((Gesture)Global.gestures.lastElement()).getNumBasicGestures()-1,bg.getID());
+            if(!serviceMode)
+                Global.mainWindow.setGesture(((Gesture)Global.gestures.lastElement()).getNumBasicGestures()-1,bg.getID());
         } finally{
             Global.gesturesLock.writeLock().unlock();
         }
@@ -224,7 +234,7 @@ public class BasicGestureClassifier extends Thread{
     public void doQuit(){
         running = false;
     }
-        public void debug(String s){
+    public void debug(String s){
         if(debug)
             System.out.println("BasicGestureClassifier: "+s);
     }

@@ -36,7 +36,7 @@ public class Controller extends Thread{
     }
     
 
-    public void doIt3(){
+    public void doIt3() throws Exception{
         Global.systemStateLock.writeLock().lock();
         try{
             if(Global.systemState == Global.SYS_RECORDING_MODE){
@@ -49,11 +49,13 @@ public class Controller extends Thread{
                 }
             } else if(Global.systemState == Global.SYS_GESTURE_RECORDED){
                 //test if the recorded gesture already exists in db
+              //  if(recordedGesture!=null && recordedGesture.getBasicGestures().size())
                 recordedGesture.setPlugin(targetPluginRef);
                 Global.gestureDBLock.writeLock().lock();
                 try{
-                    if(Global.gestureDB.gestureExists(recordedGesture)){
+                    if(false){//Global.gestureDB.gestureExists(recordedGesture)){
                         //notify GUI that the gesture cannot be accepted
+                        debug("recorded gesture is"+recordedGesture);
                         Global.mainWindow.validationResults(false);
                         Global.systemState = Global.SYS_IDLE;
                     } else {
@@ -116,7 +118,8 @@ public class Controller extends Thread{
             try{
                 doIt3();
             } catch(Exception e){
-                System.out.println(e);
+                debug(e.toString());
+                running = false;
             }
     }
     public void doQuit(){

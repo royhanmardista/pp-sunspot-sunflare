@@ -97,7 +97,7 @@ public class BasicGestureRecognizer extends Thread{
             //sums[2] = 0;
             sums[3] += ((DataStruct)dataset.elementAt(i)).getTotalG();
         }
-        if (sums[3] > 70)
+        if (sums[3] > 80)
             g.setActiveAxis("s");   //shaking
         else if(sums[0]>=sums[1] && sums[0]>=sums[2])
             g.setActiveAxis("x");
