@@ -282,6 +282,14 @@ public class GestureCreatorGUI extends JFrame {
 //            }
         }
     }
+    public void clearGestureBoxes(){
+        if(currentState!=State.STATE_TESTING_GESTURE){
+            for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++) {
+                drawingPanel[i].setGesture(GestureDrawingPanel.INVALID_GESTURE_ID);
+            }
+            repaint();
+        }
+    }
     
     public void clearGestures() {
         for (int i = 0; i < MOVEMENTS_PER_GESTURE; i++) {

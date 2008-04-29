@@ -163,7 +163,7 @@ public class BasicGestureClassifier extends Thread{
             || (!Global.gestures.isEmpty() && ((Gesture)(Global.gestures.lastElement())).getNumBasicGestures()>=Global.NUMBER_OF_MOVEMENTS_PER_GESTURE)){
                 Gesture newGesture = new Gesture(bg);
                 Global.gestures.addElement(newGesture);
-               // Global.mainWindow.clearGestures();
+                Global.mainWindow.clearGestureBoxes();
             }
             //add it to the latest gesture
             else{
