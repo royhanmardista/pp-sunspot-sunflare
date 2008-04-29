@@ -41,7 +41,7 @@ public class BasicGestureClassifier extends Thread{
                         currentTime > (((DataStruct)dataset.lastElement()).getTimeStamp() + IDLE_TIME)) {
                     classifyBasicGesture(g);
                     basicGesturesIndex++;
-                    Global.mainWindow.setGesture(basicGesturesIndex-1,g.getID());
+                    //Global.mainWindow.setGesture(basicGesturesIndex-1,g.getID());
                 }
             }
         } finally{
@@ -66,10 +66,10 @@ public class BasicGestureClassifier extends Thread{
             }
         }
         if(minIndex > maxIndex){
-            System.out.println("Left");
+            debug("Left");
             return Global.LEFT;
         }else{
-            System.out.println("Right");
+            debug("Right");
             return Global.RIGHT;
         }
         
@@ -91,11 +91,11 @@ public class BasicGestureClassifier extends Thread{
             }
         }
         if(minIndex > maxIndex){
-            System.out.println("Backward");
+            debug("Backward");
             return Global.BACKWARD;
             
         }else{
-            System.out.println("Forward");
+            debug("Forward");
             return Global.FORWARD;
             
         }
@@ -118,19 +118,19 @@ public class BasicGestureClassifier extends Thread{
             }
         }
         if(minIndex > maxIndex){
-            System.out.println("Up");
+            debug("Up");
             return Global.UP;
             
         }else{
-            System.out.println("Down");
+            debug("Down");
             return Global.DOWN;
             
         }
         
-        //System.out.println("minT/" + ((DataStruct)dataset.elementAt(minIndex)).getTimeStamp() + " maxT/" + ((DataStruct)dataset.elementAt(maxIndex)).getTimeStamp());
+        //debug("minT/" + ((DataStruct)dataset.elementAt(minIndex)).getTimeStamp() + " maxT/" + ((DataStruct)dataset.elementAt(maxIndex)).getTimeStamp());
     }
     public int shake(){
-        System.out.println("Shake");
+        debug("Shake");
         return Global.SHAKE;
     }
     public void classifyBasicGesture(BasicGesture bg){
@@ -163,6 +163,7 @@ public class BasicGestureClassifier extends Thread{
             || (!Global.gestures.isEmpty() && ((Gesture)(Global.gestures.lastElement())).getNumBasicGestures()>=Global.NUMBER_OF_MOVEMENTS_PER_GESTURE)){
                 Gesture newGesture = new Gesture(bg);
                 Global.gestures.addElement(newGesture);
+               // Global.mainWindow.clearGestures();
             }
             //add it to the latest gesture
             else{
@@ -172,6 +173,7 @@ public class BasicGestureClassifier extends Thread{
             //    debug(Global.gestures.elementAt(k).toString());
             //update the timestamp
             latestBasicGestureTimestamp = bg.getEndTimeStamp();
+            Global.mainWindow.setGesture(((Gesture)Global.gestures.lastElement()).getNumBasicGestures()-1,bg.getID());
         } finally{
             Global.gesturesLock.writeLock().unlock();
         }
@@ -205,7 +207,7 @@ public class BasicGestureClassifier extends Thread{
         latestBasicGestureTimestamp = 0;
     }
     public void run() {
-        System.out.println("BasicGestureClassifier Thread started ...");
+        debug("BasicGestureClassifier Thread started ...");
         hostLoop();
     }
     
@@ -214,10 +216,9 @@ public class BasicGestureClassifier extends Thread{
         running = true;
         while(running)
             try{
-                //       System.err.println("Inside the basic gesture classifier run");
                 classifier();
             } catch(Exception e){
-                System.out.println(e);
+                debug(e.toString());
             }
     }
     public void doQuit(){

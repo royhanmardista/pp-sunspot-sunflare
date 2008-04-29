@@ -27,19 +27,21 @@ public class GestureClassifier extends Thread{
         PluginRef p;
         Global.gestureDBLock.writeLock().lock();
         try{
-            p = Global.gestureDB.search(gesture);
+           // p = Global.gestureDB.search(gesture);
+            gesture.scan();
         } finally{
             Global.gestureDBLock.writeLock().unlock();
         }
-        
+        /*
         if(p!=null){
             debug("Gesture found: " + p.getName()+ " " + p.getActionDescription());
         } else{
             debug("Gesture not found");
         }
-        
+        */
         
         // since the classified is always the first one in the gestures vector, it is safe to remove it from the vector
+        /*
         Global.gesturesLock.writeLock().lock();
         try{
             Global.gestures.removeElement(gesture);
@@ -47,7 +49,7 @@ public class GestureClassifier extends Thread{
         }finally{
             Global.gesturesLock.writeLock().unlock();
         }
-        
+     */   
     }
     public void classifier(){
         //get current time
@@ -85,7 +87,6 @@ public class GestureClassifier extends Thread{
     //main loop
     public void hostLoop(){
         running = true;
-        debug("hello");
         while(running)
             try{
                 classifier();

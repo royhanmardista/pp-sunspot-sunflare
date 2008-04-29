@@ -30,7 +30,7 @@ public class Global {
     public static Condition gestureSegmentsCondition = gestureSegmentsLock.writeLock().newCondition();
     
     public static void endTestGesture(){
-        mainWindow.endTest();
+        mainWindow.endTest(false);
     }
     public static Vector gestureSegments = new Vector();
     

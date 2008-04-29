@@ -22,7 +22,7 @@ import sunflare.persistence.PersistentGesture;
 public class Gesture {
     private Vector basicGestures;
     private PluginRef plugin;
-    
+    private boolean scanned = false;
     /** Creates a new instance of Gesture */
     public Gesture() {
         basicGestures = new Vector();
@@ -126,5 +126,11 @@ public class Gesture {
             result.append(((BasicGesture)basicGestures.elementAt(i)).toString()+" ");
         }
         return result.toString();
+    }
+    public void scan(){
+        scanned = true;
+    }
+    public boolean isScanned(){
+        return scanned;
     }
 }
