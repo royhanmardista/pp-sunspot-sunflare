@@ -130,14 +130,14 @@ public class GestureCreatorGUI extends JFrame {
      * Creates and displays the GUI
      * @author Sean Bachelder
      */
-    public static void main(String args[]) {
+    /*public static void main(String args[]) {
         // Set system properties for Mac OS X before AWT & Swing get loaded - doesn't hurt if not on a MAC
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "SunFLARE Gesture Creator");
         
         GestureCreatorGUI gui = new GestureCreatorGUI();
         gui.show();
-    }
+    }*/
     
     /** Creates a new instance of GestureCreatorGUI */
     public GestureCreatorGUI() {

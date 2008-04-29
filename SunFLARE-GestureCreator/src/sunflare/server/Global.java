@@ -11,7 +11,7 @@
 package sunflare.server;
 import sunflare.gui.GestureCreatorGUI;
 import sunflare.persistence.GestureDatabase;
-import sunflare.plugin.PluginDatabase;
+import sunflare.plugin.PluginLayer;
 import sunflare.server.Gesture;
 import java.util.Vector;
 import java.util.HashMap;
@@ -38,9 +38,9 @@ public class Global {
     public static ReentrantReadWriteLock gestureDBLock  = new ReentrantReadWriteLock();
     public static Condition gestureDBCondition = gestureDBLock.writeLock().newCondition();
     
-    public static PluginDatabase pluginDB = new PluginDatabase();
-    public static ReentrantReadWriteLock pluginDBLock  = new ReentrantReadWriteLock();
-    public static Condition pluginDBCondition = pluginDBLock.writeLock().newCondition();
+    public static PluginLayer pluginLayer = new PluginLayer();
+    public static ReentrantReadWriteLock pluginLayerLock  = new ReentrantReadWriteLock();
+    public static Condition pluginDBCondition = pluginLayerLock.writeLock().newCondition();
     
     public static int numBasicGesturesDetected = 0;
     

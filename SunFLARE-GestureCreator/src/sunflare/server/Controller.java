@@ -160,11 +160,11 @@ public class Controller extends Thread{
     public Vector assignActionState(){
         changeSystemState(Global.SYS_ASSIGN_ACTION);
         Vector allPlugins;
-        Global.pluginDBLock.writeLock().lock();
+        Global.pluginLayerLock.writeLock().lock();
         try{
-            allPlugins = Global.pluginDB.getAllPluginRefs();
+            allPlugins = Global.pluginLayer.getAllPluginRefs();
         }finally{
-            Global.pluginDBLock.writeLock().unlock();
+            Global.pluginLayerLock.writeLock().unlock();
         }
         return allPlugins;
     }

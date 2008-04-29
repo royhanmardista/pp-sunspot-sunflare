@@ -22,7 +22,7 @@
         <jar destfile="${build.dir}/telemetry.jar"> 
             <fileset dir="${build.dir}" excludes="**.jar"/>            
                 <manifest>
-                    <attribute name="Main-Class" value="sunflare.gui.GestureCreatorGUI" /> 
+                    <attribute name="Main-Class" value="sunflare.service.SunFlareService" /> 
                 </manifest>
         </jar>
     </target>
