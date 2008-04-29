@@ -1,0 +1,5 @@
+<plugins>
+  <plugin name="plugin1" app="test" class="examples.plugins.Plugin1" desc="Description of Action 1" />
+  <plugin name="plugin2" app="test" class="examples.plugins.Plugin2" desc="Description of Action 2" />
+  <plugin name="plugin3" app="test" class="examples.plugins.Plugin3" desc="Description of Action 3" />
+</plugins>
