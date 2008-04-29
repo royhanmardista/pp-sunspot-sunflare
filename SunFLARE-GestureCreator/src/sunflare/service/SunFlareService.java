@@ -38,7 +38,7 @@ public class SunFlareService {
             recognizer.start();
         }
         if (classifier == null) {
-            classifier = new BasicGestureClassifier();
+            classifier = new BasicGestureClassifier(true);
             classifier.start();
         }
         if (gestureClassifier == null) {
@@ -49,11 +49,13 @@ public class SunFlareService {
         
     }
     public void doSendData(boolean sendData){
-        listener.doSendData(sendData);
+        if(listener.isConnected())
+            listener.doSendData(sendData);
     }
     public void doBlink(){
         listener.doBlink();
     }
+    
     //gui.show();
     
     

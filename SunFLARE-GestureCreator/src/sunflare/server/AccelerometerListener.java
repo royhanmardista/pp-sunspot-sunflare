@@ -106,7 +106,9 @@ public class AccelerometerListener extends Thread implements PacketTypes {
             Thread.currentThread().sleep(time);
         } catch (InterruptedException ex) { /* ignore */ }
     }
-
+    public boolean isConnected(){
+        return connected;
+    }
     private void debug(String s){
         if(debug)
             System.out.println("Listener: " + s);
