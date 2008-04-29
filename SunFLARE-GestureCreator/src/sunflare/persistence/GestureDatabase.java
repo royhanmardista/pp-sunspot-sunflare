@@ -102,26 +102,26 @@ public class GestureDatabase {
         Vector basicGestures = g.getBasicGestures();
         int count = basicGestures.size();
         if(count == 0){
-            if( g.getPlugin().getName().equalsIgnoreCase(p.getPluginRef()) && 
-                g.getPlugin().getActionDescription().equalsIgnoreCase(p.getAction() )){
+            if( /*g.getPlugin().getName().equalsIgnoreCase(p.getPluginRef()) && 
+                g.getPlugin().getActionDescription().equalsIgnoreCase(p.getAction())*/ true){
                 return true;
             }
         }else if(count == 1){
-            if( g.getPlugin().getName().equalsIgnoreCase(p.getPluginRef()) && 
-                g.getPlugin().getActionDescription().equalsIgnoreCase(p.getAction()) && 
+            if( /*g.getPlugin().getName().equalsIgnoreCase(p.getPluginRef()) && 
+                g.getPlugin().getActionDescription().equalsIgnoreCase(p.getAction()) && */
                 (((BasicGesture)basicGestures.elementAt(0)).getID() == p.getMovment1() )   ){
                 return true;
             }        
         }else if(count == 2){
-            if( g.getPlugin().getName().equalsIgnoreCase(p.getPluginRef()) && 
-                g.getPlugin().getActionDescription().equalsIgnoreCase(p.getAction()) && 
+            if( /*g.getPlugin().getName().equalsIgnoreCase(p.getPluginRef()) && 
+                g.getPlugin().getActionDescription().equalsIgnoreCase(p.getAction()) && */
                 (((BasicGesture)basicGestures.elementAt(0)).getID() == p.getMovment1()) &&
                 (((BasicGesture)basicGestures.elementAt(1)).getID() == p.getMovment2()) ){
                 return true;
             }        
         }else if(count == 3){
-            if( g.getPlugin().getName().equalsIgnoreCase(p.getPluginRef()) && 
-                g.getPlugin().getActionDescription().equalsIgnoreCase(p.getAction()) && 
+            if( /*g.getPlugin().getName().equalsIgnoreCase(p.getPluginRef()) && 
+                g.getPlugin().getActionDescription().equalsIgnoreCase(p.getAction()) && */
                 (((BasicGesture)basicGestures.elementAt(0)).getID() == p.getMovment1()) &&
                 (((BasicGesture)basicGestures.elementAt(1)).getID() == p.getMovment2()) && 
                 (((BasicGesture)basicGestures.elementAt(2)).getID() == p.getMovment3()) ){
@@ -142,15 +142,16 @@ public class GestureDatabase {
     }
     public Vector getAllDefinedGestures(){
         List gestures = listGestures();
-        //definedGestures.removeAllElements();
-        Vector returnV = new Vector();
+        // definedGestures.removeAllElements();
+        // Vector returnV = new Vector();
+        definedGestures.clear();
         Gesture gesture = null;
         for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
             gesture = new Gesture((PersistentGesture)i.next());
-            returnV.addElement(gesture);
+            definedGestures.addElement(gesture);
         }        
-        //return definedGestures;
-        return returnV;
+        return definedGestures;
+        //return returnV;
     }
     
     public Vector getDefinedGesturesForPlugin(PluginRef p){
