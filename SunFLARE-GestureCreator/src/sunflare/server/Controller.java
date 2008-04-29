@@ -53,7 +53,7 @@ public class Controller extends Thread{
                 recordedGesture.setPlugin(targetPluginRef);
                 Global.gestureDBLock.writeLock().lock();
                 try{
-                    if(false){//Global.gestureDB.gestureExists(recordedGesture)){
+                    if(Global.gestureDB.gestureExists(recordedGesture)){
                         //notify GUI that the gesture cannot be accepted
                         debug("recorded gesture is"+recordedGesture);
                         Global.mainWindow.validationResults(false);
