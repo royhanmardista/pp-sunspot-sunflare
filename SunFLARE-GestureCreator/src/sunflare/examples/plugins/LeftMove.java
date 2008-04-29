@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package sunflare.examples.plugins.mouseListener;
+package sunflare.examples.plugins;
 
 import sunflare.server.Gesture;
 import sunflare.plugin.Plugin;

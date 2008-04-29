@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package sunflare.examples.plugins.mouseListener;
+package sunflare.examples.plugins;
 
 import sunflare.server.Gesture;
 import sunflare.plugin.Plugin;
@@ -20,10 +20,10 @@ import java.awt.event.KeyEvent;
  *
  * @author Praveen
  */
-public class DownMove implements Plugin{
+public class UpMove implements Plugin{
     
     /** Creates a new instance of MouseListener */
-    public DownMove() {
+    public UpMove() {
     
     }
     
@@ -34,7 +34,7 @@ public class DownMove implements Plugin{
             // Creates the delay of 5 sec so that you can open notepad before
             // Robot start writting
             robot.delay(5000);
-            robot.mouseMove(500, 400);
+            robot.mouseMove(500, 600);
         } catch (AWTException e) {
             e.printStackTrace();
         }
