@@ -20,10 +20,10 @@ import java.awt.event.KeyEvent;
  *
  * @author Praveen
  */
-public class UpMove implements Plugin{
+public class RightMove implements Plugin{
     
     /** Creates a new instance of MouseListener */
-    public UpMove() {
+    public RightMove() {
     
     }
     
@@ -34,7 +34,7 @@ public class UpMove implements Plugin{
             // Creates the delay of 5 sec so that you can open notepad before
             // Robot start writting
             robot.delay(5000);
-            robot.mouseMove(500, 600);
+            robot.mouseMove(600, 500);
         } catch (AWTException e) {
             e.printStackTrace();
         }
