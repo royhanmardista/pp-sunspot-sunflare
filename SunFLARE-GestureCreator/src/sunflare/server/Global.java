@@ -29,8 +29,8 @@ public class Global {
     public static ReentrantReadWriteLock gestureSegmentsLock  = new ReentrantReadWriteLock();
     public static Condition gestureSegmentsCondition = gestureSegmentsLock.writeLock().newCondition();
     
-    public static void endTestGesture(){
-        mainWindow.endTest(false);
+    public static void endTestGesture(boolean success){
+        mainWindow.endTest(success);
     }
     public static Vector gestureSegments = new Vector();
     
