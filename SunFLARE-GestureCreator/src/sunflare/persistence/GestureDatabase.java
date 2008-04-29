@@ -66,8 +66,8 @@ public class GestureDatabase {
     }
     
     public PluginRef search(Gesture g){
-        Vector key = g.getBasicGestures();
-        getAllDefinedGestures();
+        // Winnie's Part
+        Vector key = g.getBasicGestures();       
         for(int i=0; i<definedGestures.size(); i++){
             Gesture definedGesture = (Gesture)definedGestures.elementAt(i);
             Vector v = definedGesture.getBasicGestures();
@@ -77,25 +77,54 @@ public class GestureDatabase {
             }
         }
         return null;
+        // Winnie's Part
+        
+//        Vector key = g.getBasicGestures();
+//        getAllDefinedGestures();
+//        for(int i=0; i<definedGestures.size(); i++){
+//            Gesture definedGesture = (Gesture)definedGestures.elementAt(i);
+//            Vector v = definedGesture.getBasicGestures();
+//            if(key.size() == v.size()){
+//                if(equal(v,key))
+//                    return definedGesture.getPlugin();
+//            }
+//        }
+//        return null;
     }
     
     public boolean addGesture(Gesture g){
+       // Winnie's Part
        if(!gestureExists(g)){
-           createAndStoreGesture(g);
-           return true;
-       }
+           definedGestures.addElement(g);
+          }
        return false;
+       // Winnie's Part
+
+//       if(!gestureExists(g)){
+//           createAndStoreGesture(g);
+//           return true;
+//       }
+//       return false;
     }
 
     public boolean gestureExists(Gesture g){
-        List gestures = listGestures();
-        for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
-            PersistentGesture p = ( PersistentGesture ) i.next();
-            if(equals(g,p)){
+        // Winnie's Part
+        for(int i = 0; i<definedGestures.size();i++){
+            Gesture k = (Gesture)(definedGestures.elementAt(i));
+            if(g.equals(k))
                 return true;
-            }
         }
-        return false;
+        return false;        
+        // Winnie's Part
+        
+//        List gestures = listGestures();
+//        for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
+//            PersistentGesture p = ( PersistentGesture ) i.next();
+//            if(equals(g,p)){
+//                return true;
+//            }
+//        }
+//        return false;
     }
     
     private boolean equals(Gesture g, PersistentGesture p){
@@ -141,52 +170,67 @@ public class GestureDatabase {
         return true;
     }
     public Vector getAllDefinedGestures(){
-        List gestures = listGestures();
-        // definedGestures.removeAllElements();
-        // Vector returnV = new Vector();
-        definedGestures.clear();
-        Gesture gesture = null;
-        for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
-            gesture = new Gesture((PersistentGesture)i.next());
-            definedGestures.addElement(gesture);
-        }        
-        return definedGestures;
-        //return returnV;
+        //Winnie's Part
+        return definedGestures;        
+        //Winnie's Part
+        
+//        List gestures = listGestures();
+//        // definedGestures.removeAllElements();
+//        // Vector returnV = new Vector();
+//        definedGestures.clear();
+//        Gesture gesture = null;
+//        for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
+//            gesture = new Gesture((PersistentGesture)i.next());
+//            definedGestures.addElement(gesture);
+//        }        
+//        return definedGestures;
+//        //return returnV;
     }
     
     public Vector getDefinedGesturesForPlugin(PluginRef p){
+        //Winnie's Part
         String pluginName = p.getName();
         Vector returnV = new Vector();
-        List gestures = listGestures();
-        Gesture gesture = null;
-        for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
-            if(pluginName.equals( ( (PersistentGesture)i.next() ).getPluginRef() )){
-                gesture = new Gesture((PersistentGesture)i.next());
-                returnV.addElement(gesture);
-            }            
-        }                
-//        for(int i=0; i < definedGestures.size(); i++){
-//            if(pluginName.equals(((Gesture)definedGestures.elementAt(i)).getPlugin().getName()))
-//                returnV.addElement(definedGestures.elementAt(i));
-//        }
-        return returnV;
+        for(int i=0; i < definedGestures.size(); i++){
+            if(pluginName.equals(((Gesture)definedGestures.elementAt(i)).getPlugin().getName()))
+                returnV.addElement(definedGestures.elementAt(i));
+        }
+        return returnV;        
+        //Winnie's Part
+        
+        
+//        String pluginName = p.getName();
+//        Vector returnV = new Vector();
+//        List gestures = listGestures();
+//        Gesture gesture = null;
+//        for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
+//            if(pluginName.equals( ( (PersistentGesture)i.next() ).getPluginRef() )){
+//                gesture = new Gesture((PersistentGesture)i.next());
+//                returnV.addElement(gesture);
+//            }            
+//        }                
+////        for(int i=0; i < definedGestures.size(); i++){
+////            if(pluginName.equals(((Gesture)definedGestures.elementAt(i)).getPlugin().getName()))
+////                returnV.addElement(definedGestures.elementAt(i));
+////        }
+//        return returnV;
     }
     
-    private List listGestures() 
-    {
-	Session session = PersistentGestureUtil.getSessionFactory().getCurrentSession();
-	session.beginTransaction();
-	List result = session.createQuery( "from PersistentGesture" ).list();
-	session.getTransaction().commit();
-	return result;
-    }
+//    private List listGestures() 
+//    {
+//	Session session = PersistentGestureUtil.getSessionFactory().getCurrentSession();
+//	session.beginTransaction();
+//	List result = session.createQuery( "from PersistentGesture" ).list();
+//	session.getTransaction().commit();
+//	return result;
+//    }
     
-    private void createAndStoreGesture(Gesture g )
-    {
-	Session session = PersistentGestureUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-        PersistentGesture gesture = new PersistentGesture(g);
-        session.save( gesture );        
-        session.getTransaction().commit();
-    }
+//    private void createAndStoreGesture(Gesture g )
+//    {
+//	Session session = PersistentGestureUtil.getSessionFactory().getCurrentSession();
+//        session.beginTransaction();
+//        PersistentGesture gesture = new PersistentGesture(g);
+//        session.save( gesture );        
+//        session.getTransaction().commit();
+//    }
 }
