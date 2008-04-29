@@ -118,6 +118,9 @@ public class GestureDatabase {
 //        // Winnie's Part
         
         List gestures = listGestures();
+        if(gestures == null){
+            System.out.println("GestureDataBase : Gesture List is Empty");
+        }
         for ( Iterator i = gestures.iterator(); i.hasNext(); ) {
             PersistentGesture p = ( PersistentGesture ) i.next();
             if(equals(g,p)){
@@ -128,6 +131,9 @@ public class GestureDatabase {
     }
     
     private boolean equals(Gesture g, PersistentGesture p){
+        if(g == null){
+            System.out.println("GestureDataBase : Gesture is null");
+        }
         Vector basicGestures = g.getBasicGestures();
         int count = basicGestures.size();
         if(count == 0){
