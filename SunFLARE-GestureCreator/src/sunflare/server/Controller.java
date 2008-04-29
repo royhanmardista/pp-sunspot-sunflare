@@ -95,6 +95,7 @@ public class Controller extends Thread{
                     Global.gestureDBLock.writeLock().unlock();
                 }
                 Global.systemState = Global.SYS_IDLE;
+                Global.mainWindow.updateStatusBar("Gesture saved. Click on \"New Gesture\" to create another gesture");
             }
             
         }finally{
