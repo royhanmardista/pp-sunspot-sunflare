@@ -11,6 +11,12 @@ import sunflare.server.BasicGestureRecognizer;
 import sunflare.server.GestureClassifier;
 import sunflare.plugin.PluginRef;
 import sunflare.server.Global;
+import sunflare.plugin.GestureListener;
+
+/**
+ * The main component of the service that will recognize gestures and fire callbacks
+ * or notify listeners.
+ */
 public class SunFlareService {
     
     private PluginLayer pLayer;
@@ -25,7 +31,10 @@ public class SunFlareService {
         GestureCreatorGUI gui = new GestureCreatorGUI();
     }
     
-    
+    /**
+     * Creates the basic SunFLARE service. Initializes system and connects to the SunSPOT.
+     * This is for normal plugins that use callbacks.
+     */
     public SunFlareService(){
         pLayer = new PluginLayer();
         if (listener == null) {
@@ -48,12 +57,63 @@ public class SunFlareService {
          new Global();
         
     }
+    
+    /**
+     * Creates the basic SunFLARE service. Initializes system and connects to the SunSPOT.
+     * This is for plugins that use listeners.
+     */
+    public SunFlareService(GestureListener gestureListener){
+        pLayer = new PluginLayer(gestureListener);
+        if (listener == null) {
+            listener = new AccelerometerListener();
+            sendData = true;
+            listener.start();
+        }
+        if (recognizer == null) {
+            recognizer = new BasicGestureRecognizer();
+            recognizer.start();
+        }
+        if (classifier == null) {
+            classifier = new BasicGestureClassifier(true);
+            classifier.start();
+        }
+        if (gestureClassifier == null) {
+            gestureClassifier = new GestureClassifier(pLayer);
+            gestureClassifier.start();
+        }
+        new Global();        
+    }
+    
+    /**
+     * Returns whether or not the SunSPOT is currently connected
+     * @return true if connected, false otherwise
+     */
+    public boolean isConnectedToSunSPOT() {
+        return listener.isConnected();
+    }
+    
+    /**
+     * Starts/stops collecting data from the SunSPOT
+     * @param sendData true to start sending, false to stop
+     */
     public void doSendData(boolean sendData){
         if(listener.isConnected())
             listener.doSendData(sendData);
     }
+    /**
+     * Makes the lights on the SunSPOT blink
+     */
     public void doBlink(){
         listener.doBlink();
+    }
+    /**
+     * Quits the system cleanly
+     */
+    public void doQuit(){
+        listener.doQuit();
+        recognizer.doQuit();
+        classifier.doQuit();
+        gestureClassifier.doQuit();
     }
     
     //gui.show();
