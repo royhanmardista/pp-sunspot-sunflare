@@ -11,7 +11,7 @@ package sunflare.server;
 
 import java.util.Vector;
 /**
- *
+ * Holds a single movement for a gesture
  * @author Winnie
  */
 public class BasicGesture {
@@ -177,11 +177,17 @@ public class BasicGesture {
         return result.toString();
     }
     
-
+    /**
+     * Sets the id of the basic gesture
+     * @param ID id the basic gesture is to be set to
+     */
     public void setID(int ID) {
         this.ID = ID;
     }
-
+    /**
+     * Returns the id of the basic gesture
+     * @return the id of the basic gesture
+     */
     public int getID() {
         return ID;
     }
