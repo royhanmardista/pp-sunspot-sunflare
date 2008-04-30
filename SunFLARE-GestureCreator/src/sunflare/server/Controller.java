@@ -25,23 +25,22 @@ public class Controller extends Thread{
     /** Creates a new instance of Controller */
     public Controller() {
     }
-    public int min(int a, int b){
-        if(a<b)
-            return a;
-        return b;
-    }
-    public void debug(String s){
+    /** Prints debugging statements
+     *  @param s Debugging string
+     */
+    private void debug(String s){
         if(debug)
             System.out.println("Controller: "+s);
     }
-    
-
-    public void doIt3() throws Exception{
+    /** The states handler that takes care of system states
+     */
+    public void runStateMachine() throws Exception{
         Global.systemStateLock.writeLock().lock();
         try{
             if(Global.systemState == Global.SYS_RECORDING_MODE){
                 Global.gesturesLock.writeLock().lock();
                 try{
+                    //always get the most recent Gesture made
                     if(!Global.gestures.isEmpty())
                         recordedGesture = (Gesture)Global.gestures.lastElement();
                 }finally{
@@ -104,37 +103,39 @@ public class Controller extends Thread{
     }
     
     
-    
+    /** Clears private data*/
     public void clear() {
         // clear private data
     }
+    /** Runs thread*/
     public void run() {
         System.out.println("Controller Thread started ...");
         hostLoop();
     }
-//main loop
+    /** Main loop*/
     public void hostLoop(){
         running = true;
         while(running)
             try{
-                doIt3();
+                runStateMachine();
             } catch(Exception e){
                 debug(e.toString());
                 running = false;
             }
     }
+    /** Kills thread*/
     public void doQuit(){
         running = false;
     }
     
     
     
-    /*Method calls that let GestureCreatorGUI alter
-     *the state of the system
+    //Method calls that let GestureCreatorGUI alter
+    //the state of the system
+    
+    /** Changes system state to the desired state
+     *  @param state New state
      */
-    
-    
-    /*change system state*/
     private void changeSystemState(int state){
         Global.systemStateLock.writeLock().lock();
         try{
@@ -144,12 +145,15 @@ public class Controller extends Thread{
             Global.systemStateLock.writeLock().unlock();
         }
     }
-    /*New gesture state*/
+    /** Changes system state to new gesture state
+     */
     public void newGestureState(){
         //clear recordedgesture
         changeSystemState(Global.SYS_NEW_GESTURE);
         recordedGesture = new Gesture();
     }
+    /** Clears the global gestures vector
+     */
     private void clearGesturesVector(){
         //remove global gestures vector
         Global.gesturesLock.writeLock().lock();
@@ -160,7 +164,8 @@ public class Controller extends Thread{
         }
     }
     
-    /*Assign action state, returns a vector of all pluginrefs in pluginDB*/
+    /** Assign action state
+     * @return a vector of all pluginrefs in pluginDB*/
     public Vector assignActionState(){
         changeSystemState(Global.SYS_ASSIGN_ACTION);
         Vector allPlugins;
@@ -173,38 +178,56 @@ public class Controller extends Thread{
         return allPlugins;
     }
     
-    
+    /** Action selected state
+     * @param p PluginReference that the new gesture belongs to
+     */
     public void actionSelectedState(PluginRef p){
         changeSystemState(Global.SYS_ACTION_SELECTED);
         targetPluginRef = p;
     }
     
+    /** Gesture recording state
+     */
     public void gestureRecordingState(){
         changeSystemState(Global.SYS_RECORDING_MODE);
         clearGesturesVector();
         recordedGesture = new Gesture();
     }
+    /** Gesture recorded state
+     */
     public void gestureRecordedState(){
         changeSystemState(Global.SYS_GESTURE_RECORDED);
         clearGesturesVector();
     }
+    /** Testing Gesture state
+     */
     public void testingGestureState(){
         clearGesturesVector();
         changeSystemState(Global.SYS_TEST_GESTURE);
     }
+    /** Gesture tested state
+     */
     public void gestureTestedState(){
         changeSystemState(Global.SYS_GESTURE_TESTED);
         clearGesturesVector();
     }
+    /** Gesture saved state
+     */
     public void gestureSavedState(){
         changeSystemState(Global.SYS_GESTURE_SAVED);
     }
+    /** Save Gesture state
+     */
     public void saveGestureState(){
         changeSystemState(Global.SYS_SAVE_GESTURE);
     }
+    /** System idle state
+     */
     public void systemIdle(){
         changeSystemState(Global.SYS_IDLE);
     }
+    /** Revert to previous state
+     */
     public void revertToPreviousState(){
         changeSystemState(previousState);
     }

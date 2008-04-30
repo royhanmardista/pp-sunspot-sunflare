@@ -41,10 +41,10 @@ import sunflare.gui.GestureCreatorGUI;
 /**
  * Simple example class to locate a remote service (on a SPOT), to connect to it
  * and send it a variety of commands. In this case to set or calibrate the SPOT's
- * accelerometer and to return a stream of accelerometer telemetry information. 
+ * accelerometer and to return a stream of accelerometer telemetry information.
  *
  * @author Ron Goldman<br>
- * Date: May 2, 2006 
+ * Date: May 2, 2006
  */
 public class AccelerometerListener extends Thread implements PacketTypes {
     private boolean debug = false;
@@ -71,7 +71,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     
     //private GraphView graphView = null;
     private GestureCreatorGUI guiFrame = null;
-
+    
     private double absoluteSums [] = {0,0,0};
     ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
     private Vector dataset = new Vector();
@@ -84,7 +84,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     private double yDataY_KF_Cov [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
     private double yDataZ_KF [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
     private double yDataZ_KF_Cov [] = new double[MSEC_OF_DATA/MSEC_PER_SAMPLE+20];
-
+    
     private double maxX=-1000, maxY=-1000, maxZ = -1000;
     private double minX=1000, minY=1000,minZ=1000;
     
@@ -92,16 +92,16 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     /**
      * Create a new AccelerometerListener to connect to the remote SPOT over the radio.
      */
-    public AccelerometerListener () {
+    public AccelerometerListener() {
         init();
     }
     
-    /** 
+    /**
      * Convenience function to sleep for specified time.
      *
      * @param time number of milliseconds to sleep
      */
-    private void pause (long time) {
+    private void pause(long time) {
         try {
             Thread.currentThread().sleep(time);
         } catch (InterruptedException ex) { /* ignore */ }
@@ -116,7 +116,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     /**
      * Connect to base station & other initialization.
      */
-    private void init () {
+    private void init() {
         RadiogramConnection rcvConn = null;
         try {
             rcvConn = (RadiogramConnection)Connector.open("radiogram://:" + BROADCAST_PORT);
@@ -138,24 +138,24 @@ public class AccelerometerListener extends Thread implements PacketTypes {
      *
      * @return true if using 2G scale, false for 6G scale
      */
-    public boolean is2GScale () {
+    public boolean is2GScale() {
         return scaleInUse == 2;
     }
-
+    
     /**
      * Specify the GUI window that shows whether connected to a remote SPOT.
      *
      * @param fr the TelemetryFrame GUI that will be used to display the connection status to the remote SPOT
      */
-    public void setGUI (GestureCreatorGUI fr) {
+    public void setGUI(GestureCreatorGUI fr) {
         guiFrame = fr;
         updateConnectionStatus(connected);
     }
-
+    
     /**
      * Update the GUI with the current connection status.
      */
-    private void updateConnectionStatus (boolean isConnected) {
+    private void updateConnectionStatus(boolean isConnected) {
         if (guiFrame != null) {
             final String status;
             final boolean connected = isConnected;
@@ -170,27 +170,27 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     status = "Not Connected";
                 }
                 SwingUtilities.invokeLater( new Runnable() {
-                                                public void run() {
-                                                    fr.setConnectionStatus(connected, status);
-                                                } } );
+                    public void run() {
+                        fr.setConnectionStatus(connected, status);
+                    } } );
             }
         }
     }
-
+    
     /**
      * Send a request to the remote SPOT to report on which accelerometer scale it is using.
      */
-    public void doGetScale () {
+    public void doGetScale() {
         sendCmd(GET_ACCEL_INFO_REQ);
     }
-
+    
     
     /**
      * Send a request to the remote SPOT to set which accelerometer scale it will use.
      *
      * @param val the scale to use: 2 or 6
      */
-    public void doSetScale (int val) {
+    public void doSetScale(int val) {
         if (conn != null) {
             try {
                 xdg.reset();
@@ -204,50 +204,50 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                 // ignore any other problems
             }
         }
-    }                                               
-
+    }
+    
     /**
      * Send a request to the remote SPOT to calibrate the accelerometer.
      */
-    public void doCalibrate () {
+    public void doCalibrate() {
         doGetScale();
         sendCmd(CALIBRATE_ACCEL_REQ);
     }
-
+    
     /**
      * Send a request to the remote SPOT to start or stop sending accelerometer readings.
      *
      * @param sendIt true to start sending, false to stop
      * @param gView the GraphView display to pass the data to
      */
-    public void doSendData (boolean sendIt) {
+    public void doSendData(boolean sendIt) {
         //setGOffsets();
         sendCmd(sendIt ? SEND_ACCEL_DATA_REQ : STOP_ACCEL_DATA_REQ);
         debug("listener: doSendData");
     }
-
+    
     /**
      * Send a request to the remote SPOT to report on radio signal strength.
      */
     public void doPing() {
         sendCmd(PING_REQ);
     }
-
+    
     /**
      * Send a request to the remote SPOT to blink its LEDs.
      */
     public void doBlink() {
         sendCmd(BLINK_LEDS_REQ);
     }
-
+    
     /**
      * Stop running. Also notify the remote SPOT that we are no longer listening to it.
      */
-    public void doQuit () {
+    public void doQuit() {
         sendCmd(DISPLAY_SERVER_QUITTING);
         running = false;
     }
-
+    
     /**
      * Send a request to the remote SPOT to report on radio signal strength.
      */
@@ -256,13 +256,13 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         updateConnectionStatus(connected);
         announceStarting();
     }
-
+    
     /**
      * Send a simple command request to the remote SPOT.
      *
      * @param cmd the command requested
      */
-    private void sendCmd (byte cmd) {
+    private void sendCmd(byte cmd) {
         if (conn != null) {
             try {
                 xdg.reset();
@@ -276,33 +276,35 @@ public class AccelerometerListener extends Thread implements PacketTypes {
             }
         }
     }
-
+    
     /**
      * Routine to reset after old data has been cleared from the GUI display.
      */
-    public void clear () {
+    public void clear() {
         index = 0;
         timeStampOffset = -1;
         Global.numBasicGesturesDetected = 0;
         absoluteSums[0]=0;
         absoluteSums[1]=0;
         absoluteSums[2]=0;
-       
+        
     }
-
+    
     /**
      * Main runtime loop to connect to a remote SPOT.
      * Do not call directly. Call start() instead.
      */
-    public void run () {
+    public void run() {
         if (baseStationPresent) {
             System.out.println("Accelerometer Reader Thread Started ...");
             hostLoop();
         }
     }
-
+    /** Processes the data that is passed in, divides it into DataStructs and puts them into global gestureSegments vector
+     *  @ param g array of telemetry data
+     */
     private void recognize(double g[]) {
-
+        
         double x = g[0];
         double y = g[1];
         double z = g[2];
@@ -311,25 +313,25 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         double dz = 0;
         double totalG = g[3];
         double timeStamp = g[4];
-
+        
         if(totalG>totalGThreshold){
-           //mark the start of a gesture
-           if(absoluteSums[0]==0 && absoluteSums[1]==0 && absoluteSums[2]==0){ //going from inactivity to activity, start of a gesture
+            //mark the start of a gesture
+            if(absoluteSums[0]==0 && absoluteSums[1]==0 && absoluteSums[2]==0){ //going from inactivity to activity, start of a gesture
 //               System.out.println("GESTURE START");
-               dx = x/50;    //50 is just an arbitrary time interval between this data point and the previous data point (which is all 0's)
-               dy = y/50;
-               dz = z/50;
-               recordData = true;      
-           }
-           absoluteSums[0] += Math.abs(x);
-           absoluteSums[1] += Math.abs(y);
-           absoluteSums[2] += Math.abs(z);
-
-
+                dx = x/50;    //50 is just an arbitrary time interval between this data point and the previous data point (which is all 0's)
+                dy = y/50;
+                dz = z/50;
+                recordData = true;
+            }
+            absoluteSums[0] += Math.abs(x);
+            absoluteSums[1] += Math.abs(y);
+            absoluteSums[2] += Math.abs(z);
+            
+            
         } else{
             if(absoluteSums[0]!=0 && absoluteSums[1]!=0 && absoluteSums[2]!=0){ //going from activity to inactivity, end of a gesture
                 recordData = false;
-
+                
                 if(dataset.size()!=0){
                     dx = (x - ((DataStruct)dataset.lastElement()).getX()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
                     dy = (y - ((DataStruct)dataset.lastElement()).getY()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
@@ -337,45 +339,42 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                 }
                 DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
                 dataset.addElement(data);
-                
-//                System.out.println(dataset);
-                
                 Global.numBasicGesturesDetected ++;
-//                System.out.println("GESTURE END");// Num gesture = " + Global.numBasicGesturesDetected);
+                
                 Global.gestureSegmentsLock.writeLock().lock();
-                try{  
+                try{
                     Global.gestureSegments.addElement(new Vector(dataset));
                     Global.gestureSegmentsCondition.signal();
-                }
-                finally{
+                } finally{
                     Global.gestureSegmentsLock.writeLock().unlock();
                 }
-
+                
                 dataset.removeAllElements(); //clear dataset
             }
             absoluteSums[0] = 0;
             absoluteSums[1] = 0;
             absoluteSums[2] = 0;
         }
+        //right now the dx, dy, dz are irrelevant to the gesture recognition
+        //this section may be deleted in the future
         if(recordData){
-        
+            
             if(dataset.size()!=0){
                 dx = (x - ((DataStruct)dataset.lastElement()).getX()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
                 dy = (y - ((DataStruct)dataset.lastElement()).getY()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
                 dz = (z - ((DataStruct)dataset.lastElement()).getZ()) / (timeStamp - ((DataStruct)dataset.lastElement()).getTimeStamp());
             }
-                   
             
-           DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
-           dataset.addElement(data);
+            
+            DataStruct data = new DataStruct(x,y,z,totalG,timeStamp,dx,dy,dz);
+            dataset.addElement(data);
         }
         
         //update currentTime variable
         Global.currentTimeLock.writeLock().lock();
         try{
             Global.currentTime = timeStamp;
-        }
-        finally{
+        } finally{
             Global.currentTimeLock.writeLock().unlock();
         }
         
@@ -383,13 +382,15 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     
     
     /**
-     * Process telemetry data sent by remote SPOT. 
+     * Process telemetry data sent by remote SPOT.
      * Pass the data gathered to the GraphView to be displayed.
      *
      * @param dg the packet containing the accelerometer data
      * @param twoG the scale that was used to collect the data (true = 2G, false = 6G)
+     *
+     * @return array that contains all the telemetry data
      */
-    private double[] receive (Datagram dg, boolean twoG) {
+    private double[] receive(Datagram dg, boolean twoG) {
         boolean skipZeros = (index == 0);
         double returnVals[] = new double[5];
         int scale = twoG ? 0 : 1;
@@ -406,34 +407,34 @@ public class AccelerometerListener extends Thread implements PacketTypes {
             for (int i = 0; i < sampleSize; i++) {
                 int deltaT = dg.readShort();
                 long sampleTime = timeStamp + (deltaT & 0x0ffffL);
-               
+                
                 int xValue = dg.readShort();
                 int yValue = dg.readShort();
                 int zValue = dg.readShort();
                 
                 if (skipZeros &&                    // Ignore leading values until they become non-zero
-                    ((Math.abs(xValue - (int)restOffsets[scale][0]) > 20) || 
-                     (Math.abs(yValue - (int)restOffsets[scale][1]) > 20) || 
-                     (Math.abs(zValue - (int)restOffsets[scale][2]) > 20))) {
+                        ((Math.abs(xValue - (int)restOffsets[scale][0]) > 20) ||
+                        (Math.abs(yValue - (int)restOffsets[scale][1]) > 20) ||
+                        (Math.abs(zValue - (int)restOffsets[scale][2]) > 20))) {
                     skipZeros = false;
                     timeStampOffset += sampleTime;
                     timeStamp = -deltaT;
                     sampleTime = 0;
                 }
-
+                
                 if (!skipZeros) {
                     double x  = (xValue - zeroOffsets[scale][0]) / gains[scale][0];        // Convert to G's
                     double y  = (yValue - zeroOffsets[scale][1]) / gains[scale][1];
                     double z  = (zValue - zeroOffsets[scale][2]) / gains[scale][2];
-                    double z_gravity = (zValue - zeroOffsets[scale][2]) / gains[scale][2] + 1.0;                
+                    double z_gravity = (zValue - zeroOffsets[scale][2]) / gains[scale][2] + 1.0;
                     double g = Math.sqrt(x*x + y*y + z*z);      // Square vector of the total Gs
-                    double g_gravity = Math.sqrt(x*x + y*y + z_gravity*z_gravity);     
+                    double g_gravity = Math.sqrt(x*x + y*y + z_gravity*z_gravity);
                     returnVals[0]=x;
                     returnVals[1]=y;
                     returnVals[2]=z-1;
                     returnVals[3]=g;
                     returnVals[4]=sampleTime;
-
+                    
                     
 //                    // Do the Kalman Filtering
 //                    double Q = 0.00001; // 10^-5
@@ -441,9 +442,9 @@ public class AccelerometerListener extends Thread implements PacketTypes {
 //                    double K = 0;
 //                    double cov_priori = 0;
 //                    double sample_priori = 0;
-//                    
+//
 //                    y = x;
-//                    
+//
 //                    // For X
 //                      R = 0.241935482;
 //                    //R = 0.049450549;
@@ -458,8 +459,8 @@ public class AccelerometerListener extends Thread implements PacketTypes {
 //                    yDataX_KF[index] = sample_priori + (K * (x - sample_priori));
 //                    yDataX_KF_Cov[index] = (1-K) * cov_priori;
 //                    x = yDataX_KF[index];
-//                    
-//                    
+//
+//
 //                     // For Y
 //                      R = 0.102150537;
 //                    //R = 0.049450549;
@@ -474,7 +475,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
 //                    yDataY_KF[index] = sample_priori + (K * (x - sample_priori));
 //                    yDataY_KF_Cov[index] = (1-K) * cov_priori;
 //                    //y = yDataY_KF[index];
-//                    
+//
 //                     // For Z
 //                        R = 0.016129032;
 //                    //R = 0.049450549;
@@ -495,11 +496,11 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                     
                     //if(g>1.3){
                     //   graphView.takeData(address, sampleTime, index, x, y, z, g, twoG);
-                       recognize(returnVals); //this weird statement here makes the program work
-                       debug("*** " + x + y + z);
+                    recognize(returnVals); //this weird statement here makes the program work
+                    debug("*** " + x + y + z);
                     //}
                     //else
-                     //  graphView.takeData(address,sampleTime,index,0,0,0,0,twoG);
+                    //  graphView.takeData(address,sampleTime,index,0,0,0,0,twoG);
                     index++;
                 }
             }
@@ -508,7 +509,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
         }
         return returnVals; //if you don't return anything, the program breaks. This is a very weird issue.
     }
-
+    
 //    private void setGOffsets() {
 //        if (graphView != null) {
 //            int scale = is2GScale() ? 0 : 1;
@@ -521,7 +522,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     /**
      * Broadcast that the host display server is (re)starting.
      */
-    private void announceStarting () {
+    private void announceStarting() {
         DatagramConnection txConn = null;
         try {
             txConn = (DatagramConnection)Connector.open("radiogram://broadcast:" + CONNECTED_PORT);
@@ -533,7 +534,7 @@ public class AccelerometerListener extends Thread implements PacketTypes {
             ex.printStackTrace();
         } finally {
             try {
-                if (txConn != null) { 
+                if (txConn != null) {
                     txConn.close();
                 }
             } catch (IOException ex) { /* ignore */ }
@@ -543,14 +544,14 @@ public class AccelerometerListener extends Thread implements PacketTypes {
     /**
      * Wait for a remote SPOT to request a connection.
      */
-    private void waitForSpot () {
+    private void waitForSpot() {
         RadiogramConnection rcvConn = null;
         DatagramConnection txConn = null;
         spotAddress = 0;
         try {
             rcvConn = (RadiogramConnection)Connector.open("radiogram://:" + BROADCAST_PORT);
             rcvConn.setTimeout(10000);             // timeout in 10 seconds
-            Datagram dg = rcvConn.newDatagram(rcvConn.getMaximumLength());      
+            Datagram dg = rcvConn.newDatagram(rcvConn.getMaximumLength());
             while (true) {
                 try {
                     dg.reset();
@@ -578,16 +579,16 @@ public class AccelerometerListener extends Thread implements PacketTypes {
             ex.printStackTrace();
         } finally {
             try {
-                if (rcvConn != null) { 
+                if (rcvConn != null) {
                     rcvConn.close();
                 }
-                if (txConn != null) { 
+                if (txConn != null) {
                     txConn.close();
                 }
             } catch (IOException ex) { /* ignore */ }
         }
     }
-
+    
     /**
      * Main receive loop. Receive a packet sent by remote SPOT and handle it.
      */
@@ -688,19 +689,19 @@ public class AccelerometerListener extends Thread implements PacketTypes {
                         debug("in finally");
                         connected = false;
                         updateConnectionStatus(connected);
-                        if (conn != null) { 
+                        if (conn != null) {
                             xdg.reset();
                             xdg.writeByte(DISPLAY_SERVER_QUITTING);        // packet type
                             conn.send(xdg);                                // broadcast it
                             conn.close();
                             conn = null;
-
-                                   
+                            
+                            
                         }
                     } catch (IOException ex) { /* ignore */ System.out.println(ex);}
                 }
             }
         }
     }
-
+    
 }

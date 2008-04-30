@@ -30,12 +30,18 @@ public class BasicGestureClassifier extends Thread{
         latestBasicGestureTimestamp = 0;
         serviceMode = false;
     }
+    /** Creates a new instance of BasicGestureClassifie */
+    /*  @param serviceMode true if SunFlare is running as a standalone service, false if it is running GestureCreatorGUI
+     */
     public BasicGestureClassifier(boolean serviceMode) {
         currentTime = 0;
         basicGesturesIndex = 0;
         latestBasicGestureTimestamp = 0;
         this.serviceMode = serviceMode;
     }
+    /**
+     * Determines if the movement that the user made is ready to be classified. If so, it makes a call to classifyBasicGesture
+     */
     public void classifier(){
         Global.basicGesturesLock.writeLock().lock();
         try{
@@ -58,8 +64,11 @@ public class BasicGestureClassifier extends Thread{
         }
         
     }
-    
-    public int leftOrRight(BasicGesture g){
+    /** Determines what BasicGesture it is
+     * @param g BasicGesture that is being classified
+     * @return Integer representation of Left or Right
+     */
+    private int leftOrRight(BasicGesture g){
         Vector dataset = g.getDataset();
         double max = -1000, min = 1000;
         int maxIndex = -1, minIndex = -1;
@@ -84,7 +93,11 @@ public class BasicGestureClassifier extends Thread{
         
         
     }
-    public int forwardOrBackward(BasicGesture g){
+    /** Determines what BasicGesture it is
+     * @param g BasicGesture that is being classified
+     * @return Integer representation of Forward or Backward
+     */
+    private int forwardOrBackward(BasicGesture g){
         Vector dataset = g.getDataset();
         double max = -1000, min = 1000;
         int maxIndex = -1, minIndex = -1;
@@ -111,7 +124,11 @@ public class BasicGestureClassifier extends Thread{
         
         
     }
-    public int upOrDown(BasicGesture g){
+    /** Determines what BasicGesture it is
+     * @param g BasicGesture that is being classified
+     * @return Integer representation of Up or Down
+     */
+    private int upOrDown(BasicGesture g){
         Vector dataset = g.getDataset();
         double max = -1000, min = 1000;
         int maxIndex = -1, minIndex = -1;
@@ -138,11 +155,19 @@ public class BasicGestureClassifier extends Thread{
         
         //debug("minT/" + ((DataStruct)dataset.elementAt(minIndex)).getTimeStamp() + " maxT/" + ((DataStruct)dataset.elementAt(maxIndex)).getTimeStamp());
     }
-    public int shake(){
+    /** Returns the integer representation of the Shake movement
+     * @return Integer representation of Shake
+     */
+    private int shake(){
         debug("Shake");
         return Global.SHAKE;
     }
-    public void classifyBasicGesture(BasicGesture bg){
+    
+    
+    /** Classify a BasicGesture as one of the defined movements
+     * @param bg The BasicGesture that is in question
+     */
+    private void classifyBasicGesture(BasicGesture bg){
         int thisBasicGesture = 0;
         if(bg.getActiveAxis().equals("x"))
             thisBasicGesture = leftOrRight(bg);
@@ -154,14 +179,6 @@ public class BasicGestureClassifier extends Thread{
             thisBasicGesture = shake();
         }
         bg.setID(thisBasicGesture);
-        /*******************old code needs to be deleted*************************/
-//        Global.gestureLock.writeLock().lock();
-//        try{
-//            Global.gesture.addBasicGesture(thisBasicGesture);
-//        } finally{
-//            Global.gestureLock.writeLock().unlock();
-//        }
-        /**************************end old code***********************************/
         
         Global.gesturesLock.writeLock().lock();
         try{
@@ -173,7 +190,7 @@ public class BasicGestureClassifier extends Thread{
                 Gesture newGesture = new Gesture(bg);
                 Global.gestures.addElement(newGesture);
                 //if(!serviceMode)
-                    //Global.mainWindow.clearGestureBoxes();
+                //Global.mainWindow.clearGestureBoxes();
             }
             //add it to the latest gesture
             else{
@@ -190,6 +207,7 @@ public class BasicGestureClassifier extends Thread{
         }
         
         //classifiedBasicGestures is for the Controller thread
+        /*
         Global.classifiedBasicGesturesLock.writeLock().lock();
         try{
             Global.classifiedBasicGestures.addElement(bg);
@@ -197,14 +215,16 @@ public class BasicGestureClassifier extends Thread{
             Global.classifiedBasicGesturesLock.writeLock().unlock();
         }
         
-        
+        */
         
         //update GUI's movement box
         
         
         
     }
-    public void updateCurrentTimeStamp(){
+    /** Sync timestamp with global timestamp
+     */
+    private void updateCurrentTimeStamp(){
         Global.currentTimeLock.writeLock().lock();
         try{
             currentTime = Global.currentTime;
@@ -212,17 +232,22 @@ public class BasicGestureClassifier extends Thread{
             Global.currentTimeLock.writeLock().unlock();
         }
     }
+    /** Clears private data
+     */
     public void clear() {
         // clear private data
         basicGesturesIndex = 0;
         latestBasicGestureTimestamp = 0;
     }
+    /** Runs the thread
+     */
     public void run() {
         debug("BasicGestureClassifier Thread started ...");
         hostLoop();
     }
-    
-    //main loop
+   
+    /** Main loop
+     */
     public void hostLoop(){
         running = true;
         while(running)
@@ -232,10 +257,15 @@ public class BasicGestureClassifier extends Thread{
                 debug(e.toString());
             }
     }
+    /** Kills thread
+     */
     public void doQuit(){
         running = false;
     }
-    public void debug(String s){
+    /** Prints debugging statents
+     * @param the debugging string
+     */
+    private void debug(String s){
         if(debug)
             System.out.println("BasicGestureClassifier: "+s);
     }

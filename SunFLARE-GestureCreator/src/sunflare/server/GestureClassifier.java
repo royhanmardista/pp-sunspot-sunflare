@@ -28,16 +28,18 @@ public class GestureClassifier extends Thread{
         serviceMode = false;
         this.pLayer = null;
     }
+    /** Creates a new instance of GestureClassifier */
     public GestureClassifier(PluginLayer pLayer){
         this.pLayer = pLayer;
         this.serviceMode = true;
     }
-    
+    /** Looks for the Gesture in the database.  If it is in service mode, it also executes the plugin
+     */
     public void classifyGesture(Gesture gesture){
         PluginRef p;
         Global.gestureDBLock.writeLock().lock();
         try{
-            gesture.scan();
+            gesture.scan(); //mark this gesture as scanned
         } finally{
             Global.gestureDBLock.writeLock().unlock();
         }
@@ -51,27 +53,20 @@ public class GestureClassifier extends Thread{
                 debug("Gesture not found");
             }
         }
-        
-        /*
-        if(p!=null){
-            debug("Gesture found: " + p.getName()+ " " + p.getActionDescription());
-        } else{
-            debug("Gesture not found");
-        }
-         */
-        
-        // since the classified is always the first one in the gestures vector, it is safe to remove it from the vector
+
+        // remove it from the vector
         if(serviceMode){
-        Global.gesturesLock.writeLock().lock();
-        try{
-            Global.gestures.removeElement(gesture);
-            //Global.gestures.removeElementAt(0);
-        }finally{
-            Global.gesturesLock.writeLock().unlock();
-        }
+            Global.gesturesLock.writeLock().lock();
+            try{
+                Global.gestures.removeElement(gesture);
+            }finally{
+                Global.gesturesLock.writeLock().unlock();
+            }
         }
     }
     
+    /** Classifies a not-yet-been classified Gesture if it is completed
+     */
     public void classifier(){
         //get current time
         double currentTime;
@@ -97,15 +92,17 @@ public class GestureClassifier extends Thread{
         }
         
     }
+    /** Clears private data*/
     public void clear() {
         // clear private data
     }
+    /** Runs the thread*/
     public void run() {
         System.out.println("GestureClassifier Thread started ...");
         hostLoop();
     }
     
-    //main loop
+    /** Main loop*/
     public void hostLoop(){
         running = true;
         while(running)
@@ -115,9 +112,13 @@ public class GestureClassifier extends Thread{
                 System.out.println(e);
             }
     }
+    
+    /** Kills thread*/
     public void doQuit(){
         running = false;
     }
+    /** Prints debugging statements
+     */
     public void debug(String s){
         if(debug)
             System.out.println("GestureClassifier: "+s);
