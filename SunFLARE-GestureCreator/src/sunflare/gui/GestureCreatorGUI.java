@@ -1,10 +1,8 @@
 /**
  * GestureCreatorGUI.java
  *
- * Created on April 23, 2008, 10:58 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * Contains code for the gesture creator gui
+ * Includes: GestureCreatorGUI
  */
 
 package sunflare.gui;

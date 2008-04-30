@@ -13,7 +13,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 /**
- *
+ * A JPanel where visual gestures will be drawn
  * @author Sean
  */
 public class GestureDrawingPanel  extends JPanel {
@@ -39,6 +39,9 @@ public class GestureDrawingPanel  extends JPanel {
     private BufferedImage imageArrowBackward;
     private BufferedImage imageShake;
  
+    /**
+     * Creates a new panel and loads all the images
+     */
     public GestureDrawingPanel() throws IOException {
         gestureImage = null;
         gestureID = INVALID_GESTURE_ID;
@@ -67,6 +70,9 @@ public class GestureDrawingPanel  extends JPanel {
         imageArrowBackward = ImageIO.read(new File(path));
     }
  
+    /**
+     * Paints the gesture images onto the panel
+     */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         
@@ -82,6 +88,10 @@ public class GestureDrawingPanel  extends JPanel {
         }
     }
     
+    /**
+     * Sets the gesture to be displayed
+     * @param gesture to be displayed
+     */
     public void setGesture(int id)
     {
         if (id <= INVALID_GESTURE_ID || id > MAX)
@@ -126,6 +136,10 @@ public class GestureDrawingPanel  extends JPanel {
         repaint();
     }
     
+    /**
+     * Returns gesture currently being displayed
+     * @return gesture being displayed
+     */
     public int getID()
     {
         return gestureID;
