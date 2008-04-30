@@ -28,13 +28,18 @@ public class LeftMove implements Plugin{
     }
     
     public void fireCallBack(Gesture g) {
-            System.out.println("Plugin 1 fired callback");
+            System.out.println("Left Move fired callback");
        try {
             Robot robot = new Robot();
             // Creates the delay of 5 sec so that you can open notepad before
             // Robot start writting
-            robot.delay(5000);
-            robot.mouseMove(400, 500);
+            // robot.delay(5000);
+            
+            for(int x = 500; x >= 200; x--){
+                robot.delay(20);
+                robot.mouseMove(x, 500);
+            }     
+            robot.keyPress(KeyEvent.VK_CONTROL);
         } catch (AWTException e) {
             e.printStackTrace();
         }

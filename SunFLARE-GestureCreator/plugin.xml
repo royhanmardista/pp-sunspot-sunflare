@@ -6,4 +6,5 @@
   <plugin name="down" app="mousecontroller" class="sunflare.examples.plugins.DownMove" desc="Mouse Down Move" />
   <plugin name="left" app="mousecontroller" class="sunflare.examples.plugins.LeftMove" desc="Mouse Left Move" />  
   <plugin name="right" app="mousecontroller" class="sunflare.examples.plugins.RightMove" desc="Mouse Right Move" />  
+  <plugin name="write" app="mousecontroller" class="sunflare.examples.plugins.WriteMove" desc="Write" />  
 </plugins>

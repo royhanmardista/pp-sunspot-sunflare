@@ -28,13 +28,17 @@ public class UpMove implements Plugin{
     }
     
     public void fireCallBack(Gesture g) {
-            System.out.println("Plugin 1 fired callback");
+            System.out.println("Up Move fired callback");
        try {
             Robot robot = new Robot();
             // Creates the delay of 5 sec so that you can open notepad before
             // Robot start writting
-            robot.delay(5000);
-            robot.mouseMove(500, 600);
+            // robot.delay(5000);
+            for(int y = 500; y >= 200; y-- ){
+                robot.delay(20);
+                robot.mouseMove(500, y);
+            }            
+            robot.keyPress(KeyEvent.VK_CONTROL);
         } catch (AWTException e) {
             e.printStackTrace();
         }
