@@ -8,12 +8,16 @@
  */
 
 package sunflare.persistence;
+import com.sun.squawk.io.BufferedWriter;
+import java.io.IOException;
 import java.util.*;
 import sunflare.plugin.PluginRef;
 import sunflare.server.*;
 import java.util.Iterator;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
+import java.io.FileWriter;
+
 
 
 /**
@@ -22,6 +26,7 @@ import org.hibernate.cfg.Configuration;
  */
 public class GestureDatabase {
     Vector definedGestures = new Vector();
+    BufferedWriter out;
     /** Creates a new instance of GestureDatabase */
     public GestureDatabase() {
         PluginRef plugin;
@@ -61,7 +66,6 @@ public class GestureDatabase {
         g.setPlugin(plugin);
         g.addBasicGesture(new BasicGesture(Global.SHAKE));
         definedGestures.addElement(g);
-        
         
     }
     
@@ -235,8 +239,34 @@ public class GestureDatabase {
     {
 	Session session = PersistentGestureUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        PersistentGesture gesture = new PersistentGesture(g);
-        session.save( gesture );        
+        PersistentGesture persistentGesture = new PersistentGesture(g);
+        // Write to file 
+       try {
+            System.out.println("GestureDatabase : Writing to file");
+            out = new BufferedWriter(new FileWriter("database.txt",true));
+//            out.write("My here");
+//            out.write("My here");
+//            System.out.println(gesture.getAction());
+//            System.out.println(gesture.getPluginRef());
+//            System.out.println(gesture.getMovment1());
+//            System.out.println(gesture.getMovment2());
+//            System.out.println(gesture.getMovment3());
+//            out.write(gesture.getAction());
+            out.write(persistentGesture.getAction());
+            out.write(" ");
+            out.write(persistentGesture.getPluginRef());
+            out.write(" ");
+            out.write('0' + persistentGesture.getMovment1());
+            out.write(" ");
+            out.write('0' + persistentGesture.getMovment2());
+            out.write(" ");
+            out.write('0' + persistentGesture.getMovment3());
+            out.write("\n");
+            out.close();
+        } catch (IOException e) {
+            System.out.println("GestureDatabase : File IO Exception");
+        }
+        session.save( persistentGesture );        
         session.getTransaction().commit();
     }
 }

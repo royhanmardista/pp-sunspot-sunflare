@@ -45,7 +45,7 @@ public class PersistentGesture {
             movment3 = ((BasicGesture)basicGestures.elementAt(2)).getID();              
        }
        pluginRef = g.getPlugin().getName();
-       action = g.getPlugin().getActionDescription();
+       action = g.getPlugin().getDescription();
        
    }
        
