@@ -14,7 +14,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 
-
+/**
+ * Utilities for interacting with XML files
+ */
 public final class XMLUtils {
 
   private XMLUtils() throws InstantiationException {
