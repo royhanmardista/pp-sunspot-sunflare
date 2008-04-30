@@ -8,13 +8,18 @@ import org.w3c.dom.Node;
 
 import sunflare.plugin.PluginRef;
 
-
+/**
+ * Utility for creating PluginRef's from the XML file
+ */
 public final class XMLStructFactory {
 
 	private XMLStructFactory() throws InstantiationException {
 	    throw new InstantiationException("Don't instantiate XML Struct Factories!");
 	}
 
+        /**
+         * Static function to retrieve a PluginRef
+         */
 	public static PluginRef getPluginRefs(Node node) {
 	    Element pluginNodeRoot = (Element) node;
 
