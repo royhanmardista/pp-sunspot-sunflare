@@ -49,6 +49,7 @@ public class BasicGestureClassifier extends Thread{
                         currentTime > (((DataStruct)dataset.lastElement()).getTimeStamp() + IDLE_TIME)) {
                     classifyBasicGesture(g);
                     basicGesturesIndex++;
+                    System.out.println("Some movement performed");
                     //Global.mainWindow.setGesture(basicGesturesIndex-1,g.getID());
                 }
             }

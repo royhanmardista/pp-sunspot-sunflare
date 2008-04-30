@@ -10,7 +10,7 @@
 package sunflare.server;
 
 /**
- *
+ * Holds data received from the SunSPOT
  * @author Winnie
  */
 public class DataStruct {
@@ -34,7 +34,17 @@ public class DataStruct {
         dy = 0;
         dz = 0;
     }
-    
+    /**
+     * Creates new DataStruct with specified data
+     * @param xg acceleration along the x-axis
+     * @param yg acceleration along the y-axis
+     * @param zg acceleration along the z-axis
+     * @param tg total gravity acting on the sunspot
+     * @param time timestamp of the data
+     * @param d_x no longer used
+     * @param d_y no longer used
+     * @param d_z no longer used 
+     */
     public DataStruct(double xg, double yg, double zg, double tg, double time, double d_x, double d_y, double d_z){
         x = xg;
         y = yg;
@@ -46,12 +56,24 @@ public class DataStruct {
         dz = d_z;
     }
     
+    /**
+     * Returns acceleration along x-axis
+     * @return acceleration along x-axis
+     */
     public double getX(){
         return x;
     }
+    /**
+     * Returns acceleration along y-axis
+     * @return acceleration along y-axis
+     */
     public double getY(){
         return y;
     }
+    /**
+     * Returns acceleration along z-axis
+     * @return acceleration along z-axis
+     */
     public double getZ(){
         return z;
     }
@@ -69,13 +91,26 @@ public class DataStruct {
     public double getDz(){
         return dz;
     }
+    
+    /**
+     * Returns total gravity acting on sunspot
+     * @return total gravity
+     */
     public double getTotalG(){
         return totalG;
     }
+    /**
+     * Returns the timestamp of this data
+     * @return timestamp
+     */
     public double getTimeStamp(){
         return timeStamp;
     }
     
+    /**
+     * Sets the axis that is inactive
+     * @param axis name of the axis
+     */
     public void setInactiveAxis(String axis){
         inactiveAxis = new String(axis);
     }
