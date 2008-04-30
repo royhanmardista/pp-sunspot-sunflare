@@ -26,6 +26,12 @@ public class PluginRef {
 
     }
 
+    /** Creates a PluginRef with specified parameters
+     * @param name name of the plugin
+     * @param application name of the application
+     * @param description description of the plugin
+     * @param classpath location of the class
+     */
     public PluginRef(String name, String application, String description, String classpath){
         this.name = name;
         this.application = application;
@@ -33,18 +39,28 @@ public class PluginRef {
         this.classpath = classpath;
     }
 
+    /**
+     * Gets name of the application
+     * @return name of the application
+     */
    public String getApplication() {
 	   return application;
    }
-   
+   /**
+    * Gets the class path
+    * @return class path of the plugin
+    */
    public String getClassPath(){
 	   return classpath;
    }
-   
+   /**
+    * Sets the name of the application
+    * @param application name of the application
+    */
    public void setApplication(String application) {
 	   this.application = application;
    }
-      
+
     public String getActionDescription() {
         return actionDescription;
     }
@@ -57,6 +73,11 @@ public class PluginRef {
         name = pluginName;
         actionDescription = action;
     }*/
+    /**
+     * Creates a new plugin with the specified parameters
+     * @param application name of the application
+     * @param description of the plugin
+     */
      public PluginRef(String application, String description){
         this.application = application;
         this.description = description;
@@ -64,6 +85,10 @@ public class PluginRef {
         this.actionDescription = description;
     }
 
+     /**
+      * Gets the name of the plugin
+      * @return name of the plugin
+      */
     public String getName() {
         return name;
     }
@@ -71,11 +96,17 @@ public class PluginRef {
     public void setActionDescription(String actionDescription) {
         this.actionDescription = actionDescription;
     }
-
+    /**
+     * Sets the name of the plugin
+     * @param name name of the plugin
+     */
     public void setName(String name) {
         this.name = name;
     }
-    
+    /**
+     * Sets the class path of the plugin
+     * @param classpath class path of the plugin
+     */
    public void setClassPath(String classpath){
 	   this.classpath = classpath;
    }

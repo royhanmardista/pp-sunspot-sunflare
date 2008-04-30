@@ -23,6 +23,7 @@ public class PluginLayer {
     private PluginFactory _PF;
     private Vector<PluginRef> pluginRefs;
     private HashMap<String,Plugin> myPlugins;
+    private GestureListener gestureListener;
     
     private static FileFilter pluginXmlFilter = new FileFilter() {
         public boolean accept(File pathname) {
@@ -35,6 +36,35 @@ public class PluginLayer {
         _PF = new PluginFactory();
         pluginRefs = new Vector<PluginRef>();
         myPlugins = new HashMap<String,Plugin>();
+        gestureListener = null;
+        
+        //parse out plugin config file dirs
+                /*String pluginDirUris = System
+                .getProperty("sunflare.plugin.dirs");
+                 
+                List pluginDirList = null;
+                if (pluginDirUris != null) {
+                        String[] dirUris = pluginDirUris.split(",");
+                        pluginDirList = Arrays.asList(dirUris);
+                }*/
+        
+        //load plugin refs from the xml files
+        //loadPluginInfo(pluginDirList);
+        
+        loadPluginInfo();
+        //load the plugins via the factory
+        for(int i=0;i<pluginRefs.size();i++){
+            Plugin plugin = _PF.getPluginFromFactory(pluginRefs.get(i).getClassPath());
+            myPlugins.put(pluginRefs.get(i).getName(), plugin);
+        }
+    }
+    
+    public PluginLayer(GestureListener gl){
+        
+        _PF = new PluginFactory();
+        pluginRefs = new Vector<PluginRef>();
+        myPlugins = new HashMap<String,Plugin>();
+        gestureListener = gl;
         
         //parse out plugin config file dirs
                 /*String pluginDirUris = System
@@ -66,8 +96,16 @@ public class PluginLayer {
     }
     
     public void executePlugin(String pluginName, Gesture gesture){
-        Plugin p = myPlugins.get(pluginName);
-        p.fireCallBack(gesture);
+        if (gestureListener == null) {
+            Plugin p = myPlugins.get(pluginName);
+            p.fireCallBack(gesture);
+        }
+        else {
+            System.out.println("action performed in executePlugin()");
+            GestureEvent ge = new GestureEvent();
+            ge.setGesture(gesture);
+            gestureListener.actionPerformed(ge);
+        }
     }
     
     
